@@ -1,12 +1,14 @@
 # 2800-202410-BBY13
-
+* Team Name: BBY-13
 ## 1. Project Description
 
 
 ## 2. Names of Contributors
-* ...
-* ...
-* ...
+* Phyo
+* Richard 
+* Kyle
+* Dina 
+* Yerin
 	
 ## 3. Technologies and Resources Used
 List technologies (with version numbers), API's, icons, fonts, images, media or data sources, and other resources that were used.
