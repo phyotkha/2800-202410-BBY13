@@ -1,14 +1,14 @@
 # 2800-202410-BBY13
-
+* Team Name: BBY-13
 ## 1. Project Description
 Our project, BBY-13, is developing BCIT ChatBot, an AI chatBot to help students in their academic journey by solving problems, such as having difficulty finding information, contacting supports, and etc with integrating the school’s data, offering real-time insight into courses, availability, and provide technical support 24/7.
 
 ## 2. Names of Contributors
-* Kyle
 * Phyo
-* Dina
+* Richard 
+* Kyle
+* Dina 
 * Yerin
-* Richard
 	
 ## 3. Technologies and Resources Used
 List technologies (with version numbers), API's, icons, fonts, images, media or data sources, and other resources that were used.
