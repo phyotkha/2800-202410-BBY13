@@ -1,0 +1,35 @@
+<%- include("templates/header") %>
+    <div class="container"><br>
+        <ul class="nav nav-pills nav-justified mb-3" id="ex1" role="tablist">
+            <li class="nav-item" role="presentation">
+                <a class="nav-link active" id="tab-login" data-mdb-pill-init href="/login" role="tab"
+                    aria-controls="pills-login" aria-selected="true">Login</a>
+            </li>
+            <li class="nav-item" role="presentation">
+                <a class="nav-link" id="tab-register" data-mdb-pill-init href="/signup" role="tab"
+                    aria-controls="pills-register" aria-selected="false">Register</a>
+            </li>
+        </ul>
+        <main class="form-signin w-80 m-auto">
+            <form action="/loginSubmit" method="post">
+                <div class="form-floating">
+                    <input name="email" type="email" class="form-control" id="floatingInput" placeholder="email">
+                    <label for="floatingInput">Email address</label>
+                </div>
+                <div class="form-floating">
+                    <input name="password" type="password" class="form-control" id="floatingPassword"
+                        placeholder="Password">
+                    <label for="floatingPassword">Password</label>
+                </div>
+                <div class="form-check text-start my-3">
+                    <input class="form-check-input" type="checkbox" value="remember-me" id="flexCheckDefault">
+                    <label class="form-check-label" for="flexCheckDefault">
+                        Remember me
+                    </label>
+                </div>
+                <button class="btn btn-primary w-80 py-1" type="submit">Sign in</button>
+            </form>
+        </main>
+    </div>
+
+<%- include("templates/footer") %>
