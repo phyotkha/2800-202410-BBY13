@@ -295,3 +295,7 @@ const coursesSchema = new mongoose.Schema({
 
 module.export = mongoose.model("courses", coursesSchema);
 */
+
+/* DINA'S CODE (TO BE REVIEWED - DATABASE RELATED)
+require('./database/databaseConnection'); 
+*/
