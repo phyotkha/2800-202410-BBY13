@@ -49,3 +49,4 @@ db.createView("test", "courseInstructor", [
       }
   }
 ]);
+require('./database/databaseConnection'); 
