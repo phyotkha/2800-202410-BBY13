@@ -27,7 +27,7 @@ const mongodb_session_secret = process.env.MONGODB_SESSION_SECRET;
 const node_session_secret = process.env.NODE_SESSION_SECRET; 
 /* secret info end */
 
-var { database } = include("./scripts/databaseConnection");
+var { database } = include("scripts/databaseConnection");
 
 const userCollection = database.db(mongodb_database).collection("users");
 
@@ -36,8 +36,8 @@ app.set('view engine', 'ejs');
 const navLinks = [
     { name: "Program & Courses", link: "/p&g" },
     { name: "Admission", link: "/admission" },
-    { name: "Student Services", link: "/stu" },
-    { name: "Logout", link: "/logout" }
+    { name: "Student Services", link: "/stuServices" },
+    { name: "Contact Us", link: "/contact" }
 ];
 
 // middleware so we don't need to add these navlinks/url params into everything
@@ -99,6 +99,21 @@ function adminAuthorization(req, res, next) {
         next();
     }
 }
+
+app.get("/", async (req, res) => {
+    console.log(req.url);
+    console.log(url.parse(req.url).pathname);
+    var username = req.session.username;
+    //if already have a session with user
+    if (username) {
+        res.render("loggedin", { users: username });
+        return;
+    }
+    //if no user found 
+    res.render("notloggedin");
+    return;
+});
+
 
 // to prevent nosql injection attacks
 app.get("/nosql-injection", async (req, res) => {
@@ -179,7 +194,7 @@ app.post("/signupSubmit", async (req, res) => {
     console.log("Inserted user");
     req.session.authenticated = true;
     req.session.username = username;
-    req.session.user_role = "user";
+    req.session.user_role = "student";
     req.session.cookie.maxAge = expireTime;
     res.redirect('/members');
     return;
@@ -203,7 +218,7 @@ app.post("/loginSubmit", async (req, res) => {
         return;
     }
 
-    // check for matching email in db
+    // check for matching email in db b/c emails r more unique
     const userData = await userCollection.findOne({ email });
     if (!userData) {
         console.log("Email not found");
@@ -240,4 +255,33 @@ app.get("/logout", async (req, res) => {
     console.log("session destroyed");
     // clear current session & redirect home
     res.redirect("/");
+});
+
+app.get('/admin', sessionValidation, adminAuthorization, async (req, res) => {
+    // username: 1 and id: 1 is what columns i want back
+    const result = await userCollection.find().project({ username: 1, user_role: 1, _id: 1 }).toArray();
+    const updateStatus = req.query.updateStatus;
+
+    res.render("admin", { users: result, updateStatus: updateStatus });
+});
+
+// updates user role w/ query 
+app.get('/updateStatus', sessionValidation, adminAuthorization, async (req, res) => {
+    const { username, status } = req.query;
+        await userCollection.updateOne(
+            { username: username },
+            { $set: { user_role: status } }
+        );
+        res.redirect(`/admin?updateStatus=${status}`);
+});
+
+app.use(express.static(__dirname + "/public"));
+
+app.get("*", (req, res) => {
+    res.status(404);
+    res.render("404");
+});
+
+app.listen(port, () => {
+    console.log(`Server is running on port ${port}`);
 });

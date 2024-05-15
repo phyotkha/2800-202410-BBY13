@@ -1,0 +1,20 @@
+<%- include("templates/header") %><br>
+<h1>Sign up</h1><br>
+<main class="form-signin w-80 m-auto">
+    <form action = '/signupSubmit' method = 'post'>
+        <div class="form-floating">
+            <input name="username" type="text" class="form-control" id="floatingPassword">
+            <label for="floatingUser">Username</label>
+          </div>
+        <div class="form-floating">
+        <input name="email" type="email" class="form-control" id="floatingInput">
+        <label for="floatingInput">Email address</label>
+      </div>
+      <div class="form-floating">
+        <input name="password" type="password" class="form-control" id="floatingPassword">
+        <label for="floatingPassword">Password</label><br>
+      </div>
+      <button class="btn btn-primary w-80 py-1" type="submit">Submit</button>
+    </form>
+  </main>
+<%- include("templates/footer") %>
