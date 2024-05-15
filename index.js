@@ -34,15 +34,10 @@ const mongodb_database = process.env.MONGODB_DATABASE;
 const mongodb_session_secret = process.env.MONGODB_SESSION_SECRET;
 const node_session_secret = process.env.NODE_SESSION_SECRET; 
 
-<<<<<<< HEAD
 /**
  * Database Connection
  */
 var { database } = include("./scripts/databaseConnection");
-=======
-var { database } = include("scripts/databaseConnection");
-
->>>>>>> login_feature
 const userCollection = database.db(mongodb_database).collection("users");
 
 
@@ -126,13 +121,6 @@ function adminAuthorization(req, res, next) {
     }
 }
 
-<<<<<<< HEAD
-/**
- * Route Definitions
- */
-
-// Route to demonstrate NoSQL injection prevention
-=======
 app.get("/", async (req, res) => {
     console.log(req.url);
     console.log(url.parse(req.url).pathname);
@@ -149,7 +137,6 @@ app.get("/", async (req, res) => {
 
 
 // to prevent nosql injection attacks
->>>>>>> login_feature
 app.get("/nosql-injection", async (req, res) => {
     var username = req.query.user;
 
@@ -252,11 +239,7 @@ app.post("/loginSubmit", async (req, res) => {
         return;
     }
 
-<<<<<<< HEAD
     // Check for matching email in database
-=======
-    // check for matching email in db b/c emails r more unique
->>>>>>> login_feature
     const userData = await userCollection.findOne({ email });
     if (!userData) {
         console.log("Email not found");
@@ -287,7 +270,6 @@ app.get("/logout", async (req, res) => {
     res.redirect("/");
 });
 
-<<<<<<< HEAD
 /**
  * Server
  */
@@ -328,7 +310,7 @@ module.export = mongoose.model("courses", coursesSchema);
 /* DINA'S CODE (TO BE REVIEWED - DATABASE RELATED)
 require('./database/databaseConnection'); 
 */
-=======
+
 app.get('/admin', sessionValidation, adminAuthorization, async (req, res) => {
     // username: 1 and id: 1 is what columns i want back
     const result = await userCollection.find().project({ username: 1, user_role: 1, _id: 1 }).toArray();
@@ -357,4 +339,3 @@ app.get("*", (req, res) => {
 app.listen(port, () => {
     console.log(`Server is running on port ${port}`);
 });
->>>>>>> login_feature
