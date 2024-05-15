@@ -25,3 +25,27 @@ const coursesSchema = new mongoose.Schema({
 });
 
 module.export = mongoose.model("courses", coursesSchema);
+
+db.createView("test", "courseInstructor", [
+  {
+    $lookup:
+    {
+      from: "instructors",
+      localField: "instructorId",
+      foreignField: "instrctorId",
+      as: "courseInstructorDocs"
+    }
+  },
+  {
+    $project:
+      {
+        _id: 0,
+        instructorId: 1,
+        CourseId: 1,
+        CRN: String,
+        courseStart: String,
+        courseEnd: String,
+        location: String
+      }
+  }
+]);
