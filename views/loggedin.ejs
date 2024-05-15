@@ -1,0 +1,9 @@
+<%- include("templates/header") %><br>
+<h1>Hello, <%= users %></h1><br>
+<form action ='/members' method = 'get'>
+    <button class="btn btn-primary rounded-pill px-3" type="submit">Go to Members Area</button>
+</form><br>
+<form action = '/logout' method = 'get'>
+    <button class="btn btn-secondary rounded-pill px-3" type="submit">Logout</button>
+</form>
+<%- include("templates/footer") %>
