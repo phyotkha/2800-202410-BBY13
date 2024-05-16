@@ -7,3 +7,5 @@ openai
 blinker
 protobuf==3.20.3
 cachetools
+langchain-openai
+langchain-community

@@ -1,27 +1,34 @@
 import streamlit as st
 from pymongo import MongoClient
-import urllib,io,json
-from langchain_openai import ChatOpenAI
-from langchain.prompts import PromptTemplate
-from langchain.chains import LLMChain
+import urllib, io, json
+from langchain_community.chat_models.openai import ChatOpenAI
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_core.messages import HumanMessage, SystemMessage
 
-llm=ChatOpenAI(model="gpt-4",temperature=0.0)
-#mongo client
-username="ronidas"
-pwd="YFR85HiZLgqFtbPW"
-client=MongoClient("mongodb+srv://"+urllib.parse.quote(username)+":"+urllib.parse.quote(pwd)+"@cluster0.lymvb.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0")
-db=client["sample_airbnb"]
-collection=db["listingsAndReviews"]
+# Initialize the OpenAI chat model
+llm = ChatOpenAI(model="gpt-4", temperature=0.0)
 
-st.title("talk to MongoDB")
-st.write("ask anything and get answer")
-input=st.text_area("enter your question here")
+# MongoDB client
+username = "ronidas"
+pwd = "YFR85HiZLgqFtbPW"
+client = MongoClient("mongodb+srv://" + urllib.parse.quote(username) + ":" + urllib.parse.quote(pwd) + "@cluster0.lymvb.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0")
+db = client["sample_airbnb"]
+collection = db["listingsAndReviews"]
 
-with io.open("sample.txt","r",encoding="utf-8")as f1:
-    sample=f1.read()
-    f1.close()
+st.title("Talk to MongoDB")
+st.write("Ask anything and get an answer")
+input_text = st.text_area("Enter your question here")
 
-prompt="""
+with io.open("sample.txt", "r", encoding="utf-8") as f1:
+    sample = f1.read()
+
+# prompt=
+
+
+# Define the prompt template
+prompt_template = ChatPromptTemplate.from_messages([
+    SystemMessage(content=
+                  """
         you are a very intelligent AI assitasnt who is expert in identifying relevant questions fro user
         from user and converting into nosql mongodb agggregation pipeline query.
         Note: You have to just return the query as to use in agggregation pipeline nothing else. Don't return any other thing
@@ -130,6 +137,11 @@ _url**: URL of the medium-sized image.
 
 This schema provides a comprehensive view of the data structure for an Airbnb listing in MongoDB, 
 including nested and embedded data structures that add depth and detail to the document.
+"""
+                  ),
+    HumanMessage(content=
+                 """
+
 use the below sample_examples to generate your queries perfectly
 sample_example:
 
@@ -142,22 +154,23 @@ As an expert you must use them whenever required.
 Note: You have to just return the query nothing else. Don't return any additional text with the query.Please follow this strictly
 input:{question}
 output:
-"""
-query_with_prompt=PromptTemplate(
-    template=prompt,
-    input_variables=["question","sample"]
-)
-llmchain=LLMChain(llm=llm,prompt=query_with_prompt,verbose=True)
 
-if input is not None:
-    button=st.button("Submit")
+"""
+                 )
+])
+
+# Chain the prompt and the model
+chain = prompt_template | llm
+
+if input_text:
+    button = st.button("Submit")
     if button:
-        response=llmchain.invoke({
-            "question":input,
-            "sample":sample
+        response = chain.invoke({
+            "question": input_text,
+            "sample": sample
         })
-        query=json.loads(response["text"])
-        results=collection.aggregate(query)
-        print(query)
+        query = json.loads(response.content)
+        results = collection.aggregate(query)
+        st.write("Generated Query:", query)
         for result in results:
             st.write(result)
