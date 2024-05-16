@@ -10,44 +10,44 @@ mongoose
   )
   .then(() => console.log("Connected!"));
 
-const coursesSchema = new mongoose.Schema({
-  CourseID: String,
-  Title: String,
-  School: String,
-  Program: String,
-  CourseCredit: Number,
-  MinimumPassingGrade: String,
-  TotalHours: Number,
-  TotalWeeks: Number,
-  HoursPerWeek: Number,
-  DeliveryType: String,
-  Prerequisites: String,
-  description: String,
-});
+// const coursesSchema = new mongoose.Schema({
+//   CourseID: String,
+//   Title: String,
+//   School: String,
+//   Program: String,
+//   CourseCredit: Number,
+//   MinimumPassingGrade: String,
+//   TotalHours: Number,
+//   TotalWeeks: Number,
+//   HoursPerWeek: Number,
+//   DeliveryType: String,
+//   Prerequisites: String,
+//   description: String,
+// });
 
-module.export = mongoose.model("courses", coursesSchema);
+// module.export = mongoose.model("courses", coursesSchema);
 
-db.createView("test", "courseInstructor", [
-  {
-    $lookup:
-    {
-      from: "instructors",
-      localField: "instructorId",
-      foreignField: "instrctorId",
-      as: "courseInstructorDocs"
-    }
-  },
-  {
-    $project:
-    {
-      _id: 0,
-      instructorId: 1,
-      CourseId: 1,
-      CRN: String,
-      courseStart: String,
-      courseEnd: String,
-      location: String
-    }
-  }
-]);
+// db.createView("test", "courseInstructor", [
+//   {
+//     $lookup:
+//     {
+//       from: "instructors",
+//       localField: "instructorId",
+//       foreignField: "instrctorId",
+//       as: "courseInstructorDocs"
+//     }
+//   },
+//   {
+//     $project:
+//     {
+//       _id: 0,
+//       instructorId: 1,
+//       CourseId: 1,
+//       CRN: String,
+//       courseStart: String,
+//       courseEnd: String,
+//       location: String
+//     }
+//   }
+// ]);
 
