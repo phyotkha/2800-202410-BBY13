@@ -6,7 +6,7 @@ ecommerce_schema = {
         "item_price": {"type": "number"},
         "item_extra_info": {"type": "string"}
     },
-    "required": ["item_title", "item_price", "item_extra_info"],
+    "required": ["item_name", "price", "item_extra_info"],
 }
 
 
