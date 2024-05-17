@@ -1,0 +1,61 @@
+
+[
+  {
+    "instructorId": 1,
+    "first_name": "Thorsten",
+    "last_Name": "Ewald",
+    "email": "Thorsten_Ewald@bcit.ca",
+    "department": "School of Computing and Academic Studies"
+  },
+  {
+    "instructorId": 2,
+    "first_name": "Rahul",
+    "last_Name": "Kukreja",
+    "email": "rkukreja1@bcit.ca",
+    "department": "School of Computing and Academic Studies"
+  },
+  {
+    "instructorId": 3,
+    "first_name": "Simin",
+    "last_Name": "Jolfaee",
+    "email": "Simin_Jolfaee@bcit.ca",
+    "department": "School of Computing and Academic Studies"
+  },
+  {
+    "instructorId": 4,
+    "first_name": "Arron",
+    "last_Name": "Ferguson",
+    "email": "Arron_Ferguson@bcit.ca",
+    "department": "School of Computing and Academic Studies"
+  },
+  {
+    "instructorId": 5,
+    "first_name": "Bruce",
+    "last_Name": "Link",
+    "email": "Bruce_Link@bcit.ca",
+    "department": "School of Computing and Academic Studies"
+  },
+  {
+    "instructorId": 6,
+    "first_name": "Maryam",
+    "last_Name": "Khezrzadeh",
+    "email": "mkhezrzadeh@bcit.ca",
+    "department": "School of Computing and Academic Studies"
+  },
+  {
+    "instructorId": 7,
+    "first_name": "Carly",
+    "last_Name": "Orr",
+    "email": "Carly_Wong_Orr@bcit.ca",
+    "department": "School of Computing and Academic Studies"
+  },
+  {
+    "instructorId": 8,
+    "first_name": "Patrick",
+    "last_Name": "Guichon",
+    "email": "patrick_guichon@bcit.ca",
+    "department": "School of Computing and Academic Studies"
+  }
+]
+
+
