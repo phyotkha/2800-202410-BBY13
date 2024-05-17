@@ -6,38 +6,55 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width = device-width, initial-scale=1.0">
   <title>SchoolScope AI</title>
+  <link href="/bby-13-favicon.ico" rel="icon" type="image/ico">
   <link rel="canonical" href="https://getbootstrap.com/docs/5.3/examples/navbars-offcanvas/">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
   <style>
     /* Modify the background color */
     .navbar-custom {
       background-color: #003C71;
-      opacity: 0.5;
-      filter:(opacity=50);
+      /* opacity: 0.5;
+      filter:(opacity=50); */
     }
+
     /* Modify text color */
     .navbar-custom .navbar-text {
-      color: #003C71;
+      color: 
+      #003C71;
+    }
+    .btn {
+      background-color: #003C71;
+      border-radius: 0;
     }
   </style>
 </head>
 
 <body class="d-flex flex-column vh-100">
   <header class="py-3">
-    <nav class="navbar navbar-custom navbar-expand-md navbar-dark  flex-wrap align-items-center justify-content-center py-3 mb-4 border-bottom fixed-top border-info transparent">
+    <nav
+      class="navbar navbar-custom navbar-expand-md navbar-dark  flex-wrap align-items-center justify-content-center py-3 mb-4 border-bottom fixed-top border-info transparent">
       <div class="container-fluid">
-        <a href="/" class="navbar-brand"><img src="/public/BCIT-logo.png" alt="LOGO"></a>
-        <button class="navbar-toggler collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+        <a href="/homePage" class="navbar-brand"><img src="/navbar-logo-letter.png" alt="Logo" width="55" height="55"></a>
+        <button class="navbar-toggler collapsed" type="button" data-bs-toggle="collapse"
+          data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false"
+          aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>
         </button>
-        <div class="navbar-collapse collapse show" id="navbarCollapse">
-          <ul class="nav px-5 navbar-nav me-auto mb-2 nav-pills nav-fill align-items-center justify-content-center mb-md-0">
+        <div class="navbar-collapse collapse" id="navbarCollapse">
+          <ul
+            class="nav px-5 navbar-nav me-auto mb-2 nav-pills nav-fill align-items-center justify-content-center mb-md-0">
             <% for(var i=0; i<locals.navLinks.length; i++) { %>
-            <li class="nav-item"><a href="<%= locals.navLinks[i].link %>" class="nav-link <% if (locals.navLinks[i].link == locals.currentURL) { %> .nav-underline <% } %>" aria-current="page"><%= locals.navLinks[i].name %></a></li>
-            <% } %>
+              <li class="nav-item"><a href="<%= locals.navLinks[i].link %>"
+                  class="nav-link <% if (locals.navLinks[i].link == locals.currentURL) { %> .nav-underline <% } %>"
+                  aria-current="page">
+                  <%= locals.navLinks[i].name %>
+                </a></li>
+              <% } %>
           </ul>
           <div class="navbar-nav px-0.5 mb-2 align-items-center justify-content-end mb-md-0">
-            <a href='/logout' method='get' class="nav-link"><button type="button" class="btn btn-outline-warning">Logout</button></a>
+            <a href='/logout' method='get' class="nav-link"><button type="button"
+                class="btn btn-outline-warning">Logout</button></a>
           </div>
         </div>
       </div>

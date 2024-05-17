@@ -1,20 +1,52 @@
-<%- include("templates/header") %><br>
-<h1>Sign up</h1><br>
-<main class="form-signin w-80 m-auto">
-    <form action = '/signupSubmit' method = 'post'>
-        <div class="form-floating">
-            <input name="username" type="text" class="form-control" id="floatingPassword">
-            <label for="floatingUser">Username</label>
-          </div>
-        <div class="form-floating">
-        <input name="email" type="email" class="form-control" id="floatingInput">
-        <label for="floatingInput">Email address</label>
+<%- include("templates/header") %>
+  <br><br>
+
+  <form action="/signupSubmit" method="post">
+    <ul class="nav nav-pills nav-justified mb-3" id="ex1" role="tablist">
+      <li class="nav-item" role="presentation">
+        <a class="nav-link" id="tab-login" data-mdb-pill-init href="/login" role="tab" aria-controls="pills-login"
+          aria-selected="true">Login</a>
+      </li>
+      <li class="nav-item" role="presentation">
+        <a class="nav-link active" id="tab-register" data-mdb-pill-init href="/signup" role="tab"
+          aria-controls="pills-register" aria-selected="false"
+          style="background-color: #003C71; border-radius: 0;">Signup</a>
+      </li>
+    </ul>
+    <div class="row">
+      <div class="col">
+        <label>First Name</label>
+        <input name="firstname" type="text" class="form-control" placeholder="First name">
       </div>
-      <div class="form-floating">
-        <input name="password" type="password" class="form-control" id="floatingPassword">
-        <label for="floatingPassword">Password</label><br>
+      <div class="col">
+        <label>Last Name</label>
+        <input name="lastname" type="text" class="form-control" placeholder="Last name">
       </div>
-      <button class="btn btn-primary w-80 py-1" type="submit">Submit</button>
-    </form>
-  </main>
+    </div>
+    <br>
+    <div class="form-group">
+      <label for="exampleInputUsername1">Username</label>
+      <input name="username" type="text" class="form-control" id="exampleInputUsername1" placeholder="Enter username">
+    </div>
+    <br>
+    <div class="form-group">
+      <label for="exampleInputEmail1">Email address</label>
+      <input name="email" type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp"
+        placeholder="Enter email">
+    </div>
+    <br>
+    <div class="form-group">
+      <label for="exampleInputPassword1">Password</label>
+      <input name="password" type="password" class="form-control" id="exampleInputPassword1" placeholder="Password">
+    </div>
+    <br>
+    <button type="submit" class="btn btn-primary">Submit</button>
+  </form>
 <%- include("templates/footer") %>
+
+<!-- <style>
+  .centered-form {
+    width: 700px;
+  }
+</style>
+<div class="container align-items-center centered-form"> </div>  -->
