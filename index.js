@@ -46,10 +46,11 @@ const userCollection = database.db(mongodb_database).collection("users");
 
 // Navigation links array
 const navLinks = [
-  { name: "Program & Courses", link: "/p&g" },
-  { name: "Admission", link: "/admission" },
-  { name: "Student Services", link: "/stuServices" },
-  { name: "Contact Us", link: "/contact" }
+    { name: "Profile", link: "/profile"},
+    { name: "Program & Courses", link: "/p&g" },
+    { name: "Admission", link: "/admission" },
+    { name: "Student Services", link: "/stuServices" },
+    { name: "Contact Us", link: "/contact" }
 ];
 
 /**
@@ -88,7 +89,7 @@ app.use(
 app.use(express.static(__dirname + "/public")); // Serve static files from the "public" directory
 
 /**
- * Middlewares to validate session and admin authorization
+ * Middlewares for session validation and admin authorization
  */
 function isValidSession(req) {
   if (req.session.authenticated) {
@@ -124,146 +125,102 @@ function adminAuthorization(req, res, next) {
   }
 }
 
+/**
+ * Start of Route Definitons
+ */
 app.get("/", async (req, res) => {
-  console.log(req.url);
-  console.log(url.parse(req.url).pathname);
-  var username = req.session.username;
-  //if already have a session with user
-  if (username) {
-    res.render("loggedin", { users: username });
-    return;
-  }
-  //if no user found 
-  res.render("notloggedin");
-  return;
+    res.render("starting-page");
 });
 
-
-// to prevent nosql injection attacks
-app.get("/nosql-injection", async (req, res) => {
-  var username = req.query.user;
-
-  if (!username) {
-    res.send(
-      `<h3>no user provided - try /nosql-injection?user=name</h3> <h3>or /nosql-injection?user[$ne]=name</h3>`
-    );
-    return;
-  }
-  console.log("user: " + username);
-
-  // use Joi to validate and check for valid inputs, and nothing unwanted
-  const schema = Joi.string().max(20).required();
-  const validationResult = schema.validate(username);
-
-  if (validationResult.error != null) {
-    console.log(validationResult.error);
-    res.redirect("/login");
-    return;
-  }
-
-  // 
-  const result = await userCollection
-    .find({ username: username })
-    .project({ username: 1, _id: 1 })
-    .toArray();
-  console.log(result);
-
-  res.send(`<h1>Hello ${username}</h1>`);
-});
-
-// Route to render home page
-app.get('/', (req, res) => {
-  res.render("homepage");
-})
-
-// Route to render signup page
 app.get("/signup", (req, res) => {
-  res.render("signup");
-  return;
+    res.render("signup");
 });
 
-// Route to render login page
 app.get("/login", (req, res) => {
-  res.render("login");
-  return;
+    const invalidPassword = req.query.invalidpassword;
+    const invalidUser = req.query.invaliduser;
+    
+    res.render("login", {invaliduser: invalidUser, invalidpassword: invalidPassword});
 });
 
-// Route to handle signup form submission
 app.post("/signupSubmit", async (req, res) => {
-  const { username, email, password } = req.body;
+    const { firstname, lastname, username, email, password } = req.body;
 
-  const schema = Joi.object({
-    username: Joi.string().alphanum().max(20).required(),
-    email: Joi.string().max(40).required(),
-    password: Joi.string().max(20).required(),
-  });
+    const schema = Joi.object({
+        firstname: Joi.string().alphanum().max(20).required(),
+        lastname: Joi.string().alphanum().max(20),
+        username: Joi.string().alphanum().max(20).required(),
+        email: Joi.string().max(40).required(),
+        password: Joi.string().max(20).required(),
+    });
 
-  const validationResult = schema.validate(req.body);
-  console.log('Valid inputs');
-  if (validationResult.error != null) {
-    console.log(validationResult.error);
-    res.render("signupErr", { error: validationResult.error.details[0].message });
-    return;
-  }
+    const validationResult = schema.validate(req.body);
+    console.log('Valid inputs');
+    if (validationResult.error != null) {
+        console.log(validationResult.error);
+        res.render("signupErr", { error: validationResult.error.details[0].message });
+    }
 
-  // Hash the password
-  var hashedPassword = await bcrypt.hash(password, saltRounds);
+    var hashedPassword = await bcrypt.hash(password, saltRounds);
 
-  // Insert user data into the database
-  await userCollection.insertOne({
-    username: username,
-    email: email,
-    password: hashedPassword,
-    user_role: "student"
-  });
-  console.log("User Inserted to Database (New user created).");
-  req.session.authenticated = true;
-  req.session.username = username;
-  req.session.user_role = "student";
-  req.session.cookie.maxAge = expireTime;
-  res.redirect('/members');
-  return;
+    // Insert user data into the database
+    await userCollection.insertOne({
+        firstname: firstname,
+        lastname: lastname,
+        username: username,
+        email: email,
+        password: hashedPassword,
+    });
+
+    req.session.authenticated = true;
+    req.session.firstname = firstname;
+    req.session.lastname = lastname;
+    req.session.username = username;
+    req.session.email = email;
+    req.session.cookie.maxAge = expireTime;
+    res.redirect('/homePage');
 });
 
 // Route to handle login form submission
 app.post("/loginSubmit", async (req, res) => {
-  const { email, password } = req.body;
+    const { email, password } = req.body;
 
-  const schema = Joi.object({
-    username: Joi.string().username().required(),
-    password: Joi.string().max(20).required(),
-  });
+    const schema = Joi.object({
+        email: Joi.string().email().required(),
+        password: Joi.string().max(20).required(),
+    });
 
-  // Validate input data
-  const validationResult = schema.validate(req.body);
-  if (validationResult.error != null) {
-    console.log(validationResult.error);
-    res.render("loginErr", { error: validationResult.error.details[0].message });
-    return;
-  }
+    // Validate input data
+    const validationResult = schema.validate(req.body);
+    if (validationResult.error != null) {
+        console.log(validationResult.error);
+        res.render("login_error", { error: validationResult.error.details[0].message });
+    }
 
-  // Check for matching email in database
-  const userData = await userCollection.findOne({ email });
-  if (!userData) {
-    console.log("Email not found");
-    res.render("notregis");
-    return;
-  }
+    // Check for matching email in database
+    const userData = await userCollection.findOne({ email });
+    if (!userData) {
+        return res.redirect('/login?invaliduser=1');
+    }
 
-  var isValidPassword = await bcrypt.compare(password, userData.password);
-  if (isValidPassword) {
-    console.log(userData);
-    req.session.authenticated = true;
-    req.session.username = userData.username;
-    req.session.user_role = userData.user_role;
-    req.session.cookie.maxAge = expireTime;
-    res.redirect('/members');
-    return;
-  } else {
-    console.log("Incorrect password");
-    res.render("incorrectpw");
-    return;
-  }
+    var isValidPassword = await bcrypt.compare(password, userData.password);
+    if (isValidPassword) {
+        console.log(userData);
+        req.session.authenticated = true;
+        req.session.email = email;
+        req.session.firstname = userData.firstname;
+        req.session.lastname = userData.lastname;
+        req.session.username = userData.username;
+        req.session.cookie.maxAge = expireTime;
+        return res.redirect('/homePage');
+    } else {
+        return res.redirect('/login?invalidpassword=1');
+    }
+});
+
+
+app.get('/homePage', sessionValidation, async(req, res) => {
+    res.render('homepage');
 });
 
 // Route to handle logout
@@ -273,8 +230,128 @@ app.get("/logout", async (req, res) => {
   res.redirect("/");
 });
 
-// Students router
-app.use("/students", studentsRouter);
+/* Password Reset Routes */
+app.get('/restPasswordRequest', (req, res) => {
+    res.render('reset_password_request');
+});
+
+const crypto = require('crypto');
+const nodemailer = require('nodemailer');
+
+app.post('/sendResetLink', async (req, res) => {
+    const { email } = req.body;
+
+    // Find user by email in the database
+    const user = await userCollection.findOne({ email: email });
+    if (!user) {
+        return res.render("user_not_found");
+    }
+
+    // Generate a unique token and set expiration time for the token
+    const token = crypto.randomBytes(32).toString('hex');
+    const expireTime = Date.now() + 3600000; // Expires in 1 hour
+
+    // Update user document in the database with the token and expiration time
+    await userCollection.updateOne(
+        { email: email },
+        { $set: { resetPasswordToken: token, resetPasswordExpires: expireTime }}
+    );
+
+    // Set up email transporter using nodemailer
+    const transporter = nodemailer.createTransport({
+        service: 'Gmail',
+        auth: {
+            user: process.env.EMAIL,
+            pass: process.env.EMAIL_PASSWORD
+        },
+    });
+
+    // Compose email with password reset link.
+    const mailMessage = {
+        to: email,
+        from: process.env.EMAIL,
+        subject: 'Password Reset',
+        text: `You are receiving this because you (or someone else) have requested the reset of the password for your account.\n\n` +
+              `Please click on the following link, or paste this into your browser to complete the process:\n\n` +
+              `http://${req.headers.host}/resetPassword/${token}\n\n` +
+              `If you did not request this, please ignore this email and your password will remain unchanged. The link will expire in one hour.\n`
+    };
+
+    // Send the email to user
+    transporter.sendMail(mailMessage, (err, info) => {
+        if (err) {
+            console.error(err);
+            res.render('reset_password_request', {message: 'Error sending email. Try Again!'});
+        } else {
+            console.log('Email sent: ' + info.response);
+            res.redirect('/restPasswordRequest');
+        }
+    });
+});
+
+app.get('/resetPassword/:token', async (req, res) => {
+    const { token } = req.params;
+
+    const user = await userCollection.findOne({ resetPasswordToken: token, resetPasswordExpires: { $gt: Date.now() } });
+    if (!user) {
+        return res.render('reset_password_invalid_token');
+    }
+
+    res.render('reset_password', { token: token });
+});
+
+app.post('/resetPassword', async (req, res) => {
+    const { token, password } = req.body;
+
+    const user = await userCollection.findOne({ resetPasswordToken: token, resetPasswordExpires: { $gt: Date.now() } });
+    if (!user) {
+        return res.render('reset_password_invalid_token');
+    }
+
+    const hashedPassword = await bcrypt.hash(password, saltRounds);
+
+    await userCollection.updateOne({ email: user.email }, {
+        $set: { password: hashedPassword },
+        $unset: { resetPasswordToken: "", resetPasswordExpires: "" }
+    });
+
+    res.redirect('/login');
+});
+
+app.get('/profile', sessionValidation, async (req, res) => {
+    const firstname = req.session.firstname;
+    const lastname = req.session.lastname;
+    const username = req.session.username;
+    const email = req.session.email;
+    res.render("user_profile", { firstName: firstname, lastName: lastname, userName: username, emailAddress: email});
+})
+
+app.post('/update-profile', sessionValidation, async (req, res) => {
+    const { firstname, lastname, username, email } = req.body;
+    const user = await userCollection.findOne({ username: username });
+
+    await userCollection.updateOne({ username: user.username}, {
+        $set: {
+            firstname: firstname,
+            lastname: lastname,
+            username: username,
+            email: email
+        }
+    });
+    req.session.firstname = firstname;
+    req.session.lastname = lastname;
+    req.session.username = username;
+    req.session.email = email;
+    res.redirect('/profile');
+});
+
+/**
+ * Error 404 
+ */
+app.get("*", (req, res) => {
+    res.status(404);
+    res.render("404");
+});
 
 /**
  * Server
@@ -318,105 +395,5 @@ module.export = mongoose.model("courses", coursesSchema);
 require('./database/databaseConnection'); 
 */
 
-app.get('/admin', sessionValidation, adminAuthorization, async (req, res) => {
-  // username: 1 and id: 1 is what columns i want back
-  const result = await userCollection.find().project({ username: 1, user_role: 1, _id: 1 }).toArray();
-  const updateStatus = req.query.updateStatus;
 
-  res.render("admin", { users: result, updateStatus: updateStatus });
-});
-
-// updates user role w/ query 
-app.get('/updateStatus', sessionValidation, adminAuthorization, async (req, res) => {
-  const { username, status } = req.query;
-  await userCollection.updateOne(
-    { username: username },
-    { $set: { user_role: status } }
-  );
-  res.redirect(`/admin?updateStatus=${status}`);
-});
-
-app.use(express.static(__dirname + "/public"));
-
-app.get("*", (req, res) => {
-  res.status(404);
-  res.render("404");
-});
-
-app.listen(port, () => {
-  console.log(`Server is running on port ${port}`);
-});
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// require("dotenv").config();
-// const mongoose = require("mongoose");
-// const mongodb_host = process.env.MONGODB_HOST;
-// const mongodb_user = process.env.MONGODB_USER;
-// const mongodb_password = process.env.MONGODB_PASSWORD;
-// mongoose
-//   .connect(
-//     `mongodb+srv://${mongodb_user}:${mongodb_password}@${mongodb_host}/?retryWrites=true&w=majority&appName=Cluster0`
-//   )
-//   .then(() => console.log("Connected!"));
-
-// const coursesSchema = new mongoose.Schema({
-//   CourseID: String,
-//   Title: String,
-//   School: String,
-//   Program: String,
-//   CourseCredit: Number,
-//   MinimumPassingGrade: String,
-//   TotalHours: Number,
-//   TotalWeeks: Number,
-//   HoursPerWeek: Number,
-//   DeliveryType: String,
-//   Prerequisites: String,
-//   description: String,
-// });
-
-// module.export = mongoose.model("courses", coursesSchema);
-
-// db.createView("test", "courseInstructor", [
-//   {
-//     $lookup:
-//     {
-//       from: "instructors",
-//       localField: "instructorId",
-//       foreignField: "instrctorId",
-//       as: "courseInstructorDocs"
-//     }
-//   },
-//   {
-//     $project:
-//     {
-//       _id: 0,
-//       instructorId: 1,
-//       CourseId: 1,
-//       CRN: String,
-//       courseStart: String,
-//       courseEnd: String,
-//       location: String
-//     }
-//   }
-// ]);
 
