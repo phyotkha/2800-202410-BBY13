@@ -1,5 +1,5 @@
 // Using Node.js `require()`
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
 const Schema = mongoose.Schema;
 const ObjectId = Schema.ObjectId;
@@ -22,4 +22,9 @@ const coursesSchema = new mongoose.Schema({
 
 const CoursesModel = mongoose.model("courses", coursesSchema);
 
+<<<<<<< HEAD
+module.exports = coursesSchema;
+=======
 module.exports = CoursesModel;
+
+>>>>>>> 8764b8f6b167d3d5dea0a5fa5dd53d62b255edd0

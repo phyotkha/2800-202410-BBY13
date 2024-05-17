@@ -1,3 +1,6 @@
+<<<<<<< HEAD
+
+=======
 const express = require('express');
 const studentsRouter = require("./database/routers/students");
 
@@ -70,3 +73,4 @@ app.listen(port, () => {
 //   }
 // ]);
 
+>>>>>>> 8764b8f6b167d3d5dea0a5fa5dd53d62b255edd0

@@ -12,7 +12,8 @@ const Students = new Schema({
     date_of_birth: String,
     email: String,
     major: String,
-    year: Number
+    year: Number,
+    courses: [{ CourseID: String }]
 });
 
 const StudentModel = mongoose.model('Students', Students);

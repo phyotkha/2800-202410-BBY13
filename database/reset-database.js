@@ -1,10 +1,16 @@
 const mongoose = require('mongoose');
 const Student = require('./schemas/students');
+const Courses = require("./schemas/courses");
+require("dotenv").config();
+
+const mongodb_host = process.env.MONGODB_HOST;
+const mongodb_user = process.env.MONGODB_USER;
+const mongodb_password = process.env.MONGODB_PASSWORD;
 // const Instructor = require('./schemas/instructors');
 // Assuming you have a Student model
 
 // Connection URI
-const uri = 'mongodb+srv://dingzq0807:ZS6a7BYUmFUay0mO@cluster0.58jhzag.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0';
+const uri = `mongodb+srv://${mongodb_user}:${mongodb_password}@${mongodb_host}/?retryWrites=true&w=majority&appName=Cluster0`;
 
 // Connect to MongoDB
 mongoose.connect(uri)
@@ -19,8 +25,10 @@ mongoose.connect(uri)
 
         // Insert default data
         const defaultStudents = require('./defaultData/students.json'); // Load default data from JSON file
+        const defaultCourses = require("./defaultData/courses.json");
         // const defaultInstructors = require('./defaultData/instructors.json');
         await Student.insertMany(defaultStudents); // Insert default data using Mongoose model
+        await Courses.insertMany(defaultCourses);
         //  Instructor.insertMany(defaultInstructors);
         return true
 
