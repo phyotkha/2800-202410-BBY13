@@ -357,9 +357,9 @@ app.get("*", (req, res) => {
  * Server
  */
 // Comment it because it has app.listen below - DING NOTE
-// app.listen(port, () => {
-//   console.log(`Server running at http://localhost:${port}`);
-// })
+app.listen(port, () => {
+  console.log(`Server running at http://localhost:${port}`);
+})
 
 /* YERIN'S CODE (TO BE REVIEWED - DATABASE RELATED)
 require("dotenv").config();
