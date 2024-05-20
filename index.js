@@ -273,6 +273,11 @@ app.get("/logout", async (req, res) => {
   res.redirect("/");
 });
 
+app.get('/calendar', (req, res) => {
+  res.render("calendar");
+})
+
+
 // Students router
 app.use("/students", studentsRouter);
 
