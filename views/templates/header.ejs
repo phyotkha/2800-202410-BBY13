@@ -10,6 +10,7 @@
   <link rel="canonical" href="https://getbootstrap.com/docs/5.3/examples/navbars-offcanvas/">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
     integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+  <link href="/assets/css/calendar.css" rel="stylesheet" crossorigin="anonymous">
   <style>
     /* Modify the background color */
     .navbar-custom {
@@ -20,9 +21,10 @@
 
     /* Modify text color */
     .navbar-custom .navbar-text {
-      color: 
-      #003C71;
+      color:
+        #003C71;
     }
+
     .btn {
       background-color: #003C71;
       border-radius: 0;
@@ -35,28 +37,29 @@
     <nav
       class="navbar navbar-custom navbar-expand-md navbar-dark  flex-wrap align-items-center justify-content-center py-3 mb-4 border-bottom fixed-top border-info transparent">
       <div class="container-fluid">
-        <a href="/homePage" class="navbar-brand"><img src="/navbar-logo-letter.png" alt="Logo" width="55" height="55"></a>
+        <a href="/homePage" class="navbar-brand"><img src="/navbar-logo-letter.png" alt="Logo" width="55"
+            height="55"></a>
         <button class="navbar-toggler collapsed" type="button" data-bs-toggle="collapse"
           data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false"
           aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>
         </button>
-        <div class="navbar-collapse collapse" id="navbarCollapse">
-          <ul
-            class="nav px-5 navbar-nav me-auto mb-2 nav-pills nav-fill align-items-center justify-content-center mb-md-0">
-            <% for(var i=0; i<locals.navLinks.length; i++) { %>
-              <li class="nav-item"><a href="<%= locals.navLinks[i].link %>"
-                  class="nav-link <% if (locals.navLinks[i].link == locals.currentURL) { %> .nav-underline <% } %>"
-                  aria-current="page">
-                  <%= locals.navLinks[i].name %>
-                </a></li>
-              <% } %>
-          </ul>
-          <div class="navbar-nav px-0.5 mb-2 align-items-center justify-content-end mb-md-0">
-            <a href='/logout' method='get' class="nav-link"><button type="button"
-                class="btn btn-outline-warning">Logout</button></a>
-          </div>
+        <div class="navbar-collapse collapse" id="navbarCollapse"></div>
+        <ul
+          class="nav px-5 navbar-nav me-auto mb-2 nav-pills nav-fill align-items-center justify-content-center mb-md-0">
+          <% for(var i=0; i<locals.navLinks.length; i++) { %>
+            <li class="nav-item"><a href="<%= locals.navLinks[i].link %>"
+                class="nav-link <% if (locals.navLinks[i].link == locals.currentURL) { %> .nav-underline <% } %>"
+                aria-current="page">
+                <%= locals.navLinks[i].name %>
+              </a></li>
+            <% } %>
+        </ul>
+        <div class="navbar-nav px-0.5 mb-2 align-items-center justify-content-end mb-md-0">
+          <a href='/logout' method='get' class="nav-link"><button type="button"
+              class="btn btn-outline-warning">Logout</button></a>
         </div>
+      </div>
       </div>
     </nav>
   </header>
