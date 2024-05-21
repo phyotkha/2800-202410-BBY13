@@ -345,8 +345,7 @@ app.post('/update-profile', sessionValidation, async (req, res) => {
   res.redirect('/profile');
 });
 
-
-app.get('/calendar', (req, res) => {
+app.get('/calendar', sessionValidation, async (req, res) => {
   res.render("calendar");
 })
 
