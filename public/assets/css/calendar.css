@@ -1,7 +1,7 @@
 * {
     padding: 0;
     margin: 0;
-    box-sizing: border-box;
+    /* box-sizing: border-box; */
     font-family: sans-serif;
 }
 
@@ -9,12 +9,12 @@
     font-size: 15px;
 }
 
-body {
+/* body {
     display: flex;
     margin-top: 50px;
     justify-content: center;
     background-color: #fffcff;
-}
+} */
 
 button {
     width: 75px;
