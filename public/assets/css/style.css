@@ -1,5 +1,5 @@
 .navbar-custom {
-    background-color: #003C71;
+    background-color: rgb(96, 161, 184, 0.8);
 }
 
 .navbar-custom .navbar-text {
@@ -8,7 +8,7 @@
 
 .btn {
     background-color: #003C71;
-    border-radius: 0;
+    border-radius: 2;
 }
 
 .chat-container {

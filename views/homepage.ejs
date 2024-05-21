@@ -1,57 +1,27 @@
 <%- include("templates/header") %>
-  <div class="chat-container">
-    <div class="chat-history">
-      <div class="chat-message bot">
-        <!-- Bot message goes here -->
-      </div>
-      <div class="chat-message user">
-        <!-- User message goes here -->
-      </div>
-      <div class="chat-message bot">
-        <div class="message">Chat Bot Message</div>
-      </div>
-      <div class="chat-message user">
-        <div class="message">User Message</div>
-      </div>
-      <div class="chat-message bot">
-        <div class="message">Chat Bot Message</div>
-      </div>
-      <div class="chat-message user">
-        <div class="message">User Message</div>
-      </div>
-      <div class="chat-message bot">
-        <div class="message">Chat Bot Message</div>
-      </div>
-      <div class="chat-message user">
-        <div class="message">User Message</div>
-      </div>
-      <div class="chat-message bot">
-        <div class="message">Chat Bot Message</div>
-      </div>
-      <div class="chat-message user">
-        <div class="message">User Message</div>
-      </div>
-      <div class="chat-message bot">
-        <div class="message">Chat Bot Message</div>
-      </div>
-      <div class="chat-message user">
-        <div class="message">User Message</div>
-      </div>
-      <div class="chat-message bot">
-        <div class="message">Chat Bot Message</div>
-      </div>
-      <div class="chat-message user">
-        <div class="message">User Message</div>
-      </div>
-      <div class="chat-message bot">
-        <div class="message">Chat Bot Message</div>
-      </div>
-      <div class="chat-message user">
-        <div class="message">User Message</div>
-      </div>
+<div class="container col-xxl-8 px-4 py-5">
+  <div class="row flex-lg-row-reverse align-items-center g-5 py-5">
+    <div class="col-10 col-sm-8 col-lg-6">
+      <img src="/logo-transparent-bg.png" class="d-block mx-lg-auto img-fluid" alt="Bootstrap Themes" width="400" height="400" loading="lazy">
     </div>
-    <div class="chat-input">
-      <input type="text" placeholder="Type a message...">
-      <button class="btn btn-primary">Send</button>
+    <div class="col-lg-6">
+      <h1 class="display-5 fw-bold lh-1 mb-3">Welcome to SchoolScopeAI</h1>
+      <p class="lead">An BCIT ChatBot powered by a large language model, designed to help students in their
+        academic journey by solving problems, such as having difficulty finding information, contacting supports, and
+        etc with integrating the school's data, offering real-time insight into courses, availability, and provide
+        technical support 24/7. Developed by BBY-13.</p>
+      <div class="d-grid gap-2 d-md-flex justify-content-md-start">
+        <form id="actionForm" method="get" class="d-grid gap-2 d-md-flex justify-content-md-start w-100">
+          <button type="submit" class="btn btn-primary px-0.5 mb-2 align-items-center justify-content-end mb-md-0" onclick="setFormAction('/login')">Login</button>
+          <button type="submit" class="btn btn-outline-warning px-0.5 mb-2 align-items-center justify-content-end mb-md-0" onclick="setFormAction('/signup')">Signup</button>
+        </form>
+      </div>
     </div>
   </div>
+</div>
+<script>
+  function setFormAction(action) {
+    document.getElementById('actionForm').action = action;
+  }
+</script>
+<%- include("templates/footer") %>

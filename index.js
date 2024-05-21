@@ -41,16 +41,16 @@ const node_session_secret = process.env.NODE_SESSION_SECRET;
  * Database Connection
  */
 var { database } = include("./scripts/databaseConnection");
-const userCollection = database.db(mongodb_database).collection("users");
+const userCollection = database.db(mongodb_database).collection("students");
 
 
 // Navigation links array
 const navLinks = [
-  { name: "Profile", link: "/profile" },
-  { name: "Program & Courses", link: "/p&g" },
+  { name: "Chat", link: "/chatpage" },
+  { name: "Program & Courses", link: "/programs&courses" },
   { name: "Admission", link: "/admission" },
   { name: "Student Services", link: "/stuServices" },
-  { name: "Contact Us", link: "/contact" }
+  { name: "Account", link: "/profile" }
 ];
 
 /**
@@ -103,7 +103,7 @@ function sessionValidation(req, res, next) {
     next();
   }
   else {
-    res.redirect('/login');
+    res.redirect('/');
   }
 }
 
@@ -129,7 +129,7 @@ function adminAuthorization(req, res, next) {
  * Start of Route Definitons
  */
 app.get("/", async (req, res) => {
-  res.render("starting-page");
+  res.render("homePage");
 });
 
 app.get("/signup", (req, res) => {
@@ -347,7 +347,15 @@ app.post('/update-profile', sessionValidation, async (req, res) => {
 
 app.get('/calendar', sessionValidation, async (req, res) => {
   res.render("calendar");
-})
+});
+
+app.get('/chatpage', sessionValidation, async (req, res) => {
+  res.render("chatpage");
+});
+
+app.get('/p&g', sessionValidation, async (req, res) => {
+  res.render("p&g");
+});
 
 // Students router
 app.use("/students", studentsRouter);
