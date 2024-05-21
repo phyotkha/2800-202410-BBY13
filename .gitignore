@@ -2,3 +2,10 @@
 *.logs
 node_modules/
 .vscode/
+entities-extraction-web-scraper/web_scraper/lib/
+entities-extraction-web-scraper/web_scraper/lib64
+entities-extraction-web-scraper/web_scraper/bin/
+entities-extraction-web-scraper/web_scraper/include/
+entities-extraction-web-scraper/web_scraper/.env
+axolotl/
+
