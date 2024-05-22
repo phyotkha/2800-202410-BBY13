@@ -4,14 +4,15 @@ import urllib, io, json
 from langchain_openai import ChatOpenAI
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.messages import HumanMessage, SystemMessage
+import re
 
 # Initialize the OpenAI chat model
-llm = ChatOpenAI(model="gpt-4", temperature=0.0)
+llm = ChatOpenAI(model="gpt-3.5-turbo-0125", temperature=0.0)
 
 # MongoDB client
 username = "dingzq0807"
 pwd = "ZS6a7BYUmFUay0mO"
-client = MongoClient("mongodb+srv://" + urllib.parse.quote(username) + ":" + urllib.parse.quote(pwd) + "@cluster0.lymvb.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0")
+client = MongoClient(f"mongodb+srv://dingzq0807:{urllib.parse.quote(pwd)}@cluster0.58jhzag.mongodb.net/")
 db = client["test"]
 collection = db["students"]
 
@@ -24,12 +25,12 @@ with io.open("sample.txt", "r", encoding="utf-8") as f1:
     sample = f1.read()
 
 # Debugging: print the input question and sample
-st.write("Debug: Input question:", input_text)
-st.write("Debug: Sample data:", sample)
+# st.write("Debug: Input question:", input_text)
+# st.write("Debug: Sample data:", sample.replace('$', '\\$'))
 
 # Define the prompt template
 prompt_template = ChatPromptTemplate.from_messages([
-    SystemMessage(content="""
+    SystemMessage(content=f"""
         You are a very intelligent AI assistant who is an expert in identifying relevant questions from users
         and converting them into NoSQL MongoDB aggregation pipeline queries.
         Note: You have to just return the query to use in the aggregation pipeline, nothing else. Don't return any other text.
@@ -89,15 +90,13 @@ prompt_template = ChatPromptTemplate.from_messages([
                   
         As an expert, you must use them whenever required.
         Note: You have to just return the query, nothing else. Don't return any additional text with the query.
-        Please follow this strictly.
-        input:{question}
-         output:
     """),
-    HumanMessage(content="Generate a MongoDB aggregation pipeline query based on the following input: User question: '{question}', Sample: '{sample}'. Ensure the output is a valid JSON object with double quotes around keys and values.")
+    HumanMessage(content=f"Generate a MongoDB aggregation pipeline query based on the following input: User question: '{input_text}', Sample: '{sample}'. Ensure the output is a valid JSON object with double quotes around keys and values.")
 ])
 
 # Chain the prompt and the model
 chain = prompt_template | llm
+
 
 if input_text:
     if st.button("Submit"):
@@ -108,17 +107,17 @@ if input_text:
         })
 
         # Debug the response content
-        st.write("Raw response content:", response.content)
+        raw_response_content = response.content
+        st.markdown(f"```json\n{raw_response_content}\n```")
+        # st.write("Raw response content:", response.content)
         
         # Extract the JSON part of the response
         response_text = response.content.strip()
         try:
             query = json.loads(response_text)
             results = collection.aggregate(query)
-            st.write("Generated Query:", query)
+            # st.write("Generated Query:", query)
             for result in results:
                 st.write(result)
         except json.JSONDecodeError as e:
             st.error(f"JSON decoding error: {e}")
-
-
