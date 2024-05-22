@@ -11,6 +11,8 @@ const MongoStore = require("connect-mongo");
 const app = express();
 const Joi = require("joi");
 const bcrypt = require("bcrypt");
+const axios = require("axios");
+const bodyParser = require('body-parser');
 
 const studentsRouter = require("./database/routers/students");
 
@@ -41,7 +43,7 @@ const node_session_secret = process.env.NODE_SESSION_SECRET;
  * Database Connection
  */
 var { database } = include("./scripts/databaseConnection");
-const userCollection = database.db(mongodb_database).collection("users");
+const userCollection = database.db(mongodb_database).collection("students");
 
 
 // Navigation links array
@@ -58,7 +60,7 @@ const navLinks = [
  */
 app.set('view engine', 'ejs'); //Setting view engine to EJS
 app.use(express.urlencoded({ extended: false })); // To parse URL-encoded bodies
-
+app.use(bodyParser.urlencoded({ extended: true }));
 
 //Middleware so we don't need to add these navlinks/url params into everything.
 //This add navigation links and current URL to local variables.
@@ -144,12 +146,15 @@ app.get("/login", (req, res) => {
 });
 
 app.post("/signupSubmit", async (req, res) => {
-  const { firstname, lastname, username, email, password } = req.body;
+  const { firstname, lastname, studentid, dateofbirth, username, program, email, password } = req.body;
 
   const schema = Joi.object({
     firstname: Joi.string().alphanum().max(20).required(),
     lastname: Joi.string().alphanum().max(20),
+    studentid: Joi.string().alphanum().max(20).required(),
+    dateofbirth: Joi.date(),
     username: Joi.string().alphanum().max(20).required(),
+    program: Joi.string().max(20),
     email: Joi.string().max(40).required(),
     password: Joi.string().max(20).required(),
   });
@@ -165,18 +170,23 @@ app.post("/signupSubmit", async (req, res) => {
 
   // Insert user data into the database
   await userCollection.insertOne({
-    firstname: firstname,
-    lastname: lastname,
+    studentId: studentid,
+    first_name: firstname,
+    last_name: lastname,
     username: username,
     email: email,
+    date_of_birth: dateofbirth,
+    program: program,
     password: hashedPassword,
   });
 
   req.session.authenticated = true;
+  req.session.studentId = studentid;
   req.session.firstname = firstname;
   req.session.lastname = lastname;
   req.session.username = username;
   req.session.email = email;
+  req.session.dateofbirth = dateofbirth
   req.session.cookie.maxAge = expireTime;
   res.redirect('/homePage');
 });
@@ -208,8 +218,8 @@ app.post("/loginSubmit", async (req, res) => {
     console.log(userData);
     req.session.authenticated = true;
     req.session.email = email;
-    req.session.firstname = userData.firstname;
-    req.session.lastname = userData.lastname;
+    req.session.firstname = userData.first_name;
+    req.session.lastname = userData.last_name;
     req.session.username = userData.username;
     req.session.cookie.maxAge = expireTime;
     return res.redirect('/homePage');
@@ -218,10 +228,51 @@ app.post("/loginSubmit", async (req, res) => {
   }
 });
 
+// -----------------------------------------------------------------------------
+app.get('/homePage', async (req, res) => {
 
-app.get('/homePage', sessionValidation, async (req, res) => {
-  res.render('homepage');
+  res.render('homepage', { userMessage: '', botMessage: ''});
 });
+
+app.post('/chat', async (req, res) => {
+  const userMessage = req.body.message;
+
+  try {
+    /*
+    // Log the request payload for debugging
+    console.log('Sending request to ChatGPT API with payload:', {
+      model: "gpt-3.5-turbo",
+      messages: [{ role: "user", content: userMessage }]
+    });
+    */
+
+    // Call the ChatGPT API with GPT-3.5
+    const response = await axios.post('https://api.openai.com/v1/chat/completions', {
+      model: "gpt-3.5-turbo",
+      messages: [{ role: "user", content: userMessage }],
+    }, {
+      headers: {
+        'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
+        'Content-Type': 'application/json'
+      }
+    });
+    
+    /*
+    // Log the response data for debugging
+    console.log('Received response from ChatGPT API', response.data);
+    */
+   
+    const botMessage = response.data.choices[0].message.content;
+
+    res.render('homepage', { userMessage, botMessage });
+
+  } catch (error) {
+    // Log the full error response for debugging
+    console.error('Error calling ChatGPT API:', error.response ? error.response.data : error.message);
+    res.status(500).send('Error communicating with ChatGPT API');
+  }
+});
+// ------------------------------------------------------------------
 
 // Route to handle logout
 app.get("/logout", async (req, res) => {
@@ -273,7 +324,7 @@ app.post('/sendResetLink', async (req, res) => {
     subject: 'Password Reset',
     text: `You are receiving this because you (or someone else) have requested the reset of the password for your account.\n\n` +
       `Please click on the following link, or paste this into your browser to complete the process:\n\n` +
-      `http://${req.headers.host}/resetPassword/${token}\n\n` +
+      `https://${req.headers.host}/resetPassword/${token}\n\n` +
       `If you did not request this, please ignore this email and your password will remain unchanged. The link will expire in one hour.\n`
   };
 
@@ -332,8 +383,8 @@ app.post('/update-profile', sessionValidation, async (req, res) => {
 
   await userCollection.updateOne({ username: user.username }, {
     $set: {
-      firstname: firstname,
-      lastname: lastname,
+      first_name: firstname,
+      last_name: lastname,
       username: username,
       email: email
     }

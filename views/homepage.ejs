@@ -1,57 +1,21 @@
 <%- include("templates/header") %>
-  <div class="chat-container">
-    <div class="chat-history">
+<div class="chat-container">
+  <div class="chat-history">
+    <form action="/chat" method="POST">
+      <% if (botMessage) { %>
       <div class="chat-message bot">
-        <!-- Bot message goes here -->
+        <%= botMessage %>
       </div>
+      <% } %>
+      <% if (userMessage) { %>
       <div class="chat-message user">
-        <!-- User message goes here -->
+        <%= userMessage %>
       </div>
-      <div class="chat-message bot">
-        <div class="message">Chat Bot Message</div>
+      <% } %>
       </div>
-      <div class="chat-message user">
-        <div class="message">User Message</div>
+      <div class="chat-input">
+        <input name="message" type="text" placeholder="Type a message...">
+        <button class="btn btn-primary" type="submit">Send</button>
       </div>
-      <div class="chat-message bot">
-        <div class="message">Chat Bot Message</div>
-      </div>
-      <div class="chat-message user">
-        <div class="message">User Message</div>
-      </div>
-      <div class="chat-message bot">
-        <div class="message">Chat Bot Message</div>
-      </div>
-      <div class="chat-message user">
-        <div class="message">User Message</div>
-      </div>
-      <div class="chat-message bot">
-        <div class="message">Chat Bot Message</div>
-      </div>
-      <div class="chat-message user">
-        <div class="message">User Message</div>
-      </div>
-      <div class="chat-message bot">
-        <div class="message">Chat Bot Message</div>
-      </div>
-      <div class="chat-message user">
-        <div class="message">User Message</div>
-      </div>
-      <div class="chat-message bot">
-        <div class="message">Chat Bot Message</div>
-      </div>
-      <div class="chat-message user">
-        <div class="message">User Message</div>
-      </div>
-      <div class="chat-message bot">
-        <div class="message">Chat Bot Message</div>
-      </div>
-      <div class="chat-message user">
-        <div class="message">User Message</div>
-      </div>
-    </div>
-    <div class="chat-input">
-      <input type="text" placeholder="Type a message...">
-      <button class="btn btn-primary">Send</button>
-    </div>
-  </div>
+    </form>
+</div>
