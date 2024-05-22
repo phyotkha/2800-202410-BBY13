@@ -3,59 +3,67 @@
   {
     "instructorId": 1,
     "first_name": "Thorsten",
-    "last_Name": "Ewald",
+    "last_name": "Ewald",
     "email": "Thorsten_Ewald@bcit.ca",
-    "department": "School of Computing and Academic Studies"
+    "department": "School of Computing and Academic Studies",
+    "courses": [
+      { "courseId": "COMP 1116" }
+    ]
   },
   {
     "instructorId": 2,
     "first_name": "Rahul",
-    "last_Name": "Kukreja",
+    "last_name": "Kukreja",
     "email": "rkukreja1@bcit.ca",
-    "department": "School of Computing and Academic Studies"
+    "department": "School of Computing and Academic Studies",
+    "courses": [{ "courseId": "COMP 1110" }]
   },
   {
     "instructorId": 3,
     "first_name": "Simin",
-    "last_Name": "Jolfaee",
+    "last_name": "Jolfaee",
     "email": "Simin_Jolfaee@bcit.ca",
-    "department": "School of Computing and Academic Studies"
+    "department": "School of Computing and Academic Studies",
+    "courses": [{ "courseId": "COMP 1113" }]
   },
   {
     "instructorId": 4,
     "first_name": "Arron",
-    "last_Name": "Ferguson",
+    "last_name": "Ferguson",
     "email": "Arron_Ferguson@bcit.ca",
-    "department": "School of Computing and Academic Studies"
+    "department": "School of Computing and Academic Studies",
+    "courses": [{ "courseId": "COMP 1537" }]
   },
   {
     "instructorId": 5,
     "first_name": "Bruce",
-    "last_Name": "Link",
+    "last_name": "Link",
     "email": "Bruce_Link@bcit.ca",
-    "department": "School of Computing and Academic Studies"
+    "department": "School of Computing and Academic Studies",
+    "courses": [{ "courseId": "COMP 1510" }]
   },
   {
     "instructorId": 6,
     "first_name": "Maryam",
-    "last_Name": "Khezrzadeh",
+    "last_name": "Khezrzadeh",
     "email": "mkhezrzadeh@bcit.ca",
-    "department": "School of Computing and Academic Studies"
+    "department": "School of Computing and Academic Studies",
+    "courses": [{ "courseId": "COMP 1712" }]
   },
   {
     "instructorId": 7,
     "first_name": "Carly",
-    "last_Name": "Orr",
+    "last_name": "Orr",
     "email": "Carly_Wong_Orr@bcit.ca",
-    "department": "School of Computing and Academic Studies"
+    "department": "School of Computing and Academic Studies",
+    "courses": [{ "courseId": "COMP 1800" }, { "courseId": "COMP 2800" }]
   },
   {
     "instructorId": 8,
     "first_name": "Patrick",
-    "last_Name": "Guichon",
+    "last_name": "Guichon",
     "email": "patrick_guichon@bcit.ca",
-    "department": "School of Computing and Academic Studies"
+    "department": "School of Computing and Academic Studies",
+    "courses": [{ "courseId": "COMP 2537" }]
   }
 ]
-
-

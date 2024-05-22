@@ -5,7 +5,7 @@ const { registerLicense } = require('@syncfusion/ej2-base');
 /**
  * Imported Modules
  */
-const url = require('url');
+const url = require("url");
 const express = require("express");
 const session = require("express-session");
 const MongoStore = require("connect-mongo");
@@ -14,8 +14,7 @@ const Joi = require("joi");
 const bcrypt = require("bcrypt");
 
 const studentsRouter = require("./database/routers/students");
-
-
+const instructorRouter = require("./database/routers/routerInstructor")
 const saltRounds = 12; //Number of rounds for bcrypt hashing
 
 /**
@@ -29,7 +28,7 @@ const port = process.env.PORT || 8000;
 const expireTime = 1 * 60 * 60 * 1000;
 
 /**
- * Environment Variables 
+ * Environment Variables
  */
 const mongodb_host = process.env.MONGODB_HOST;
 const mongodb_user = process.env.MONGODB_USER;
@@ -47,22 +46,20 @@ registerLicense('licenseKey');
 var { database } = include("./scripts/databaseConnection");
 const userCollection = database.db(mongodb_database).collection("users");
 
-
 // Navigation links array
 const navLinks = [
   { name: "Profile", link: "/profile" },
   { name: "Program & Courses", link: "/p&g" },
   { name: "Admission", link: "/admission" },
   { name: "Student Services", link: "/stuServices" },
-  { name: "Contact Us", link: "/contact" }
+  { name: "Contact Us", link: "/contact" },
 ];
 
 /**
  * Middleware Setup
  */
-app.set('view engine', 'ejs'); //Setting view engine to EJS
+app.set("view engine", "ejs"); //Setting view engine to EJS
 app.use(express.urlencoded({ extended: false })); // To parse URL-encoded bodies
-
 
 //Middleware so we don't need to add these navlinks/url params into everything.
 //This add navigation links and current URL to local variables.
@@ -71,7 +68,7 @@ app.use("/", (req, res, next) => {
   app.locals.currentURL = url.parse(req.url).pathname;
   res.locals.licenseKey = licenseKey;
   next();
-})
+});
 
 // MongoDB session store configuration
 var mongoStore = MongoStore.create({
@@ -79,7 +76,7 @@ var mongoStore = MongoStore.create({
   crypto: {
     secret: mongodb_session_secret,
   },
-})
+});
 
 //Session middleware setup
 app.use(
@@ -106,14 +103,13 @@ function isValidSession(req) {
 function sessionValidation(req, res, next) {
   if (isValidSession(req)) {
     next();
-  }
-  else {
-    res.redirect('/login');
+  } else {
+    res.redirect("/login");
   }
 }
 
 function isAdmin(req) {
-  if (req.session.user_role == 'admin') {
+  if (req.session.user_role == "admin") {
     return true;
   }
   return false;
@@ -124,8 +120,7 @@ function adminAuthorization(req, res, next) {
     res.status(403);
     res.render("errorMessage", { error: "Not Authorized" });
     return;
-  }
-  else {
+  } else {
     next();
   }
 }
@@ -145,7 +140,10 @@ app.get("/login", (req, res) => {
   const invalidPassword = req.query.invalidpassword;
   const invalidUser = req.query.invaliduser;
 
-  res.render("login", { invaliduser: invalidUser, invalidpassword: invalidPassword });
+  res.render("login", {
+    invaliduser: invalidUser,
+    invalidpassword: invalidPassword,
+  });
 });
 
 app.post("/signupSubmit", async (req, res) => {
@@ -160,10 +158,12 @@ app.post("/signupSubmit", async (req, res) => {
   });
 
   const validationResult = schema.validate(req.body);
-  console.log('Valid inputs');
+  console.log("Valid inputs");
   if (validationResult.error != null) {
     console.log(validationResult.error);
-    res.render("signupErr", { error: validationResult.error.details[0].message });
+    res.render("signupErr", {
+      error: validationResult.error.details[0].message,
+    });
   }
 
   var hashedPassword = await bcrypt.hash(password, saltRounds);
@@ -183,7 +183,7 @@ app.post("/signupSubmit", async (req, res) => {
   req.session.username = username;
   req.session.email = email;
   req.session.cookie.maxAge = expireTime;
-  res.redirect('/homePage');
+  res.redirect("/homePage");
 });
 
 // Route to handle login form submission
@@ -199,13 +199,15 @@ app.post("/loginSubmit", async (req, res) => {
   const validationResult = schema.validate(req.body);
   if (validationResult.error != null) {
     console.log(validationResult.error);
-    res.render("login_error", { error: validationResult.error.details[0].message });
+    res.render("login_error", {
+      error: validationResult.error.details[0].message,
+    });
   }
 
   // Check for matching email in database
   const userData = await userCollection.findOne({ email });
   if (!userData) {
-    return res.redirect('/login?invaliduser=1');
+    return res.redirect("/login?invaliduser=1");
   }
 
   var isValidPassword = await bcrypt.compare(password, userData.password);
@@ -217,15 +219,14 @@ app.post("/loginSubmit", async (req, res) => {
     req.session.lastname = userData.lastname;
     req.session.username = userData.username;
     req.session.cookie.maxAge = expireTime;
-    return res.redirect('/homePage');
+    return res.redirect("/homePage");
   } else {
-    return res.redirect('/login?invalidpassword=1');
+    return res.redirect("/login?invalidpassword=1");
   }
 });
 
-
-app.get('/homePage', sessionValidation, async (req, res) => {
-  res.render('homepage');
+app.get("/homePage", sessionValidation, async (req, res) => {
+  res.render("homepage");
 });
 
 // Route to handle logout
@@ -236,14 +237,14 @@ app.get("/logout", async (req, res) => {
 });
 
 /* Password Reset Routes */
-app.get('/restPasswordRequest', (req, res) => {
-  res.render('reset_password_request');
+app.get("/restPasswordRequest", (req, res) => {
+  res.render("reset_password_request");
 });
 
-const crypto = require('crypto');
-const nodemailer = require('nodemailer');
+const crypto = require("crypto");
+const nodemailer = require("nodemailer");
 
-app.post('/sendResetLink', async (req, res) => {
+app.post("/sendResetLink", async (req, res) => {
   const { email } = req.body;
 
   // Find user by email in the database
@@ -253,7 +254,7 @@ app.post('/sendResetLink', async (req, res) => {
   }
 
   // Generate a unique token and set expiration time for the token
-  const token = crypto.randomBytes(32).toString('hex');
+  const token = crypto.randomBytes(32).toString("hex");
   const expireTime = Date.now() + 3600000; // Expires in 1 hour
 
   // Update user document in the database with the token and expiration time
@@ -264,10 +265,10 @@ app.post('/sendResetLink', async (req, res) => {
 
   // Set up email transporter using nodemailer
   const transporter = nodemailer.createTransport({
-    service: 'Gmail',
+    service: "Gmail",
     auth: {
       user: process.env.EMAIL,
-      pass: process.env.EMAIL_PASSWORD
+      pass: process.env.EMAIL_PASSWORD,
     },
   });
 
@@ -275,90 +276,110 @@ app.post('/sendResetLink', async (req, res) => {
   const mailMessage = {
     to: email,
     from: process.env.EMAIL,
-    subject: 'Password Reset',
-    text: `You are receiving this because you (or someone else) have requested the reset of the password for your account.\n\n` +
+    subject: "Password Reset",
+    text:
+      `You are receiving this because you (or someone else) have requested the reset of the password for your account.\n\n` +
       `Please click on the following link, or paste this into your browser to complete the process:\n\n` +
       `http://${req.headers.host}/resetPassword/${token}\n\n` +
-      `If you did not request this, please ignore this email and your password will remain unchanged. The link will expire in one hour.\n`
+      `If you did not request this, please ignore this email and your password will remain unchanged. The link will expire in one hour.\n`,
   };
 
   // Send the email to user
   transporter.sendMail(mailMessage, (err, info) => {
     if (err) {
       console.error(err);
-      res.render('reset_password_request', { message: 'Error sending email. Try Again!' });
+      res.render("reset_password_request", {
+        message: "Error sending email. Try Again!",
+      });
     } else {
-      console.log('Email sent: ' + info.response);
-      res.redirect('/restPasswordRequest');
+      console.log("Email sent: " + info.response);
+      res.redirect("/restPasswordRequest");
     }
   });
 });
 
-app.get('/resetPassword/:token', async (req, res) => {
+app.get("/resetPassword/:token", async (req, res) => {
   const { token } = req.params;
 
-  const user = await userCollection.findOne({ resetPasswordToken: token, resetPasswordExpires: { $gt: Date.now() } });
+  const user = await userCollection.findOne({
+    resetPasswordToken: token,
+    resetPasswordExpires: { $gt: Date.now() },
+  });
   if (!user) {
-    return res.render('reset_password_invalid_token');
+    return res.render("reset_password_invalid_token");
   }
 
-  res.render('reset_password', { token: token });
+  res.render("reset_password", { token: token });
 });
 
-app.post('/resetPassword', async (req, res) => {
+app.post("/resetPassword", async (req, res) => {
   const { token, password } = req.body;
 
-  const user = await userCollection.findOne({ resetPasswordToken: token, resetPasswordExpires: { $gt: Date.now() } });
+  const user = await userCollection.findOne({
+    resetPasswordToken: token,
+    resetPasswordExpires: { $gt: Date.now() },
+  });
   if (!user) {
-    return res.render('reset_password_invalid_token');
+    return res.render("reset_password_invalid_token");
   }
 
   const hashedPassword = await bcrypt.hash(password, saltRounds);
 
-  await userCollection.updateOne({ email: user.email }, {
-    $set: { password: hashedPassword },
-    $unset: { resetPasswordToken: "", resetPasswordExpires: "" }
-  });
+  await userCollection.updateOne(
+    { email: user.email },
+    {
+      $set: { password: hashedPassword },
+      $unset: { resetPasswordToken: "", resetPasswordExpires: "" },
+    }
+  );
 
-  res.redirect('/login');
+  res.redirect("/login");
 });
 
-app.get('/profile', sessionValidation, async (req, res) => {
+app.get("/profile", sessionValidation, async (req, res) => {
   const firstname = req.session.firstname;
   const lastname = req.session.lastname;
   const username = req.session.username;
   const email = req.session.email;
-  res.render("user_profile", { firstName: firstname, lastName: lastname, userName: username, emailAddress: email });
-})
+  res.render("user_profile", {
+    firstName: firstname,
+    lastName: lastname,
+    userName: username,
+    emailAddress: email,
+  });
+});
 
-app.post('/update-profile', sessionValidation, async (req, res) => {
+app.post("/update-profile", sessionValidation, async (req, res) => {
   const { firstname, lastname, username, email } = req.body;
   const user = await userCollection.findOne({ username: username });
 
-  await userCollection.updateOne({ username: user.username }, {
-    $set: {
-      firstname: firstname,
-      lastname: lastname,
-      username: username,
-      email: email
+  await userCollection.updateOne(
+    { username: user.username },
+    {
+      $set: {
+        firstname: firstname,
+        lastname: lastname,
+        username: username,
+        email: email,
+      },
     }
-  });
+  );
   req.session.firstname = firstname;
   req.session.lastname = lastname;
   req.session.username = username;
   req.session.email = email;
-  res.redirect('/profile');
+  res.redirect("/profile");
 });
 
 app.get('/calendar', sessionValidation, async (req, res) => {
   res.render("calendar", { ESSENTIAL_STUDIO_KEY: process.env.ESSENTIAL_STUDIO_KEY });
-})
+});
 
 // Students router
 app.use("/students", studentsRouter);
-
+app.use("/instructors", instructorRouter);
 /**
- * Error 404 
+ * Error 404
  */
 app.get("*", (req, res) => {
   res.status(404);
@@ -370,7 +391,7 @@ app.get("*", (req, res) => {
  */
 app.listen(port, () => {
   console.log(`Server running at http://localhost:${port}`);
-})
+});
 
 /* YERIN'S CODE (TO BE REVIEWED - DATABASE RELATED)
 require("dotenv").config();
@@ -385,7 +406,7 @@ mongoose
   .then(() => console.log("Connected!"));
 
 const coursesSchema = new mongoose.Schema({
-  CourseID: String,
+  courseId: String,
   Title: String,
   School: String,
   Program: String,
@@ -405,6 +426,3 @@ module.export = mongoose.model("courses", coursesSchema);
 /* DINA'S CODE (TO BE REVIEWED - DATABASE RELATED)
 require('./database/databaseConnection'); 
 */
-
-
-

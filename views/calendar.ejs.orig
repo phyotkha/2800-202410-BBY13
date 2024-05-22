@@ -1,5 +1,7 @@
 <%- include("templates/header") %>
+<<<<<<< .merge_file_jiYOBa
   <!-- <div id="container">
+=======
 <br>
 <br>
 <br>
@@ -11,6 +13,9 @@
 <br>
 <br>
 <br>
+<br>
+<div id="container">
+>>>>>>> .merge_file_W7zQTi
     <header id="header">
       <div id="monthDisplay"></div>
       <div id="actionButtons">
