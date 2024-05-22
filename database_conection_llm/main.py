@@ -12,9 +12,8 @@ llm = ChatOpenAI(model="gpt-3.5-turbo-0125", temperature=0.0)
 # MongoDB client
 username = "dingzq0807"
 pwd = "ZS6a7BYUmFUay0mO"
-client = MongoClient(f"mongodb+srv://dingzq0807:{urllib.parse.quote(pwd)}@cluster0.58jhzag.mongodb.net/")
+client = MongoClient(f"mongodb+srv://{username}:{urllib.parse.quote(pwd)}@cluster0.58jhzag.mongodb.net/")
 db = client["test"]
-collection = db["courses"]
 
 st.title("Talk to MongoDB")
 st.write("Ask anything and get an answer")
@@ -97,6 +96,23 @@ prompt_template = ChatPromptTemplate.from_messages([
 # Chain the prompt and the model
 chain = prompt_template | llm
 
+def add_dollar_signs(query):
+    # Add dollar signs to MongoDB operators if they are missing
+    query = re.sub(r'\"(match|group|project|lookup|sum|avg|max|min)\"', r'"\$\1"', query)
+    return query
+
+def get_collection_name(query):
+    # Extract the collection name from the query (basic example, adjust as needed)
+    if "students" in query or "student" in query:
+        return "students"
+    elif "courses" in query or "course" in query:
+        return "courses"
+    elif "instructors" in query or "instructor" in query:
+        return "instructors"
+    elif "courseInstructor" in query or "courseInstructorView" in query:
+        return "courseInstructor"
+    return None
+
 
 if input_text:
     if st.button("Submit"):
@@ -112,16 +128,29 @@ if input_text:
         # st.write("Raw response content:", response.content)
         
         # Extract the JSON part of the response
-        response_text = response.content.strip()
+        response_text = raw_response_content.strip()
+        response_text = add_dollar_signs(response_text)  # Add missing $ symbols
+
         try:
             query = json.loads(response_text)
-            results = list(collection.aggregate(query))  # Convert cursor to list
-            # st.write("Generated Query:", query)
-            if results:
-                for result in results:
-                    st.write(result)
+            # st.write("Generated Query:", query)  # Display the generated query
+            # st.write("response_text:", response_text)  # Display the generated query
+
+            # Get the collection name dynamically
+            collection_name = get_collection_name(input_text)
+            if not collection_name:
+                st.error("Could not determine the collection name from the query.")
             else:
-                st.write("No results found.")
+                collection = db[collection_name]  # Set the collection dynamically
+                st.write(f"Using Collection: {collection_name}")
+
+                results = list(collection.aggregate(query))  # Convert cursor to list
+                if results:
+                    st.write("Results:")
+                    for result in results:
+                        st.write(result)
+                else:
+                    st.write("No results found.")
         except json.JSONDecodeError as e:
             st.error(f"JSON decoding error: {e}")
         except Exception as e:

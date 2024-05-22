@@ -59,6 +59,24 @@ json
   { "$project": { "major": "$_id", "total_students": 1, "_id": 0 } }
 ]
 
+Question 6: Give me the list of courses from the Computer Systems Technology (CST) Diploma .
+
+Query:
+json
+[
+  { 
+    "$match": { "Program": "Computer Systems Technology (CST) Diploma" } 
+  },
+  { 
+    "$project": { 
+      "CourseID": 1,
+      "Title": 1,
+      "CourseCredit": 1,
+      "_id": 0 
+    }
+  }
+]
+
 
 Each of these queries is designed to run within MongoDB's aggregation framework to extract specific information based on the user's questions.
  The `$project` step is used to format the output to include only relevant fields. 
