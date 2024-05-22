@@ -12,6 +12,29 @@
     integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
   <link href="/assets/css/calendar.css" rel="stylesheet" crossorigin="anonymous">
   <link href="/assets/css/style.css" rel="stylesheet">
+  <!-- Syncfusion EJ2 Schedule CSS -->
+  <link href="https://cdn.syncfusion.com/ej2/20.1.55/material.css" rel="stylesheet">
+  <!-- Syncfusion EJ2 Base, Buttons, and Schedule JS -->
+  <script src="https://cdn.syncfusion.com/ej2/20.1.55/dist/ej2.min.js"></script>
+  <script>
+
+    ej.base.registerLicense('<%= licenseKey %>');
+    document.addEventListener('DOMContentLoaded', function () {
+      // 引入 Syncfusion Schedule 组件
+      const { Schedule, Day, Week, WorkWeek, Month, Agenda } = ej.schedule;
+      
+      // 初始化 Schedule 组件
+      let scheduleObj = new Schedule({
+        height: '550px',
+        selectedDate: new Date(),
+        eventSettings: { dataSource: [] }, // 你的数据源
+        allowAdding: false, // 禁用添加新事件功能
+        views: ['Day', 'Week', 'WorkWeek', 'Month', 'Agenda']
+      });
+
+      scheduleObj.appendTo('#schedule');
+    });
+  </script>
 </head>
 
 <body class="d-flex flex-column vh-100">

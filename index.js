@@ -1,5 +1,6 @@
 require("./utils.js");
 require("dotenv").config();
+const { registerLicense } = require('@syncfusion/ej2-base');
 
 /**
  * Imported Modules
@@ -37,6 +38,9 @@ const mongodb_database = process.env.MONGODB_DATABASE;
 const mongodb_session_secret = process.env.MONGODB_SESSION_SECRET;
 const node_session_secret = process.env.NODE_SESSION_SECRET;
 
+
+const licenseKey = process.env.ESSENTIAL_STUDIO_KEY;
+registerLicense('licenseKey');
 /**
  * Database Connection
  */
@@ -65,6 +69,7 @@ app.use(express.urlencoded({ extended: false })); // To parse URL-encoded bodies
 app.use("/", (req, res, next) => {
   app.locals.navLinks = navLinks;
   app.locals.currentURL = url.parse(req.url).pathname;
+  res.locals.licenseKey = licenseKey;
   next();
 })
 
@@ -346,7 +351,7 @@ app.post('/update-profile', sessionValidation, async (req, res) => {
 });
 
 app.get('/calendar', sessionValidation, async (req, res) => {
-  res.render("calendar");
+  res.render("calendar", { ESSENTIAL_STUDIO_KEY: process.env.ESSENTIAL_STUDIO_KEY });
 })
 
 // Students router
