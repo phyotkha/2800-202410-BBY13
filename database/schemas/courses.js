@@ -1,11 +1,10 @@
 // Using Node.js `require()`
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
 const Schema = mongoose.Schema;
-const ObjectId = Schema.ObjectId;
 
 const coursesSchema = new mongoose.Schema({
-  CourseID: String,
+  courseId: String,
   Title: String,
   School: String,
   Program: String,
@@ -18,6 +17,10 @@ const coursesSchema = new mongoose.Schema({
   Prerequisites: String,
   description: String,
   instructorId: Number,
+  courseStart: Date,
+  courseEnd: Date,
+  courseTime: [{ courseDay: String, courseSHour: String, courseEHour: String }],
+  location: String,
 });
 
 const CoursesModel = mongoose.model("courses", coursesSchema);
