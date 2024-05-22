@@ -14,7 +14,7 @@ username = "dingzq0807"
 pwd = "ZS6a7BYUmFUay0mO"
 client = MongoClient(f"mongodb+srv://dingzq0807:{urllib.parse.quote(pwd)}@cluster0.58jhzag.mongodb.net/")
 db = client["test"]
-collection = db["students"]
+collection = db["courses"]
 
 st.title("Talk to MongoDB")
 st.write("Ask anything and get an answer")
@@ -115,9 +115,14 @@ if input_text:
         response_text = response.content.strip()
         try:
             query = json.loads(response_text)
-            results = collection.aggregate(query)
+            results = list(collection.aggregate(query))  # Convert cursor to list
             # st.write("Generated Query:", query)
-            for result in results:
-                st.write(result)
+            if results:
+                for result in results:
+                    st.write(result)
+            else:
+                st.write("No results found.")
         except json.JSONDecodeError as e:
             st.error(f"JSON decoding error: {e}")
+        except Exception as e:
+            st.error(f"An error occurred: {e}")
