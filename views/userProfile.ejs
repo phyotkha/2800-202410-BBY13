@@ -3,7 +3,7 @@
     <h2>
         <%= firstName %>'s profile:
     </h2>
-    <form action="/update-profile" method="post">
+    <form action="/updateProfile" method="post">
         <div class="row">
             <div class="col">
                 <label>First Name</label>
@@ -16,10 +16,17 @@
                     disabled>
             </div>
         </div>
-        <div class="form-group">
-            <label for="exampleInputUsername1">Username</label>
-            <input name="username" type="text" class="form-control" id="exampleInputUsername1"
-                placeholder="Enter username" value="<%= userName %>" disabled>
+        <div class="row">
+            <div class="col">
+                <label>Username</label>
+                <input name="username" type="text" class="form-control" placeholder="Username"
+                    value="<%= userName %>" disabled>
+            </div>
+            <div class="col">
+                <label>Student ID</label>
+                <input name="studentid" type="text" class="form-control" placeholder="Student Id" value="<%= studentId %>"
+                    disabled>
+            </div>
         </div>
         <div class="form-group">
             <label for="exampleInputEmail1">Email address</label>
@@ -30,19 +37,6 @@
         <button id="edit-button" type="button" class="btn btn-primary">Edit</button>
         <button id="save-button" type="submit" class="btn btn-success" style="display: none;">Save</button>
     </form>
-    <!-- <script>
-        document.getElementById('edit-button').addEventListener('click', function () {
-            document.querySelectorAll('input').forEach(function (input) {
-                input.disabled = false;
-            });
-            document.getElementById('edit-button').style.display = 'none';
-            document.getElementById('save-button').style.display = 'inline-block';
-        });
-
-        document.getElementById('save-button').addEventListener('click', function () {
-            document.querySelector('form').submit();
-        });
-    </script> -->
     <script>
         document.getElementById('edit-button').addEventListener('click', function () {
             document.querySelectorAll('input').forEach(function (input) {

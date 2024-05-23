@@ -11,6 +11,7 @@
   "author": "BBY13",
   "license": "ISC",
   "dependencies": {
+<<<<<<< HEAD
     "@syncfusion/ej2-base": "^25.2.5",
     "@syncfusion/ej2-buttons": "^25.2.4",
     "@syncfusion/ej2-calendars": "^25.2.5",
@@ -22,7 +23,11 @@
     "@syncfusion/ej2-popups": "^25.2.4",
     "@syncfusion/ej2-schedule": "^25.2.4",
     "@syncfusion/ej2-splitbuttons": "^25.2.4",
+=======
+    "axios": "^1.7.2",
+>>>>>>> database_connection_update
     "bcrypt": "^5.1.1",
+    "body-parser": "^1.20.2",
     "connect-mongo": "^5.1.0",
     "cors": "^2.8.5",
     "crypto": "^1.0.1",
@@ -31,8 +36,13 @@
     "express": "^4.19.2",
     "express-session": "^1.18.0",
     "joi": "^17.13.1",
+<<<<<<< HEAD
     "mongodb": "^6.6.2",
     "mongoose": "^8.4.0",
+=======
+    "mongodb": "^6.6.1",
+    "mongoose": "^8.3.4",
+>>>>>>> database_connection_update
     "nodemailer": "^6.9.13",
     "nodemon": "^3.1.0",
     "url": "^0.11.3",

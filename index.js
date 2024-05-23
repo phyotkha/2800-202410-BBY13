@@ -12,6 +12,7 @@ const MongoStore = require("connect-mongo");
 const app = express();
 const Joi = require("joi");
 const bcrypt = require("bcrypt");
+const axios = require("axios");
 
 const studentsRouter = require("./database/routers/students");
 const instructorRouter = require("./database/routers/routerInstructor")
@@ -44,7 +45,8 @@ registerLicense('licenseKey');
  * Database Connection
  */
 var { database } = include("./scripts/databaseConnection");
-const userCollection = database.db(mongodb_database).collection("users");
+const userCollection = database.db(mongodb_database).collection("students");
+
 
 // Navigation links array
 const navLinks = [
@@ -147,12 +149,15 @@ app.get("/login", (req, res) => {
 });
 
 app.post("/signupSubmit", async (req, res) => {
-  const { firstname, lastname, username, email, password } = req.body;
+  const { firstname, lastname, studentid, dateofbirth, username, program, email, password } = req.body;
 
   const schema = Joi.object({
     firstname: Joi.string().alphanum().max(20).required(),
     lastname: Joi.string().alphanum().max(20),
+    studentid: Joi.string().alphanum().max(20).required(),
+    dateofbirth: Joi.date(),
     username: Joi.string().alphanum().max(20).required(),
+    program: Joi.string().max(20),
     email: Joi.string().max(40).required(),
     password: Joi.string().max(20).required(),
   });
@@ -170,18 +175,23 @@ app.post("/signupSubmit", async (req, res) => {
 
   // Insert user data into the database
   await userCollection.insertOne({
-    firstname: firstname,
-    lastname: lastname,
+    studentId: studentid,
+    first_name: firstname,
+    last_name: lastname,
     username: username,
     email: email,
+    date_of_birth: dateofbirth,
+    program: program,
     password: hashedPassword,
   });
 
   req.session.authenticated = true;
+  req.session.studentId = studentid;
   req.session.firstname = firstname;
   req.session.lastname = lastname;
   req.session.username = username;
   req.session.email = email;
+  req.session.dateofbirth = dateofbirth
   req.session.cookie.maxAge = expireTime;
   res.redirect("/homePage");
 });
@@ -215,8 +225,9 @@ app.post("/loginSubmit", async (req, res) => {
     console.log(userData);
     req.session.authenticated = true;
     req.session.email = email;
-    req.session.firstname = userData.firstname;
-    req.session.lastname = userData.lastname;
+    req.session.studentid = userData.studentId;
+    req.session.firstname = userData.first_name;
+    req.session.lastname = userData.last_name;
     req.session.username = userData.username;
     req.session.cookie.maxAge = expireTime;
     return res.redirect("/homePage");
@@ -225,9 +236,70 @@ app.post("/loginSubmit", async (req, res) => {
   }
 });
 
-app.get("/homePage", sessionValidation, async (req, res) => {
-  res.render("homepage");
+/* ChatBot Routes */
+// -----------------------------------------------------------------------------------------------------
+app.get('/homePage', sessionValidation, async (req, res) => {
+  const chatHistoryCollections = database.db();
+  const conversations = await chatHistoryCollections.collection('chats').find().toArray();
+  res.render('homepage', { conversations, userMessage: '', botMessage: ''});
 });
+
+app.post('/chat', sessionValidation, async (req, res) => {
+  const userMessage = req.body.message;
+
+  try {
+    /*
+    // Log the request payload for debugging
+    console.log('Sending request to ChatGPT API with payload:', {
+      model: "gpt-3.5-turbo",
+      messages: [{ role: "user", content: userMessage }]
+    });
+    */
+
+    // Call the ChatGPT API with GPT-3.5
+    const response = await axios.post('https://api.openai.com/v1/chat/completions', {
+      model: "gpt-3.5-turbo",
+      messages: [{ role: "user", content: userMessage }],
+    }, {
+      headers: {
+        'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
+        'Content-Type': 'application/json'
+      }
+    });
+    
+    /*
+    // Log the response data for debugging
+    console.log('Received response from ChatGPT API', response.data);
+    */
+    
+    const botMessage = response.data.choices[0].message.content;
+
+    const conversation = {
+      sessionID: req.session.id,
+      userMessage: userMessage,
+      botMessage: botMessage,
+      timestamp: new Date()
+    }
+
+    const chatHistoryCollections = database.db();
+    const result = await chatHistoryCollections.collection('chats').insertOne(conversation);
+
+    const conversations = await chatHistoryCollections.collection('chats').find().toArray();
+    res.render('homepage', { conversations, userMessage, botMessage });
+
+  } catch (error) {
+    // Log the full error response for debugging
+    console.error('Error calling ChatGPT API:', error.response ? error.response.data : error.message);
+    res.status(500).send('Error communicating with ChatGPT API');
+  }
+});
+
+/* FOR MODULE
+const { homePage, chatBot } = require('./modules/chatBotMoudle.js');
+app.get('/homePage', sessionValidation, homePage);
+app.post('/chat', sessionValidation, chatBot);
+*/
+// ---------------------------------------------------------------------------------------------------- //
 
 // Route to handle logout
 app.get("/logout", async (req, res) => {
@@ -237,8 +309,10 @@ app.get("/logout", async (req, res) => {
 });
 
 /* Password Reset Routes */
-app.get("/restPasswordRequest", (req, res) => {
-  res.render("reset_password_request");
+// ----------------------------------------------------------------------------------------------------
+app.get('/resetPasswordRequest', (req, res) => {
+  const invalidUser = req.query.invaliduser;
+  res.render('resetPasswordRequest', {invaliduser: invalidUser} );
 });
 
 const crypto = require("crypto");
@@ -250,7 +324,8 @@ app.post("/sendResetLink", async (req, res) => {
   // Find user by email in the database
   const user = await userCollection.findOne({ email: email });
   if (!user) {
-    return res.render("user_not_found");
+    // to change!!!
+    return res.redirect("/resetPasswordRequest?invaliduser=1")
   }
 
   // Generate a unique token and set expiration time for the token
@@ -288,12 +363,10 @@ app.post("/sendResetLink", async (req, res) => {
   transporter.sendMail(mailMessage, (err, info) => {
     if (err) {
       console.error(err);
-      res.render("reset_password_request", {
-        message: "Error sending email. Try Again!",
-      });
+      res.render('resetPasswordRequest', { message: 'Error sending email. Try Again!' });
     } else {
-      console.log("Email sent: " + info.response);
-      res.redirect("/restPasswordRequest");
+      console.log('Email sent: ' + info.response);
+      res.redirect('/resetPasswordRequest');
     }
   });
 });
@@ -306,10 +379,10 @@ app.get("/resetPassword/:token", async (req, res) => {
     resetPasswordExpires: { $gt: Date.now() },
   });
   if (!user) {
-    return res.render("reset_password_invalid_token");
+    return res.render('resetPasswordInvalidToken');
   }
 
-  res.render("reset_password", { token: token });
+  res.render('resetPassword', { token: token });
 });
 
 app.post("/resetPassword", async (req, res) => {
@@ -320,7 +393,7 @@ app.post("/resetPassword", async (req, res) => {
     resetPasswordExpires: { $gt: Date.now() },
   });
   if (!user) {
-    return res.render("reset_password_invalid_token");
+    return res.render('resetPasswordInvalidToken');
   }
 
   const hashedPassword = await bcrypt.hash(password, saltRounds);
@@ -335,41 +408,45 @@ app.post("/resetPassword", async (req, res) => {
 
   res.redirect("/login");
 });
+// ---------------------------------------------------------------------------------------------------- //
 
-app.get("/profile", sessionValidation, async (req, res) => {
+/* Profile Routes */
+// ---------------------------------------------------------------------------------------------------- 
+app.get('/profile', sessionValidation, async (req, res) => {
+  const studentid = req.session.studentid;
   const firstname = req.session.firstname;
   const lastname = req.session.lastname;
   const username = req.session.username;
   const email = req.session.email;
-  res.render("user_profile", {
-    firstName: firstname,
-    lastName: lastname,
-    userName: username,
-    emailAddress: email,
-  });
-});
+  res.render("userProfile", { 
+    studentId: studentid, 
+    firstName: firstname, 
+    lastName: lastname, 
+    userName: username, 
+    emailAddress: email });
+})
 
-app.post("/update-profile", sessionValidation, async (req, res) => {
-  const { firstname, lastname, username, email } = req.body;
+app.post('/updateProfile', sessionValidation, async (req, res) => {
+  const { studentid, firstname, lastname, username, email } = req.body;
   const user = await userCollection.findOne({ username: username });
 
-  await userCollection.updateOne(
-    { username: user.username },
-    {
-      $set: {
-        firstname: firstname,
-        lastname: lastname,
-        username: username,
-        email: email,
-      },
+  await userCollection.updateOne({ username: user.username }, {
+    $set: {
+      studentId: studentid,
+      first_name: firstname,
+      last_name: lastname,
+      username: username,
+      email: email
     }
-  );
+  });
+  req.session.studentid = studentid;
   req.session.firstname = firstname;
   req.session.lastname = lastname;
   req.session.username = username;
   req.session.email = email;
   res.redirect("/profile");
 });
+// ---------------------------------------------------------------------------------------------------- //
 
 app.get('/calendar', sessionValidation, async (req, res) => {
   res.render("calendar", { ESSENTIAL_STUDIO_KEY: process.env.ESSENTIAL_STUDIO_KEY });

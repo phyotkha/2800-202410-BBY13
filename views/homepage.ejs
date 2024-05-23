@@ -1,57 +1,37 @@
 <%- include("templates/header") %>
-  <div class="chat-container">
-    <div class="chat-history">
+<div class="chat-container">
+  <div class="chat-history">
+    <form action="/chat" method="POST">
+      <% conversations.forEach(conversation => { %>
       <div class="chat-message bot">
-        <!-- Bot message goes here -->
+        <div id="bot-message">
+          <img src="/navbar-logo.png" width="30" height="30" style="border-radius: 25px; ">
+          <strong>SchoolScope</strong>
+        </div>
+        <%= conversation.botMessage %>
       </div>
       <div class="chat-message user">
-        <!-- User message goes here -->
+        <div id="user-message">
+          <strong>You</strong>
+        </div>
+        <%= conversation.userMessage %>
       </div>
-      <div class="chat-message bot">
-        <div class="message">Chat Bot Message</div>
+      <% }) %>
+      <div class="chat-input">
+        <input name="message" type="text" placeholder="Type a message...">
+        <button class="btn btn-primary" type="submit">Send</button>
       </div>
-      <div class="chat-message user">
-        <div class="message">User Message</div>
-      </div>
-      <div class="chat-message bot">
-        <div class="message">Chat Bot Message</div>
-      </div>
-      <div class="chat-message user">
-        <div class="message">User Message</div>
-      </div>
-      <div class="chat-message bot">
-        <div class="message">Chat Bot Message</div>
-      </div>
-      <div class="chat-message user">
-        <div class="message">User Message</div>
-      </div>
-      <div class="chat-message bot">
-        <div class="message">Chat Bot Message</div>
-      </div>
-      <div class="chat-message user">
-        <div class="message">User Message</div>
-      </div>
-      <div class="chat-message bot">
-        <div class="message">Chat Bot Message</div>
-      </div>
-      <div class="chat-message user">
-        <div class="message">User Message</div>
-      </div>
-      <div class="chat-message bot">
-        <div class="message">Chat Bot Message</div>
-      </div>
-      <div class="chat-message user">
-        <div class="message">User Message</div>
-      </div>
-      <div class="chat-message bot">
-        <div class="message">Chat Bot Message</div>
-      </div>
-      <div class="chat-message user">
-        <div class="message">User Message</div>
-      </div>
-    </div>
-    <div class="chat-input">
-      <input type="text" placeholder="Type a message...">
-      <button class="btn btn-primary">Send</button>
-    </div>
+    </form>
   </div>
+
+<!-- <% if (botMessage) { %>
+<div class="chat-message bot">
+  <img src="/white-transparent-logo.png" width="50" height="50">
+  <%= botMessage %>
+</div>
+<% } %>
+<% if (userMessage) { %>
+<div class="chat-message user">
+  <%= userMessage %>
+</div>
+<% } %> -->
