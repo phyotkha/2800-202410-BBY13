@@ -236,16 +236,28 @@ app.post("/loginSubmit", async (req, res) => {
   }
 });
 
-/* ChatBot Routes */
-// -----------------------------------------------------------------------------------------------------
-app.get('/homePage', sessionValidation, async (req, res) => {
-  const chatHistoryCollections = database.db();
-  const conversations = await chatHistoryCollections.collection('chats').find().toArray();
-  res.render('homepage', { conversations, userMessage: '', botMessage: ''});
+// -----------------------------------------------------------------------------
+app.get('/homepage', sessionValidation, async (req, res) => {
+  // Initialize chat history if it doesn't exist
+  if (!req.session.chatHistory) {
+    req.session.chatHistory = [];
+  }
+
+  res.render('homepage', { chatHistory: req.session.chatHistory, firstname: req.session.firstname });
 });
 
 app.post('/chat', sessionValidation, async (req, res) => {
   const userMessage = req.body.message;
+  const firstname = req.session.firstname;
+
+  // Initialize chat history if it doesn't exist
+  if (!req.session.chatHistory) {
+    req.session.chatHistory = [];
+  }
+
+  // Add user message to chat history
+  req.session.chatHistory.push({ role: 'user', content: userMessage });
+
 
   try {
     /*
@@ -266,40 +278,27 @@ app.post('/chat', sessionValidation, async (req, res) => {
         'Content-Type': 'application/json'
       }
     });
-    
+
     /*
     // Log the response data for debugging
     console.log('Received response from ChatGPT API', response.data);
     */
-    
+
     const botMessage = response.data.choices[0].message.content;
 
-    const conversation = {
-      sessionID: req.session.id,
-      userMessage: userMessage,
-      botMessage: botMessage,
-      timestamp: new Date()
-    }
+    // Add bot message to chat history
+    req.session.chatHistory.push({ role: 'bot', content: botMessage });
 
-    const chatHistoryCollections = database.db();
-    const result = await chatHistoryCollections.collection('chats').insertOne(conversation);
-
-    const conversations = await chatHistoryCollections.collection('chats').find().toArray();
-    res.render('homepage', { conversations, userMessage, botMessage });
+    res.render('homepage', { chatHistory: req.session.chatHistory, firstname: firstname });
 
   } catch (error) {
     // Log the full error response for debugging
     console.error('Error calling ChatGPT API:', error.response ? error.response.data : error.message);
     res.status(500).send('Error communicating with ChatGPT API');
   }
-});
 
-/* FOR MODULE
-const { homePage, chatBot } = require('./modules/chatBotMoudle.js');
-app.get('/homePage', sessionValidation, homePage);
-app.post('/chat', sessionValidation, chatBot);
-*/
-// ---------------------------------------------------------------------------------------------------- //
+});
+// ------------------------------------------------------------------
 
 // Route to handle logout
 app.get("/logout", async (req, res) => {
