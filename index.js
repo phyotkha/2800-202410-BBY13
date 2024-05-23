@@ -50,11 +50,11 @@ const userCollection = database.db(mongodb_database).collection("students");
 
 // Navigation links array
 const navLinks = [
-  { name: "Profile", link: "/profile" },
-  { name: "Program & Courses", link: "/p&g" },
+  { name: "Chat", link: "/chatpage" },
+  { name: "Program & Courses", link: "/programs&courses" },
   { name: "Admission", link: "/admission" },
   { name: "Student Services", link: "/stuServices" },
-  { name: "Contact Us", link: "/contact" },
+  { name: "Account", link: "/profile" }
 ];
 
 /**
@@ -131,7 +131,7 @@ function adminAuthorization(req, res, next) {
  * Start of Route Definitons
  */
 app.get("/", async (req, res) => {
-  res.render("starting-page");
+  res.render("startingPage");
 });
 
 app.get("/signup", (req, res) => {
@@ -193,7 +193,7 @@ app.post("/signupSubmit", async (req, res) => {
   req.session.email = email;
   req.session.dateofbirth = dateofbirth
   req.session.cookie.maxAge = expireTime;
-  res.redirect("/homePage");
+  res.redirect("/chatpage");
 });
 
 // Route to handle login form submission
@@ -230,7 +230,7 @@ app.post("/loginSubmit", async (req, res) => {
     req.session.lastname = userData.last_name;
     req.session.username = userData.username;
     req.session.cookie.maxAge = expireTime;
-    return res.redirect("/homePage");
+    return res.redirect("/chatpage");
   } else {
     return res.redirect("/login?invalidpassword=1");
   }
@@ -238,10 +238,10 @@ app.post("/loginSubmit", async (req, res) => {
 
 /* ChatBot Routes */
 // -----------------------------------------------------------------------------------------------------
-app.get('/homePage', sessionValidation, async (req, res) => {
+app.get('/chatpage', sessionValidation, async (req, res) => {
   const chatHistoryCollections = database.db();
   const conversations = await chatHistoryCollections.collection('chats').find().toArray();
-  res.render('homepage', { conversations, userMessage: '', botMessage: ''});
+  res.render('chatpage', { conversations, userMessage: '', botMessage: ''});
 });
 
 app.post('/chat', sessionValidation, async (req, res) => {
@@ -285,7 +285,7 @@ app.post('/chat', sessionValidation, async (req, res) => {
     const result = await chatHistoryCollections.collection('chats').insertOne(conversation);
 
     const conversations = await chatHistoryCollections.collection('chats').find().toArray();
-    res.render('homepage', { conversations, userMessage, botMessage });
+    res.render('chatpage', { conversations, userMessage, botMessage });
 
   } catch (error) {
     // Log the full error response for debugging
@@ -449,7 +449,15 @@ app.post('/updateProfile', sessionValidation, async (req, res) => {
 // ---------------------------------------------------------------------------------------------------- //
 
 app.get('/calendar', sessionValidation, async (req, res) => {
-  res.render("calendar", { ESSENTIAL_STUDIO_KEY: process.env.ESSENTIAL_STUDIO_KEY });
+  res.render("calendar");
+});
+
+app.get('/chatpage', sessionValidation, async (req, res) => {
+  res.render("chatpage");
+});
+
+app.get('/p&g', sessionValidation, async (req, res) => {
+  res.render("p&g");
 });
 
 // Students router
