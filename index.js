@@ -12,7 +12,6 @@ const app = express();
 const Joi = require("joi");
 const bcrypt = require("bcrypt");
 const axios = require("axios");
-const bodyParser = require('body-parser');
 
 const studentsRouter = require("./database/routers/students");
 
@@ -60,7 +59,6 @@ const navLinks = [
  */
 app.set('view engine', 'ejs'); //Setting view engine to EJS
 app.use(express.urlencoded({ extended: false })); // To parse URL-encoded bodies
-app.use(bodyParser.urlencoded({ extended: true }));
 
 //Middleware so we don't need to add these navlinks/url params into everything.
 //This add navigation links and current URL to local variables.
@@ -218,6 +216,7 @@ app.post("/loginSubmit", async (req, res) => {
     console.log(userData);
     req.session.authenticated = true;
     req.session.email = email;
+    req.session.studentid = userData.studentId;
     req.session.firstname = userData.first_name;
     req.session.lastname = userData.last_name;
     req.session.username = userData.username;
@@ -228,13 +227,15 @@ app.post("/loginSubmit", async (req, res) => {
   }
 });
 
-// -----------------------------------------------------------------------------
-app.get('/homePage', async (req, res) => {
-
-  res.render('homepage', { userMessage: '', botMessage: ''});
+/* ChatBot Routes */
+// -----------------------------------------------------------------------------------------------------
+app.get('/homePage', sessionValidation, async (req, res) => {
+  const chatHistoryCollections = database.db();
+  const conversations = await chatHistoryCollections.collection('chats').find().toArray();
+  res.render('homepage', { conversations, userMessage: '', botMessage: ''});
 });
 
-app.post('/chat', async (req, res) => {
+app.post('/chat', sessionValidation, async (req, res) => {
   const userMessage = req.body.message;
 
   try {
@@ -261,10 +262,21 @@ app.post('/chat', async (req, res) => {
     // Log the response data for debugging
     console.log('Received response from ChatGPT API', response.data);
     */
-   
+    
     const botMessage = response.data.choices[0].message.content;
 
-    res.render('homepage', { userMessage, botMessage });
+    const conversation = {
+      sessionID: req.session.id,
+      userMessage: userMessage,
+      botMessage: botMessage,
+      timestamp: new Date()
+    }
+
+    const chatHistoryCollections = database.db();
+    const result = await chatHistoryCollections.collection('chats').insertOne(conversation);
+
+    const conversations = await chatHistoryCollections.collection('chats').find().toArray();
+    res.render('homepage', { conversations, userMessage, botMessage });
 
   } catch (error) {
     // Log the full error response for debugging
@@ -272,7 +284,13 @@ app.post('/chat', async (req, res) => {
     res.status(500).send('Error communicating with ChatGPT API');
   }
 });
-// ------------------------------------------------------------------
+
+/* FOR MODULE
+const { homePage, chatBot } = require('./modules/chatBotMoudle.js');
+app.get('/homePage', sessionValidation, homePage);
+app.post('/chat', sessionValidation, chatBot);
+*/
+// ---------------------------------------------------------------------------------------------------- //
 
 // Route to handle logout
 app.get("/logout", async (req, res) => {
@@ -282,8 +300,10 @@ app.get("/logout", async (req, res) => {
 });
 
 /* Password Reset Routes */
-app.get('/restPasswordRequest', (req, res) => {
-  res.render('reset_password_request');
+// ----------------------------------------------------------------------------------------------------
+app.get('/resetPasswordRequest', (req, res) => {
+  const invalidUser = req.query.invaliduser;
+  res.render('resetPasswordRequest', {invaliduser: invalidUser} );
 });
 
 const crypto = require('crypto');
@@ -295,7 +315,8 @@ app.post('/sendResetLink', async (req, res) => {
   // Find user by email in the database
   const user = await userCollection.findOne({ email: email });
   if (!user) {
-    return res.render("user_not_found");
+    // to change!!!
+    return res.redirect("/resetPasswordRequest?invaliduser=1")
   }
 
   // Generate a unique token and set expiration time for the token
@@ -324,7 +345,7 @@ app.post('/sendResetLink', async (req, res) => {
     subject: 'Password Reset',
     text: `You are receiving this because you (or someone else) have requested the reset of the password for your account.\n\n` +
       `Please click on the following link, or paste this into your browser to complete the process:\n\n` +
-      `https://${req.headers.host}/resetPassword/${token}\n\n` +
+      `http://${req.headers.host}/resetPassword/${token}\n\n` +
       `If you did not request this, please ignore this email and your password will remain unchanged. The link will expire in one hour.\n`
   };
 
@@ -332,10 +353,10 @@ app.post('/sendResetLink', async (req, res) => {
   transporter.sendMail(mailMessage, (err, info) => {
     if (err) {
       console.error(err);
-      res.render('reset_password_request', { message: 'Error sending email. Try Again!' });
+      res.render('resetPasswordRequest', { message: 'Error sending email. Try Again!' });
     } else {
       console.log('Email sent: ' + info.response);
-      res.redirect('/restPasswordRequest');
+      res.redirect('/resetPasswordRequest');
     }
   });
 });
@@ -345,10 +366,10 @@ app.get('/resetPassword/:token', async (req, res) => {
 
   const user = await userCollection.findOne({ resetPasswordToken: token, resetPasswordExpires: { $gt: Date.now() } });
   if (!user) {
-    return res.render('reset_password_invalid_token');
+    return res.render('resetPasswordInvalidToken');
   }
 
-  res.render('reset_password', { token: token });
+  res.render('resetPassword', { token: token });
 });
 
 app.post('/resetPassword', async (req, res) => {
@@ -356,7 +377,7 @@ app.post('/resetPassword', async (req, res) => {
 
   const user = await userCollection.findOne({ resetPasswordToken: token, resetPasswordExpires: { $gt: Date.now() } });
   if (!user) {
-    return res.render('reset_password_invalid_token');
+    return res.render('resetPasswordInvalidToken');
   }
 
   const hashedPassword = await bcrypt.hash(password, saltRounds);
@@ -368,33 +389,45 @@ app.post('/resetPassword', async (req, res) => {
 
   res.redirect('/login');
 });
+// ---------------------------------------------------------------------------------------------------- //
 
+/* Profile Routes */
+// ---------------------------------------------------------------------------------------------------- 
 app.get('/profile', sessionValidation, async (req, res) => {
+  const studentid = req.session.studentid;
   const firstname = req.session.firstname;
   const lastname = req.session.lastname;
   const username = req.session.username;
   const email = req.session.email;
-  res.render("user_profile", { firstName: firstname, lastName: lastname, userName: username, emailAddress: email });
+  res.render("userProfile", { 
+    studentId: studentid, 
+    firstName: firstname, 
+    lastName: lastname, 
+    userName: username, 
+    emailAddress: email });
 })
 
-app.post('/update-profile', sessionValidation, async (req, res) => {
-  const { firstname, lastname, username, email } = req.body;
+app.post('/updateProfile', sessionValidation, async (req, res) => {
+  const { studentid, firstname, lastname, username, email } = req.body;
   const user = await userCollection.findOne({ username: username });
 
   await userCollection.updateOne({ username: user.username }, {
     $set: {
+      studentId: studentid,
       first_name: firstname,
       last_name: lastname,
       username: username,
       email: email
     }
   });
+  req.session.studentid = studentid;
   req.session.firstname = firstname;
   req.session.lastname = lastname;
   req.session.username = username;
   req.session.email = email;
   res.redirect('/profile');
 });
+// ---------------------------------------------------------------------------------------------------- //
 
 app.get('/calendar', sessionValidation, async (req, res) => {
   res.render("calendar");

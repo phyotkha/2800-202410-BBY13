@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 require('./schemas/students');
 require('./schemas/courses');
-// require('./schemas/chat');
+require('./schemas/chat');
 
 require("dotenv").config();
 const mongodb_host = process.env.MONGODB_HOST;
