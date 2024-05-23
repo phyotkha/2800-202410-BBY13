@@ -1,57 +1,27 @@
 <%- include("templates/header") %>
-  <div class="chat-container">
-    <div class="chat-history">
-      <div class="chat-message bot">
-        <!-- Bot message goes here -->
-      </div>
-      <div class="chat-message user">
-        <!-- User message goes here -->
-      </div>
-      <div class="chat-message bot">
-        <div class="message">Chat Bot Message</div>
-      </div>
-      <div class="chat-message user">
-        <div class="message">User Message</div>
-      </div>
-      <div class="chat-message bot">
-        <div class="message">Chat Bot Message</div>
-      </div>
-      <div class="chat-message user">
-        <div class="message">User Message</div>
-      </div>
-      <div class="chat-message bot">
-        <div class="message">Chat Bot Message</div>
-      </div>
-      <div class="chat-message user">
-        <div class="message">User Message</div>
-      </div>
-      <div class="chat-message bot">
-        <div class="message">Chat Bot Message</div>
-      </div>
-      <div class="chat-message user">
-        <div class="message">User Message</div>
-      </div>
-      <div class="chat-message bot">
-        <div class="message">Chat Bot Message</div>
-      </div>
-      <div class="chat-message user">
-        <div class="message">User Message</div>
-      </div>
-      <div class="chat-message bot">
-        <div class="message">Chat Bot Message</div>
-      </div>
-      <div class="chat-message user">
-        <div class="message">User Message</div>
-      </div>
-      <div class="chat-message bot">
-        <div class="message">Chat Bot Message</div>
-      </div>
-      <div class="chat-message user">
-        <div class="message">User Message</div>
+<div class="chat-container" onload="scrollToBottom()">
+  <div class="chat-history" id="chatHistory">
+    <% chatHistory.forEach(message => { %>
+    <div class="chat-message <%= message.role %>">
+      <div class="message">
+        <strong><%= message.role === 'user' ? firstname : 'SchoolScope' %>:</strong> <%= message.content %>
       </div>
     </div>
-    <div class="chat-input">
-      <input type="text" placeholder="Type a message...">
-      <button class="btn btn-primary">Send</button>
-    </div>
+    <% }) %>
   </div>
+  <form action="/chat" method="POST">
+    <div class="chat-input">
+      <input name="message" type="text" placeholder="Type a message...">
+      <button class="btn btn-primary" type="submit">Send</button>
+    </div>
+  </form>
+</div>
+
+<script>
+  function scrollToBottom() {
+    var chatHistory = document.getElementById("chatHistory");
+    chatHistory.scrollTop = chatHistory.scrollHeight;
+  }
+
+  window.onload = scrollToBottom;
+</script>
