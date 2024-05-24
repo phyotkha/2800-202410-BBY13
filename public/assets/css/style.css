@@ -114,9 +114,8 @@
 @media (max-width: 768px) {
 
     .chat-container {
-        height: calc(100vh - 105px - 60px);
+        height: calc(100vh - 105px - 20px);
         margin-top: 4px;
-        left: 50%;
     }
 
     /* .chat-history {
