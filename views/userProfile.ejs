@@ -1,10 +1,10 @@
 <%- include("templates/header") %>
 <br>
-<h2>
+<h1 style="font-weight: bold;">
   <%= firstName %>'s profile:
-</h2>
+</h1><br>
 <form action="/updateProfile" method="post">
-  <div class="row">
+  <div class="row"><br>
     <div class="col">
       <label>First Name</label>
       <input name="firstname" type="text" class="form-control" placeholder="First name" value="<%= firstName %>" disabled>
@@ -13,8 +13,8 @@
       <label>Last Name</label>
       <input name="lastname" type="text" class="form-control" placeholder="Last name" value="<%= lastName %>" disabled>
     </div>
-  </div>
-  <div class="row">
+  </div><br>
+  <div class="row"><br>
     <div class="col">
       <label>Username</label>
       <input name="username" type="text" class="form-control" placeholder="Username" value="<%= userName %>" disabled>
@@ -23,7 +23,7 @@
       <label>Student ID</label>
       <input name="studentid" type="text" class="form-control" placeholder="Student Id" value="<%= studentId %>" disabled>
     </div>
-  </div>
+  </div><br>
   <div class="form-group">
     <label for="exampleInputEmail1">Email address</label>
     <input name="email" type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Enter email" value="<%= emailAddress %>" disabled>
