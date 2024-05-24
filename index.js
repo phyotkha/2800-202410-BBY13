@@ -50,11 +50,10 @@ const userCollection = database.db(mongodb_database).collection("students");
 
 // Navigation links array
 const navLinks = [
-  { name: "Chat", link: "/chatpage" },
-  { name: "Program & Courses", link: "/programs&courses" },
-  { name: "Admission", link: "/admission" },
-  { name: "Student Services", link: "/stuServices" },
-  { name: "Profile", link: "/profile" }
+  { name: "Chat", link: "/chatPage" },
+  { name: "Calendar", link: "/calendar" },
+  { name: "Account", link: "/profile" },
+  { name: "About Us", link: "/aboutus"}
 ];
 
 /** 
@@ -105,8 +104,9 @@ function isValidSession(req) {
 function sessionValidation(req, res, next) {
   if (isValidSession(req)) {
     next();
-  } else {
-    res.redirect("/login");
+  }
+  else {
+    res.redirect('/');
   }
 }
 
@@ -178,7 +178,7 @@ app.post("/signupSubmit", async (req, res) => {
   req.session.email = email;
   req.session.dateofbirth = dateofbirth
   req.session.cookie.maxAge = expireTime;
-  res.redirect("/chatpage");
+  res.redirect("/chatPage");
 });
 
 // Route to handle login form submission
@@ -215,20 +215,20 @@ app.post("/loginSubmit", async (req, res) => {
     req.session.lastname = userData.last_name;
     req.session.username = userData.username;
     req.session.cookie.maxAge = expireTime;
-    return res.redirect("/chatpage");
+    return res.redirect("/chatPage");
   } else {
     return res.redirect("/login?invalidpassword=1");
   }
 });
 
 // -----------------------------------------------------------------------------
-app.get('/chatpage', sessionValidation, async (req, res) => {
+app.get('/chatPage', sessionValidation, async (req, res) => {
   // Initialize chat history if it doesn't exist
   if (!req.session.chatHistory) {
     req.session.chatHistory = [];
   }
 
-  res.render('chatpage', { chatHistory: req.session.chatHistory, firstname: req.session.firstname });
+  res.render('chatPage', { chatHistory: req.session.chatHistory, firstname: req.session.firstname });
 });
 
 app.post('/chat', sessionValidation, async (req, res) => {
@@ -261,7 +261,7 @@ app.post('/chat', sessionValidation, async (req, res) => {
     // Add bot message to chat history
     req.session.chatHistory.push({ role: 'bot', content: botMessage });
 
-    res.render('chatpage', { chatHistory: req.session.chatHistory, firstname: firstname });
+    res.render('chatPage', { chatHistory: req.session.chatHistory, firstname: firstname });
 
   } catch (error) {
     console.error('Error calling ChatGPT API:', error.response ? error.response.data : error.message);
@@ -422,8 +422,16 @@ app.get('/calendar', sessionValidation, async (req, res) => {
   res.render("calendar");
 });
 
-app.get('/chatpage', sessionValidation, async (req, res) => {
-  res.render("chatpage");
+app.get('/chatPage', sessionValidation, async (req, res) => {
+  res.render("chatPage");
+});
+
+app.get('/p&g', sessionValidation, async (req, res) => {
+  res.render("p&g");
+});
+
+app.get('/starting-page', async (req, res) => {
+  res.render("starting-page");
 });
 
 app.get('/p&g', sessionValidation, async (req, res) => {

@@ -2,6 +2,31 @@
     background-color: #003C71;
 }
 
+.nav-link {
+    position: relative;
+    color: white;
+}
+
+.nav-link:hover {
+    color: #FFC107;
+}
+
+.nav-link::after {
+    content: "";
+    opacity: 0;
+    transition: all 0.2s;
+    height: 2px;
+    width: 100%;
+    background-color: yellow;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+}
+
+.nav-link:hover::after {
+    opacity: 1;
+}
+
 .navbar-custom .navbar-text {
     color: #003C71;
 }
@@ -14,15 +39,15 @@
 .chat-container {
     display: flex;
     flex-direction: column;
-    height: calc(100vh - 105px); /* Subtract header's height */
-    margin-top: 22px;
+    height: calc(100vh - 105px);
+    margin-top: 3px;
     border: 1px solid #ccc;
     border-radius: 10px;
     overflow: hidden;
 }
 
 .chat-history {
-    border-radius: 10px;
+    border-radius: 2;
     flex: 1;
     padding: 15px;
     overflow-y: auto;
