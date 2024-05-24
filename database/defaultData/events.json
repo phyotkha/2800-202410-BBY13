@@ -1,0 +1,11 @@
+[
+  {
+    "Id": 1,
+    "Subject": "Yerin's Appointment",
+    "StartTime": "2024-05-24T10:00:00.000",
+    "EndTime": "2024-05-24T10:30:00.000",
+    "CatagoryColor": "darkblue",
+    "departmentId": 1,
+    "instructorId": 1
+  }
+]
