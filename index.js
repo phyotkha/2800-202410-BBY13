@@ -50,11 +50,10 @@ const userCollection = database.db(mongodb_database).collection("students");
 
 // Navigation links array
 const navLinks = [
-  { name: "Profile", link: "/profile" },
-  { name: "Program & Courses", link: "/p&g" },
-  { name: "Admission", link: "/admission" },
-  { name: "Student Services", link: "/stuServices" },
-  { name: "Contact Us", link: "/contact" },
+  { name: "Chat", link: "/homepage" },
+  { name: "Calendar", link: "/calendar" },
+  { name: "Account", link: "/profile" },
+  { name: "About Us", link: "/aboutus"}
 ];
 
 /**
@@ -105,8 +104,9 @@ function isValidSession(req) {
 function sessionValidation(req, res, next) {
   if (isValidSession(req)) {
     next();
-  } else {
-    res.redirect("/login");
+  }
+  else {
+    res.redirect('/');
   }
 }
 
@@ -131,7 +131,7 @@ function adminAuthorization(req, res, next) {
  * Start of Route Definitons
  */
 app.get("/", async (req, res) => {
-  res.render("starting-page");
+  res.render("homePage");
 });
 
 app.get("/signup", (req, res) => {
@@ -449,6 +449,14 @@ app.post('/updateProfile', sessionValidation, async (req, res) => {
 
 app.get('/calendar', sessionValidation, async (req, res) => {
   res.render("calendar", { ESSENTIAL_STUDIO_KEY: process.env.ESSENTIAL_STUDIO_KEY });
+});
+
+app.get('/starting-page', async (req, res) => {
+  res.render("starting-page");
+});
+
+app.get('/p&g', sessionValidation, async (req, res) => {
+  res.render("p&g");
 });
 
 // Students router

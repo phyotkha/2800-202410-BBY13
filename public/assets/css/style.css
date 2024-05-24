@@ -8,7 +8,7 @@
 
 .btn {
     background-color: #003C71;
-    border-radius: 0;
+    border-radius: 2;
 }
 
 .chat-container {
@@ -22,7 +22,7 @@
 }
 
 .chat-history {
-    border-radius: 10px;
+    border-radius: 2;
     flex: 1;
     padding: 15px;
     overflow-y: auto;
