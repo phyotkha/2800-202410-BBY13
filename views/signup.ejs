@@ -17,10 +17,16 @@
       <div class="col">
         <label>First Name</label>
         <input name="firstname" type="text" class="form-control" placeholder="First name">
+        <% if (error) { %>
+          <div style="color: red; margin-top: 5px;">Error: <%= error %> </div>
+          <% } %>
       </div>
       <div class="col">
         <label>Last Name</label>
         <input name="lastname" type="text" class="form-control" placeholder="Last name">
+        <% if (error) { %>
+          <div style="color: red; margin-top: 5px;">Error: <%= error %> </div>
+          <% } %>
       </div>
     </div>
     <br>

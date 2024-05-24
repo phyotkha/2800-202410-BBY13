@@ -106,8 +106,8 @@ function sessionValidation(req, res, next) {
     next();
   }
   else {
-    res.redirect('/login');
-  } 
+    res.redirect('/');
+  }
 }
 
 /**
@@ -154,6 +154,7 @@ app.post("/signupSubmit", async (req, res) => {
     res.render("signupErr", {
       error: validationResult.error.details[0].message,
     });
+    return;
   }
 
   var hashedPassword = await bcrypt.hash(password, saltRounds);
@@ -424,18 +425,6 @@ app.get('/calendar', sessionValidation, async (req, res) => {
 
 app.get('/chatPage', sessionValidation, async (req, res) => {
   res.render("chatPage");
-});
-
-app.get('/p&g', sessionValidation, async (req, res) => {
-  res.render("p&g");
-});
-
-app.get('/starting-page', async (req, res) => {
-  res.render("starting-page");
-});
-
-app.get('/p&g', sessionValidation, async (req, res) => {
-  res.render("p&g");
 });
 
 // Students router
