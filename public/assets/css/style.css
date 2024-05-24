@@ -1,7 +1,3 @@
-.no-zoom {
-    touch-action: manipulation;
-}
-
 .navbar-custom {
     background-color: #003C71;
 }
@@ -119,6 +115,7 @@
     .chat-container {
         /* height: calc(100vh - 105px - 20px); */
         max-height: 100vh;
+        margin-top: 5px;
     }
 
     .chat-input input {

@@ -7,9 +7,9 @@
         <% if (message.role === 'user') { %>
         <strong><%= firstname %>:</strong>
         <% } else { %>
-        <strong><img id ="botLogo" src="/navbar-logo.png" alt="SchoolScope"> SchoolScope:</strong>
-        <% } %>
-        <%= message.content %>
+        <strong><img class="botLogo" src="/navbar-logo.png" alt="SchoolScope"> SchoolScope:</strong>
+          <% } %>
+          <%= message.content %>
       </div>
     </div>
     <% }) %>
@@ -31,8 +31,7 @@
 </div>
 
 <!-- BootStrap Script -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" 
-integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
 
@@ -45,32 +44,35 @@ integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIe
   window.onload = scrollToBottom;
 
   document.addEventListener('DOMContentLoaded', (event) => {
-    let clickCount = 0;
-    const schoolscopeElement = document.getElementById('botLogo');
     const easterEggElement = document.getElementById('easterEgg');
     const easterEggImage = document.getElementById('easterEggImage');
 
-    schoolscopeElement.addEventListener('click', () => {
-      clickCount++;
-      if (clickCount === 2) {
-        // Show the easter egg
-        easterEggElement.style.display = 'block';
-        easterEggImage.classList.add('animate');
+    const botLogoElement = document.querySelectorAll('.botLogo');
+    botLogoElement.forEach(botLogoElement => {
+      let clickCount = 0;
 
-        // Reset click count after displaying the easter egg
-        clickCount = 0;
+      botLogoElement.addEventListener('click', () => {
+        clickCount++;
+        if (clickCount === 2) {
+          // Show the easter egg
+          easterEggElement.style.display = 'block';
+          easterEggImage.classList.add('animate');
 
-        // Hide the easter egg after 3 seconds
+          // Reset click count after displaying the easter egg
+          clickCount = 0;
+
+          // Hide the easter egg after 3 seconds
+          setTimeout(() => {
+            easterEggElement.style.display = 'none';
+            easterEggImage.classList.remove('animate');
+          }, 3000);
+        }
+
+        // Reset click count if not clicked within 1 second
         setTimeout(() => {
-          easterEggElement.style.display = 'none';
-          easterEggImage.classList.remove('animate');
-        }, 3000);
-      }
-
-      // Reset click count if not clicked within 1 second
-      setTimeout(() => {
-        clickCount = 0;
-      }, 1000);
+          clickCount = 0;
+        }, 1000);
+      });
     });
   });
 </script>
@@ -163,9 +165,9 @@ integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIe
       left: 50%;
       transform: translateX(-50%);
     }
-    
+
     #easterEggImage {
-      width: 180px; 
+      width: 180px;
       height: 180px;
     }
 
@@ -173,8 +175,8 @@ integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIe
       width: 200px;
       bottom: 105%;
       left: 110%;
-      font-size: 14px; 
-      padding: 5px 10px; 
+      font-size: 14px;
+      padding: 5px 10px;
     }
   }
 </style>
