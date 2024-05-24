@@ -18,19 +18,19 @@
   <script src="https://cdn.syncfusion.com/ej2/20.1.55/dist/ej2.min.js"></script>
   <script>
 
-    ej.base.registerLicense('<%= licenseKey %>');
-    document.addEventListener('DOMContentLoaded', function () {
-      const { Schedule, Day, Week, WorkWeek, Month, Agenda } = ej.schedule;
-      let scheduleObj = new Schedule({
-        height: '550px',
-        selectedDate: new Date(),
-        eventSettings: { dataSource: [] },
-        allowAdding: false, 
-        views: ['Day', 'Week', 'WorkWeek', 'Month', 'Agenda']
-      });
+    // ej.base.registerLicense('<%= licenseKey %>');
+    // document.addEventListener('DOMContentLoaded', function () {
+    //   const { Schedule, Day, Week, WorkWeek, Month, Agenda } = ej.schedule;
+    //   let scheduleObj = new Schedule({
+    //     height: '550px',
+    //     selectedDate: new Date(),
+    //     eventSettings: { dataSource: [] },
+    //     allowAdding: false, 
+    //     views: ['Day', 'Week', 'WorkWeek', 'Month', 'Agenda']
+    //   });
 
-      scheduleObj.appendTo('#schedule');
-    });
+    //   scheduleObj.appendTo('#schedule');
+    // });
   </script>
 </head>
 
