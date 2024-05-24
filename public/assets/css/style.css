@@ -116,6 +116,11 @@
 }
 
 @media (max-width: 768px) {
+    .chat-container {
+        /* height: calc(100vh - 105px - 20px); */
+        max-height: 100vh;
+    }
+
     .chat-input input {
         width: 70%;
     }
