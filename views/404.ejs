@@ -1,3 +1,94 @@
 <%- include("templates/header") %><br>
-    <h1>404 - Page not found</h1>
+<div id="mascot">
+  <div class="mascotContainer">
+    <img id="mascotImage" src="/navbar-logo.png" alt="SchoolScope Image">
+    <div class="messageBubble">404 - Page Not Found!</div>
+  </div>
+</div>
+<style>
+    #mascot {
+      position: fixed;
+      top: 60%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+    }
+  
+    .mascotContainer {
+      position: relative;
+      display: inline-block;
+    }
+  
+    #mascotImage {
+      width: 250px;
+      height: 250px;
+      border-radius: 50%;
+      animation: tilt 0.5s ease-in-out infinite;
+    }
+  
+    @keyframes tilt {
+      0% {
+        transform: rotate(0deg);
+      }
+  
+      25% {
+        transform: rotate(-10deg);
+      }
+  
+      50% {
+        transform: rotate(10deg);
+      }
+  
+      75% {
+        transform: rotate(-10deg);
+      }
+  
+      100% {
+        transform: rotate(0deg);
+      }
+    }
+  
+    .messageBubble {
+      width: 220px;
+      position: absolute;
+      bottom: 90%;
+      left: 130%;
+      transform: translateX(-50%);
+      background-color: #fff;
+      border: 2px solid #000;
+      border-radius: 10px;
+      padding: 10px 15px;
+      box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.3);
+      font-family: Arial, sans-serif;
+      font-size: 20px;
+      transition: opacity 0.5s, visibility 0.5s;
+    }
+    
+    #mascotImage.animate~.messageBubble {
+      visibility: visible;
+      opacity: 1;
+    }
+  
+    @media (max-width: 600px) {
+      #mascot {
+        top: 45%;
+        left: 50%;
+        transform: translateX(-50%);
+      }
+      
+      #mascotImage {
+        width: 180px; 
+        height: 180px;
+      }
+  
+      .messageBubble {
+        width: 200px;
+        bottom: 105%;
+        left: 110%;
+        font-size: 14px; 
+        padding: 5px 10px; 
+      }
+    }
+  </style>
 <%- include("templates/footer") %>
+

@@ -1,0 +1,176 @@
+<%- include("templates/header") %>
+<div class="chat-container" onload="scrollToBottom()">
+  <div class="chat-history" id="chatHistory">
+    <% chatHistory.forEach(message => { %>
+    <div class="chat-message <%= message.role %>">
+      <div class="message">
+        <% if (message.role === 'user') { %>
+        <strong><%= firstname %>:</strong>
+        <% } else { %>
+        <strong><img id ="botLogo" src="/navbar-logo.png" alt="SchoolScope"> SchoolScope:</strong>
+        <% } %>
+        <%= message.content %>
+      </div>
+    </div>
+    <% }) %>
+  </div>
+  <form action="/chat" method="POST">
+    <div class="chat-input">
+      <input name="message" type="text" placeholder="Type a message...">
+      <button class="btn btn-primary" type="submit">Send</button>
+    </div>
+  </form>
+</div>
+
+<div id="easterEgg">
+  <div class="easterEggContainer">
+    <img id="easterEggImage" src="/navbar-logo.png" alt="SchoolScope Image">
+    <div class="messageBubble">Hello! BBY13 greets you. Hope you are you having fun!!</div>
+  </div>
+</div>
+</div>
+
+<!-- BootStrap Script -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" 
+integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+
+<script>
+  function scrollToBottom() {
+    var chatHistory = document.getElementById("chatHistory");
+    chatHistory.scrollTop = chatHistory.scrollHeight;
+  }
+
+  window.onload = scrollToBottom;
+
+  document.addEventListener('DOMContentLoaded', (event) => {
+    let clickCount = 0;
+    const schoolscopeElement = document.getElementById('botLogo');
+    const easterEggElement = document.getElementById('easterEgg');
+    const easterEggImage = document.getElementById('easterEggImage');
+
+    schoolscopeElement.addEventListener('click', () => {
+      clickCount++;
+      if (clickCount === 2) {
+        // Show the easter egg
+        easterEggElement.style.display = 'block';
+        easterEggImage.classList.add('animate');
+
+        // Reset click count after displaying the easter egg
+        clickCount = 0;
+
+        // Hide the easter egg after 3 seconds
+        setTimeout(() => {
+          easterEggElement.style.display = 'none';
+          easterEggImage.classList.remove('animate');
+        }, 3000);
+      }
+
+      // Reset click count if not clicked within 1 second
+      setTimeout(() => {
+        clickCount = 0;
+      }, 1000);
+    });
+  });
+</script>
+
+<!-- Styling -->
+<style>
+  #botLogo {
+    width: 25px;
+    height: 25px;
+    border-radius: 20px;
+    cursor: pointer;
+  }
+
+  #easterEgg {
+    display: none;
+    position: fixed;
+    top: 60%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+  }
+
+  .easterEggContainer {
+    position: relative;
+    display: inline-block;
+  }
+
+  #easterEggImage {
+    width: 250px;
+    height: 250px;
+    border-radius: 50%
+  }
+
+  #easterEggImage.animate {
+    animation: tilt 0.5s ease-in-out;
+  }
+
+  @keyframes tilt {
+    0% {
+      transform: rotate(0deg);
+    }
+
+    25% {
+      transform: rotate(-10deg);
+    }
+
+    50% {
+      transform: rotate(10deg);
+    }
+
+    75% {
+      transform: rotate(-10deg);
+    }
+
+    100% {
+      transform: rotate(0deg);
+    }
+  }
+
+  .messageBubble {
+    width: 220px;
+    position: absolute;
+    bottom: 90%;
+    left: 130%;
+    transform: translateX(-50%);
+    background-color: #fff;
+    border: 2px solid #000;
+    border-radius: 10px;
+    padding: 10px 15px;
+    box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.3);
+    font-family: Arial, sans-serif;
+    font-size: 20px;
+    visibility: hidden;
+    opacity: 0;
+    transition: opacity 0.5s, visibility 0.5s;
+  }
+
+  #easterEggImage.animate~.messageBubble {
+    visibility: visible;
+    opacity: 1;
+  }
+
+  @media (max-width: 600px) {
+    #easterEgg {
+      top: 45%;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+    
+    #easterEggImage {
+      width: 180px; 
+      height: 180px;
+    }
+
+    .messageBubble {
+      width: 200px;
+      bottom: 105%;
+      left: 110%;
+      font-size: 14px; 
+      padding: 5px 10px; 
+    }
+  }
+</style>

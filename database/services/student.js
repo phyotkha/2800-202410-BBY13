@@ -9,40 +9,32 @@ const getCoursesByStudentId = async (studentId) => {
       {
         $match: {
           studentId,
-        }
+        },
       },
       {
         $lookup: {
-          from: 'courses', // The name of the collection to join with
-          localField: 'courses.CourseID', // The field in the local collection
-          foreignField: 'CourseID', // The field in the foreign collection
-          as: 'courses' // The field where the joined data will be stored
-        }
-      }
+          from: "courses", // The name of the collection to join with
+          localField: "courses.courseId", // The field in the local collection
+          foreignField: "courseId", // The field in the foreign collection
+          as: "courses", // The field where the joined data will be stored
+        },
+      },
     ]);
 
-    return result
+    return result;
   } catch (error) {
     throw error;
   }
-}
+};
 
+module.exports = { getCoursesByStudentId };
 
-module.exports = { getCoursesByStudentId }
-
-
-
-
-
-
-
-
-// // Perform the "join" to look up data from the Student collection based on CourseID
+// // Perform the "join" to look up data from the Student collection based on courseId
 // Course.aggregate([
 //   {
 //     $lookup: {
 //       from: 'students', // The name of the collection to join with
-//       localField: 'CourseID', // The field in the local collection (courses)
+//       localField: 'courseId', // The field in the local collection (courses)
 //       foreignField: 'courses', // The field in the foreign collection (students)
 //       as: 'studentsData' // The field where the joined data will be stored
 //     }
@@ -54,11 +46,6 @@ module.exports = { getCoursesByStudentId }
 //   }
 //   console.log(result);
 // });
-
-
-
-
-
 
 // const mongoose = require('mongoose');
 
