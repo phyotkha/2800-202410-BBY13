@@ -38,9 +38,9 @@ const mongodb_database = process.env.MONGODB_DATABASE;
 const mongodb_session_secret = process.env.MONGODB_SESSION_SECRET;
 const node_session_secret = process.env.NODE_SESSION_SECRET;
 
-
 const licenseKey = process.env.ESSENTIAL_STUDIO_KEY;
 registerLicense('licenseKey');
+
 /**
  * Database Connection
  */
@@ -54,10 +54,10 @@ const navLinks = [
   { name: "Program & Courses", link: "/programs&courses" },
   { name: "Admission", link: "/admission" },
   { name: "Student Services", link: "/stuServices" },
-  { name: "Account", link: "/profile" }
+  { name: "Profile", link: "/profile" }
 ];
 
-/**
+/** 
  * Middleware Setup
  */
 app.set("view engine", "ejs"); //Setting view engine to EJS
@@ -110,23 +110,6 @@ function sessionValidation(req, res, next) {
   }
 }
 
-function isAdmin(req) {
-  if (req.session.user_role == "admin") {
-    return true;
-  }
-  return false;
-}
-
-function adminAuthorization(req, res, next) {
-  if (!isAdmin(req)) {
-    res.status(403);
-    res.render("errorMessage", { error: "Not Authorized" });
-    return;
-  } else {
-    next();
-  }
-}
-
 /**
  * Start of Route Definitons
  */
@@ -135,7 +118,8 @@ app.get("/", async (req, res) => {
 });
 
 app.get("/signup", (req, res) => {
-  res.render("signup");
+  const error = req.query.error;
+  res.render("signup", { error: error});
 });
 
 app.get("/login", (req, res) => {
@@ -149,21 +133,22 @@ app.get("/login", (req, res) => {
 });
 
 app.post("/signupSubmit", async (req, res) => {
-  const { firstname, lastname, studentid, dateofbirth, username, program, email, password } = req.body;
+  const { firstname, lastname, studentid, dateofbirth, username, major, email, password } = req.body;
 
   const schema = Joi.object({
     firstname: Joi.string().alphanum().max(20).required(),
-    lastname: Joi.string().alphanum().max(20),
+    lastname: Joi.string().alphanum().max(20).required(),
     studentid: Joi.string().alphanum().max(20).required(),
     dateofbirth: Joi.date(),
     username: Joi.string().alphanum().max(20).required(),
-    program: Joi.string().max(20),
+    major: Joi.string().max(20),
     email: Joi.string().max(40).required(),
     password: Joi.string().max(20).required(),
   });
 
   const validationResult = schema.validate(req.body);
   console.log("Valid inputs");
+
   if (validationResult.error != null) {
     console.log(validationResult.error);
     res.render("signupErr", {
@@ -181,12 +166,12 @@ app.post("/signupSubmit", async (req, res) => {
     username: username,
     email: email,
     date_of_birth: dateofbirth,
-    program: program,
+    major: major,
     password: hashedPassword,
   });
 
   req.session.authenticated = true;
-  req.session.studentId = studentid;
+  req.session.studentid = studentid;
   req.session.firstname = firstname;
   req.session.lastname = lastname;
   req.session.username = username;
@@ -236,26 +221,30 @@ app.post("/loginSubmit", async (req, res) => {
   }
 });
 
-/* ChatBot Routes */
-// -----------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 app.get('/chatpage', sessionValidation, async (req, res) => {
-  const chatHistoryCollections = database.db();
-  const conversations = await chatHistoryCollections.collection('chats').find().toArray();
-  res.render('chatpage', { conversations, userMessage: '', botMessage: ''});
+  // Initialize chat history if it doesn't exist
+  if (!req.session.chatHistory) {
+    req.session.chatHistory = [];
+  }
+
+  res.render('chatpage', { chatHistory: req.session.chatHistory, firstname: req.session.firstname });
 });
 
 app.post('/chat', sessionValidation, async (req, res) => {
   const userMessage = req.body.message;
+  const firstname = req.session.firstname;
+
+  // Initialize chat history if it doesn't exist
+  if (!req.session.chatHistory) {
+    req.session.chatHistory = [];
+  }
+
+  // Add user message to chat history
+  req.session.chatHistory.push({ role: 'user', content: userMessage });
+
 
   try {
-    /*
-    // Log the request payload for debugging
-    console.log('Sending request to ChatGPT API with payload:', {
-      model: "gpt-3.5-turbo",
-      messages: [{ role: "user", content: userMessage }]
-    });
-    */
-
     // Call the ChatGPT API with GPT-3.5
     const response = await axios.post('https://api.openai.com/v1/chat/completions', {
       model: "gpt-3.5-turbo",
@@ -266,40 +255,21 @@ app.post('/chat', sessionValidation, async (req, res) => {
         'Content-Type': 'application/json'
       }
     });
-    
-    /*
-    // Log the response data for debugging
-    console.log('Received response from ChatGPT API', response.data);
-    */
-    
+
     const botMessage = response.data.choices[0].message.content;
 
-    const conversation = {
-      sessionID: req.session.id,
-      userMessage: userMessage,
-      botMessage: botMessage,
-      timestamp: new Date()
-    }
+    // Add bot message to chat history
+    req.session.chatHistory.push({ role: 'bot', content: botMessage });
 
-    const chatHistoryCollections = database.db();
-    const result = await chatHistoryCollections.collection('chats').insertOne(conversation);
-
-    const conversations = await chatHistoryCollections.collection('chats').find().toArray();
-    res.render('chatpage', { conversations, userMessage, botMessage });
+    res.render('chatpage', { chatHistory: req.session.chatHistory, firstname: firstname });
 
   } catch (error) {
-    // Log the full error response for debugging
     console.error('Error calling ChatGPT API:', error.response ? error.response.data : error.message);
     res.status(500).send('Error communicating with ChatGPT API');
   }
-});
 
-/* FOR MODULE
-const { homePage, chatBot } = require('./modules/chatBotMoudle.js');
-app.get('/homePage', sessionValidation, homePage);
-app.post('/chat', sessionValidation, chatBot);
-*/
-// ---------------------------------------------------------------------------------------------------- //
+});
+// ------------------------------------------------------------------
 
 // Route to handle logout
 app.get("/logout", async (req, res) => {
@@ -463,6 +433,8 @@ app.get('/p&g', sessionValidation, async (req, res) => {
 // Students router
 app.use("/students", studentsRouter);
 app.use("/instructors", instructorRouter);
+
+
 /**
  * Error 404
  */
@@ -477,37 +449,3 @@ app.get("*", (req, res) => {
 app.listen(port, () => {
   console.log(`Server running at http://localhost:${port}`);
 });
-
-/* YERIN'S CODE (TO BE REVIEWED - DATABASE RELATED)
-require("dotenv").config();
-const mongoose = require("mongoose");
-const mongodb_host = process.env.MONGODB_HOST;
-const mongodb_user = process.env.MONGODB_USER;
-const mongodb_password = process.env.MONGODB_PASSWORD;
-mongoose
-  .connect(
-    `mongodb+srv://${mongodb_user}:${mongodb_password}@${mongodb_host}/?retryWrites=true&w=majority&appName=Cluster0`
-  )
-  .then(() => console.log("Connected!"));
-
-const coursesSchema = new mongoose.Schema({
-  courseId: String,
-  Title: String,
-  School: String,
-  Program: String,
-  CourseCredit: Number,
-  MinimumPassingGrade: String,
-  TotalHours: Number,
-  TotalWeeks: Number,
-  HoursPerWeek: Number,
-  DeliveryType: String,
-  Prerequisites: String,
-  description: String,
-});
-
-module.export = mongoose.model("courses", coursesSchema);
-*/
-
-/* DINA'S CODE (TO BE REVIEWED - DATABASE RELATED)
-require('./database/databaseConnection'); 
-*/

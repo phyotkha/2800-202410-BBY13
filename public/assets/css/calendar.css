@@ -16,7 +16,7 @@
     background-color: #fffcff;
 } */
 
-button {
+/* button {
     width: 75px;
     cursor: pointer;
     box-shadow: 0px 0px 2px gray;
@@ -25,10 +25,10 @@ button {
     padding: 5px;
     border-radius: 5px;
     color: white;
-}
+} */
 
 .mt-5 {
-    margin-top: 8rem !important;
+    margin-top: 8rem;
 }
 
 #header {

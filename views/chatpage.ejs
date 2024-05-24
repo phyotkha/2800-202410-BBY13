@@ -1,37 +1,27 @@
 <%- include("templates/header") %>
-<div class="chat-container">
-  <div class="chat-history">
-    <form action="/chat" method="POST">
-      <% conversations.forEach(conversation => { %>
-      <div class="chat-message bot">
-        <div id="bot-message">
-          <img src="/navbar-logo.png" width="30" height="30" style="border-radius: 25px; ">
-          <strong>SchoolScope</strong>
-        </div>
-        <%= conversation.botMessage %>
+<div class="chat-container" onload="scrollToBottom()">
+  <div class="chat-history" id="chatHistory">
+    <% chatHistory.forEach(message => { %>
+    <div class="chat-message <%= message.role %>">
+      <div class="message">
+        <strong><%= message.role === 'user' ? firstname : 'SchoolScope' %>:</strong> <%= message.content %>
       </div>
-      <div class="chat-message user">
-        <div id="user-message">
-          <strong>You</strong>
-        </div>
-        <%= conversation.userMessage %>
-      </div>
-      <% }) %>
-      <div class="chat-input">
-        <input name="message" type="text" placeholder="Type a message...">
-        <button class="btn btn-primary" type="submit">Send</button>
-      </div>
-    </form>
+    </div>
+    <% }) %>
   </div>
+  <form action="/chat" method="POST">
+    <div class="chat-input">
+      <input name="message" type="text" placeholder="Type a message...">
+      <button class="btn btn-primary" type="submit">Send</button>
+    </div>
+  </form>
+</div>
+<%- include("templates/footer") %>
+<script>
+  function scrollToBottom() {
+    var chatHistory = document.getElementById("chatHistory");
+    chatHistory.scrollTop = chatHistory.scrollHeight;
+  }
 
-<!-- <% if (botMessage) { %>
-<div class="chat-message bot">
-  <img src="/white-transparent-logo.png" width="50" height="50">
-  <%= botMessage %>
-</div>
-<% } %>
-<% if (userMessage) { %>
-<div class="chat-message user">
-  <%= userMessage %>
-</div>
-<% } %> -->
+  window.onload = scrollToBottom;
+</script>
