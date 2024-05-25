@@ -3,9 +3,9 @@ const mongoose = require("mongoose");
 
 const Schema = mongoose.Schema;
 
-const coursesSchema = new mongoose.Schema({
+const coursesSchema = new Schema({
   courseId: String,
-  Title: String,
+  Subject: String,
   School: String,
   Program: String,
   CourseCredit: Number,
@@ -21,6 +21,11 @@ const coursesSchema = new mongoose.Schema({
   courseEnd: Date,
   courseTime: [{ courseDay: String, courseSHour: String, courseEHour: String }],
   location: String,
+  StartTime: Date,
+  EndTime: Date,
+  RecurrenceRule: String,
+  CategoryColor: String,
+  departmentId: Number
 });
 
 const CoursesModel = mongoose.model("courses", coursesSchema);

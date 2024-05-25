@@ -2,6 +2,7 @@ const mongoose = require("mongoose");
 const Student = require("./schemas/students");
 const Courses = require("./schemas/courses");
 const Instructors = require("./schemas/instructors");
+const Events = require("./schemas/events");
 require("dotenv").config();
 
 const mongodb_host = process.env.MONGODB_HOST;
@@ -28,11 +29,14 @@ mongoose
     // Insert default data
     const defaultStudents = require("./defaultData/students.json"); // Load default data from JSON file
     const defaultCourses = require("./defaultData/courses.json");
-    const defaultInstructors = require("./defaultData/instructors.json");
+        const defaultInstructors = require('./defaultData/instructors.json');
+        const defaultEvents = require("./defaultData/events.json");
+
     await Student.insertMany(defaultStudents); // Insert default data using Mongoose model
     await Courses.insertMany(defaultCourses);
-    await Instructors.insertMany(defaultInstructors);
-    return true;
+        await Instructors.insertMany(defaultInstructors);
+        await Events.insertMany(defaultEvents);
+        return true;
   })
   .then(() => {
     console.log("Default data inserted");
@@ -41,3 +45,4 @@ mongoose
   .catch((error) => {
     console.error("Error resetting database:", error);
   });
+
