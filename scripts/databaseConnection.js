@@ -1,4 +1,5 @@
 require('dotenv').config();
+include('/database/mongooseConnection.js');
 
 const mongodb_host = process.env.MONGODB_HOST;
 const mongodb_user = process.env.MONGODB_USER;

@@ -450,7 +450,6 @@ app.get('/calendar', sessionValidation, async (req, res) => {
 
 app.get("/courses", async (req, res) => {
   try {
-    console.log(1233333);
     const courses = await courseModel.find();
     res.json(courses);
   } catch (error) {

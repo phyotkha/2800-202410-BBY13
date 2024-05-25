@@ -5,7 +5,7 @@ const Schema = mongoose.Schema;
 
 const coursesSchema = new Schema({
   courseId: String,
-  Title: String,
+  Subject: String,
   School: String,
   Program: String,
   CourseCredit: Number,

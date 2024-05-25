@@ -27,7 +27,7 @@ mongoose.connect(uri)
         // Insert default data
         const defaultStudents = require('./defaultData/students.json'); // Load default data from JSON file
         const defaultCourses = require("./defaultData/courses.json");
-        // const defaultInstructors = require('./defaultData/instructors.json');
+        const defaultInstructors = require('./defaultData/instructors.json');
         await Student.insertMany(defaultStudents); // Insert default data using Mongoose model
         await Courses.insertMany(defaultCourses);
         await Instructors.insertMany(defaultInstructors);
