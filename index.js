@@ -2,8 +2,6 @@ require("./utils.js");
 require("dotenv").config();
 const { registerLicense } = require('@syncfusion/ej2-base');
 
-
-
 /**
  * Imported Modules
  */
@@ -48,7 +46,6 @@ registerLicense('licenseKey');
  */
 var { database } = include("./scripts/databaseConnection");
 const userCollection = database.db(mongodb_database).collection("students");
-// const eventModel = require("./database/schemas/events.js");
 const courseModel = require("./database/schemas/courses.js")
 const eventModel = require("./database/schemas/events.js");
 
@@ -84,14 +81,6 @@ var mongoStore = MongoStore.create({
   },
 });
 
-app.use((req, res, next) => {
-  res.cookie('myCookie', 'myValue', {
-    sameSite: 'None',
-    secure: true
-  });
-  next();
-});
-
 //Session middleware setup
 app.use(
   session({
@@ -103,9 +92,6 @@ app.use(
 );
 
 app.use(express.static(__dirname + "/public")); // Serve static files from the "public" directory
-app.use(express.static(__dirname + "/database"));
-app.use(express.urlencoded({ extended: false })); // To parse URL-encoded bodies
-
 
 /**
  * Middlewares for session validation and admin authorization
@@ -436,13 +422,8 @@ app.post('/updateProfile', sessionValidation, async (req, res) => {
 });
 // ---------------------------------------------------------------------------------------------------- //
 
-app.use("/calendar", (req, res, next) => {
-  app.locals.currentURL = url.parse(req.url).pathname;
-  res.locals.licenseKey = licenseKey;
-  next();
-});
-
 app.get('/calendar', sessionValidation, async (req, res) => {
+
   res.render("calendar", {
     ESSENTIAL_STUDIO_KEY: process.env.ESSENTIAL_STUDIO_KEY,
   });
@@ -465,6 +446,7 @@ app.get("/courses", async (req, res) => {
     console.log(error);
     res.status(500).send(error);
   }
+
 });
 
 app.get('/chatPage', sessionValidation, async (req, res) => {
