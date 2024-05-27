@@ -1,36 +1,69 @@
 import asyncio
-import pprint
+import requests
+import json
+import os
+from dotenv import load_dotenv
+import openai
 
-from ai_extractor import extract
-from schemas import SchemaNewsWebsites, ecommerce_schema
-from scrape import ascrape_playwright
+# Load environment variables from .env file
+load_dotenv()
 
-# TESTING
+# Define the URL to scrape
+url_to_scrape = "https://www.bcit.ca/study/programs/applied-natural-sciences"
+
+# OpenAI API key from environment variable
+openai_api_key = os.getenv("OPENAI_API_KEY")
+openai.api_key = openai_api_key
+
+async def fetch_content(url):
+    # Prepend the URL with Jina AI Reader prefix
+    reader_url = f"https://r.jina.ai/{url}"
+    response = requests.get(reader_url)
+    if response.status_code == 200:
+        try:
+            return response.json()
+        except json.JSONDecodeError:
+            # Handle non-JSON response by processing text
+            print("Received response is not in JSON format.")
+            return response.text
+    else:
+        response.raise_for_status()
+
+async def process_with_gpt(content):
+    # Send content to GPT model for processing
+    prompt = (
+        "You are given the following content fetched from a webpage. "
+        "Please format it into JSONL format where each line is a JSON object with relevant data:\n\n"
+        f"{content}\n\n"
+        "Return the content as JSONL format."
+    )
+
+    response = openai.ChatCompletion.create(
+        model="gpt-3.5-turbo",
+        messages=[
+            {"role": "system", "content": "You are a helpful assistant."},
+            {"role": "user", "content": prompt}
+        ],
+        max_tokens=2048,
+        n=1,
+        stop=None,
+        temperature=0.5,
+    )
+
+    return response['choices'][0]['message']['content']
+
 if __name__ == "__main__":
-    token_limit = 4000
+    try:
+        # Fetch the content from the webpage
+        content = asyncio.run(fetch_content(url_to_scrape))
 
-    # News sites mostly have <span> tags to scrape
-    cnn_url = "https://www.cnn.com"
-    wsj_url = "https://www.wsj.com"
-    nyt_url = "https://www.nytimes.com/ca/"
-
-    amazon_url = "https://www.amazon.ca/s?k=computers&crid=1LUXGQOD2ULFD&sprefix=%2Caps%2C94&ref=nb_sb_ss_recent_1_0_recent"
-
-    async def scrape_with_playwright(url: str, tags, **kwargs):
-        html_content = await ascrape_playwright(url, tags)
-
-        print("Extracting content with LLM")
-
-        html_content_fits_context_window_llm = html_content[:token_limit]
-
-        extracted_content = extract(**kwargs,
-                                    content=html_content_fits_context_window_llm)
-
-        pprint.pprint(extracted_content)
-
-    # Scrape and Extract with LLM
-    asyncio.run(scrape_with_playwright(
-        url=wsj_url,
-        tags=["span"],
-        schema_pydantic=SchemaNewsWebsites
-    ))
+        # Process the content with GPT
+        if content:
+            gpt_response = asyncio.run(process_with_gpt(content))
+            with open('output.jsonl', 'w') as f:
+                f.write(gpt_response)
+            print("Content fetched and saved to output.jsonl")
+        else:
+            print("Failed to fetch content.")
+    except Exception as e:
+        print(f"An error occurred: {e}")
