@@ -2,8 +2,6 @@ require("./utils.js");
 require("dotenv").config();
 const { registerLicense } = require('@syncfusion/ej2-base');
 
-
-
 /**
  * Imported Modules
  */
@@ -17,7 +15,7 @@ const bcrypt = require("bcrypt");
 const axios = require("axios");
 
 const studentsRouter = require("./database/routers/students");
-const instructorRouter = require("./database/routers/routerInstructor");
+const instructorRouter = require("./database/routers/routerInstructor")
 const saltRounds = 12; //Number of rounds for bcrypt hashing
 
 /**
@@ -48,9 +46,6 @@ registerLicense('licenseKey');
  */
 var { database } = include("./scripts/databaseConnection");
 const userCollection = database.db(mongodb_database).collection("students");
-// const eventModel = require("./database/schemas/events.js");
-const courseModel = require("./database/schemas/courses.js")
-const eventModel = require("./database/schemas/events.js");
 
 
 // Navigation links array
@@ -58,7 +53,7 @@ const navLinks = [
   { name: "Chat", link: "/chatPage" },
   { name: "Calendar", link: "/calendar" },
   { name: "Account", link: "/profile" },
-  { name: "About Us", link: "/aboutus" }
+  { name: "About Us", link: "/aboutus"}
 ];
 
 /** 
@@ -84,14 +79,6 @@ var mongoStore = MongoStore.create({
   },
 });
 
-app.use((req, res, next) => {
-  res.cookie('myCookie', 'myValue', {
-    sameSite: 'None',
-    secure: true
-  });
-  next();
-});
-
 //Session middleware setup
 app.use(
   session({
@@ -103,9 +90,6 @@ app.use(
 );
 
 app.use(express.static(__dirname + "/public")); // Serve static files from the "public" directory
-app.use(express.static(__dirname + "/database"));
-app.use(express.urlencoded({ extended: false })); // To parse URL-encoded bodies
-
 
 /**
  * Middlewares for session validation and admin authorization
@@ -130,13 +114,12 @@ function sessionValidation(req, res, next) {
  * Start of Route Definitons
  */
 app.get("/", async (req, res) => {
-app.get("/", async (req, res) => {
   res.render("startingPage");
 });
 
 app.get("/signup", (req, res) => {
   const error = req.query.error;
-  res.render("signup", { error: error });
+  res.render("signup", { error: error});
 });
 
 app.get("/login", (req, res) => {
@@ -247,14 +230,11 @@ app.get('/chatPage', sessionValidation, async (req, res) => {
   }
 
   res.render('chatPage', { chatHistory: req.session.chatHistory, firstname: req.session.firstname });
-
-  res.render('chatPage', { chatHistory: req.session.chatHistory, firstname: req.session.firstname });
 });
 
 app.post('/chat', sessionValidation, async (req, res) => {
   const userMessage = req.body.message;
   const firstname = req.session.firstname;
-  }
 
   // Initialize chat history if it doesn't exist
   if (!req.session.chatHistory) {
@@ -263,6 +243,7 @@ app.post('/chat', sessionValidation, async (req, res) => {
 
   // Add user message to chat history
   req.session.chatHistory.push({ role: 'user', content: userMessage });
+
 
   try {
     // Call the ChatGPT API with GPT-3.5
@@ -302,7 +283,7 @@ app.get("/logout", async (req, res) => {
 // ----------------------------------------------------------------------------------------------------
 app.get('/resetPasswordRequest', (req, res) => {
   const invalidUser = req.query.invaliduser;
-  res.render('resetPasswordRequest', { invaliduser: invalidUser });
+  res.render('resetPasswordRequest', {invaliduser: invalidUser} );
 });
 
 const crypto = require("crypto");
@@ -327,7 +308,6 @@ app.post("/sendResetLink", async (req, res) => {
     { email: email },
     { $set: { resetPasswordToken: token, resetPasswordExpires: expireTime } }
   );
-  }
 
   // Set up email transporter using nodemailer
   const transporter = nodemailer.createTransport({
@@ -364,15 +344,6 @@ app.post("/sendResetLink", async (req, res) => {
 
 app.get("/resetPassword/:token", async (req, res) => {
   const { token } = req.params;
-    to: email,
-    from: process.env.EMAIL,
-    subject: "Password Reset",
-    text:
-      `You are receiving this because you (or someone else) have requested the reset of the password for your account.\n\n` +
-      `Please click on the following link, or paste this into your browser to complete the process:\n\n` +
-      `http://${req.headers.host}/resetPassword/${token}\n\n` +
-      `If you did not request this, please ignore this email and your password will remain unchanged. The link will expire in one hour.\n`,
-  };
 
   const user = await userCollection.findOne({
     resetPasswordToken: token,
@@ -381,21 +352,12 @@ app.get("/resetPassword/:token", async (req, res) => {
   if (!user) {
     return res.render('resetPasswordInvalidToken');
   }
-      res.redirect('/resetPasswordRequest');
-    }
-  });
-});
 
   res.render('resetPassword', { token: token });
 });
 
 app.post("/resetPassword", async (req, res) => {
   const { token, password } = req.body;
-    resetPasswordExpires: { $gt: Date.now() },
-  });
-  if (!user) {
-    return res.render('resetPasswordInvalidToken');
-  }
 
   const user = await userCollection.findOne({
     resetPasswordToken: token,
@@ -406,7 +368,6 @@ app.post("/resetPassword", async (req, res) => {
   }
 
   const hashedPassword = await bcrypt.hash(password, saltRounds);
-  const { token, password } = req.body;
 
   await userCollection.updateOne(
     { email: user.email },
@@ -428,13 +389,12 @@ app.get('/profile', sessionValidation, async (req, res) => {
   const lastname = req.session.lastname;
   const username = req.session.username;
   const email = req.session.email;
-  res.render("userProfile", {
-    studentId: studentid,
-    firstName: firstname,
-    lastName: lastname,
-    userName: username,
-    emailAddress: email
-  });
+  res.render("userProfile", { 
+    studentId: studentid, 
+    firstName: firstname, 
+    lastName: lastname, 
+    userName: username, 
+    emailAddress: email });
 })
 
 app.post('/updateProfile', sessionValidation, async (req, res) => {
@@ -459,47 +419,8 @@ app.post('/updateProfile', sessionValidation, async (req, res) => {
 });
 // ---------------------------------------------------------------------------------------------------- //
 
-app.use("/calendar", (req, res, next) => {
-  app.locals.currentURL = url.parse(req.url).pathname;
-  res.locals.licenseKey = licenseKey;
-  next();
-});
-
 app.get('/calendar', sessionValidation, async (req, res) => {
-  res.render("calendar", {
-    ESSENTIAL_STUDIO_KEY: process.env.ESSENTIAL_STUDIO_KEY,
-  });
-});
-      username: username,
-      email: email
-    }
-  });
-  req.session.studentid = studentid;
-  req.session.firstname = firstname;
-  req.session.lastname = lastname;
-  req.session.username = username;
-  req.session.email = email;
-  res.redirect("/profile");
-});
-// ---------------------------------------------------------------------------------------------------- //
-
-app.get("/events", async (req, res) => {
-  try {
-    const events = await eventModel.find();
-    res.json(events);
-  } catch (error) {
-    res.status(500).send(error);
-  }
-});
-
-app.get("/courses", async (req, res) => {
-  try {
-    const courses = await courseModel.find();
-    res.json(courses);
-  } catch (error) {
-    console.log(error);
-    res.status(500).send(error);
-  }
+  res.render("calendar");
 });
 
 app.get('/chatPage', sessionValidation, async (req, res) => {

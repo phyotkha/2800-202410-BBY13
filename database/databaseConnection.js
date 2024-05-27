@@ -2,7 +2,6 @@ const mongoose = require('mongoose');
 require('./schemas/students');
 require('./schemas/courses');
 require("./schemas/instructors");
-require("./schemas/events");
 require('./schemas/chat');
 
 require("dotenv").config();

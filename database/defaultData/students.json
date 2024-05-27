@@ -1,5 +1,5 @@
 [
-    {
+  {
     "studentId": "A01354567",
     "first_name": "Alice",
     "last_name": "Johnson",
@@ -7,18 +7,18 @@
     "email": "ajohnson@my.bcit.ca",
     "major": "CST",
     "year": 2024,
-      "courses": [
-        { "courseId": "COMP 1100" },
-        { "courseId": "COMP 1113" },
-        { "courseId": "COMP 1510" },
-        { "courseId": "COMP 1537" },
-        { "courseId": "COMP 1712" },
-        { "courseId": "COMP 1800" },
-        { "courseId": "COMP 2537" },
-        { "courseId": "COMP 2800" }
-      ]
-    },
-    {
+    "courses": [
+      { "courseId": "COMP 1100" },
+      { "courseId": "COMP 1113" },
+      { "courseId": "COMP 1510" },
+      { "courseId": "COMP 1537" },
+      { "courseId": "COMP 1712" },
+      { "courseId": "COMP 1800" },
+      { "courseId": "COMP 2537" },
+      { "courseId": "COMP 2800" }
+    ]
+  },
+  {
     "studentId": "A01284568",
     "first_name": "Bob",
     "last_name": "Smith",
@@ -26,18 +26,18 @@
     "email": "bsmith@my.bcit.ca",
     "major": "CST",
     "year": 2024,
-      "courses": [
-        { "courseId": "COMP 1100" },
-        { "courseId": "COMP 1113" },
-        { "courseId": "COMP 1510" },
-        { "courseId": "COMP 1537" },
-        { "courseId": "COMP 1712" },
-        { "courseId": "COMP 1800" },
-        { "courseId": "COMP 2537" },
-        { "courseId": "COMP 2800" }
-      ]
-    },
-    {
+    "courses": [
+      { "courseId": "COMP 1100" },
+      { "courseId": "COMP 1113" },
+      { "courseId": "COMP 1510" },
+      { "courseId": "COMP 1537" },
+      { "courseId": "COMP 1712" },
+      { "courseId": "COMP 1800" },
+      { "courseId": "COMP 2537" },
+      { "courseId": "COMP 2800" }
+    ]
+  },
+  {
     "studentId": "A01334569",
     "first_name": "Charlie",
     "last_name": "Brown",
@@ -45,18 +45,18 @@
     "email": "cbrown@my.bcit.ca",
     "major": "CST",
     "year": 2024,
-      "courses": [
-        { "courseId": "COMP 1100" },
-        { "courseId": "COMP 1116" },
-        { "courseId": "COMP 1510" },
-        { "courseId": "COMP 1537" },
-        { "courseId": "COMP 1712" },
-        { "courseId": "COMP 1800" },
-        { "courseId": "COMP 2537" },
-        { "courseId": "COMP 2800" }
-      ]
-    },
-    {
+    "courses": [
+      { "courseId": "COMP 1100" },
+      { "courseId": "COMP 1116" },
+      { "courseId": "COMP 1510" },
+      { "courseId": "COMP 1537" },
+      { "courseId": "COMP 1712" },
+      { "courseId": "COMP 1800" },
+      { "courseId": "COMP 2537" },
+      { "courseId": "COMP 2800" }
+    ]
+  },
+  {
     "studentId": "A01394570",
     "first_name": "David",
     "last_name": "Lee",
@@ -64,18 +64,18 @@
     "email": "dlee@my.bcit.ca",
     "major": "CST",
     "year": 2024,
-      "courses": [
-        { "courseId": "COMP 1100" },
-        { "courseId": "COMP 1113" },
-        { "courseId": "COMP 1510" },
-        { "courseId": "COMP 1537" },
-        { "courseId": "COMP 1712" },
-        { "courseId": "COMP 1800" },
-        { "courseId": "COMP 2537" },
-        { "courseId": "COMP 2800" }
-      ]
-    },
-    {
+    "courses": [
+      { "courseId": "COMP 1100" },
+      { "courseId": "COMP 1113" },
+      { "courseId": "COMP 1510" },
+      { "courseId": "COMP 1537" },
+      { "courseId": "COMP 1712" },
+      { "courseId": "COMP 1800" },
+      { "courseId": "COMP 2537" },
+      { "courseId": "COMP 2800" }
+    ]
+  },
+  {
     "studentId": "A01364681",
     "first_name": "Emily",
     "last_name": "Garcia",
@@ -83,18 +83,18 @@
     "email": "egarcia@my.bcit.ca",
     "major": "CST",
     "year": 2024,
-      "courses": [
-        { "courseId": "COMP 1100" },
-        { "courseId": "COMP 1116" },
-        { "courseId": "COMP 1510" },
-        { "courseId": "COMP 1537" },
-        { "courseId": "COMP 1712" },
-        { "courseId": "COMP 1800" },
-        { "courseId": "COMP 2537" },
-        { "courseId": "COMP 2800" }
-      ]
-    },
-    {
+    "courses": [
+      { "courseId": "COMP 1100" },
+      { "courseId": "COMP 1116" },
+      { "courseId": "COMP 1510" },
+      { "courseId": "COMP 1537" },
+      { "courseId": "COMP 1712" },
+      { "courseId": "COMP 1800" },
+      { "courseId": "COMP 2537" },
+      { "courseId": "COMP 2800" }
+    ]
+  },
+  {
     "studentId": "A01324662",
     "first_name": "Frank",
     "last_name": "Martinez",
@@ -102,17 +102,17 @@
     "email": "fmartinez@my.bcit.ca",
     "major": "CST",
     "year": 2024,
-      "courses": [
-        { "courseId": "COMP 1100" },
-        { "courseId": "COMP 1113" },
-        { "courseId": "COMP 1510" },
-        { "courseId": "COMP 1537" },
-        { "courseId": "COMP 1800" },
-        { "courseId": "COMP 2537" },
-        { "courseId": "COMP 2800" }
-      ]
-    },
-    {
+    "courses": [
+      { "courseId": "COMP 1100" },
+      { "courseId": "COMP 1113" },
+      { "courseId": "COMP 1510" },
+      { "courseId": "COMP 1537" },
+      { "courseId": "COMP 1800" },
+      { "courseId": "COMP 2537" },
+      { "courseId": "COMP 2800" }
+    ]
+  },
+  {
     "studentId": "A0134673",
     "first_name": "Grace",
     "last_name": "Lopez",
@@ -120,16 +120,16 @@
     "email": "glopez@my.bcit.ca",
     "major": "CST",
     "year": 2024,
-      "courses": [
-        { "courseId": "COMP 1100" },
-        { "courseId": "COMP 1113" },
-        { "courseId": "COMP 1510" },
-        { "courseId": "COMP 1537" },
-        { "courseId": "COMP 1712" },
-        { "courseId": "COMP 1800" }
-      ]
-    },
-    {
+    "courses": [
+      { "courseId": "COMP 1100" },
+      { "courseId": "COMP 1113" },
+      { "courseId": "COMP 1510" },
+      { "courseId": "COMP 1537" },
+      { "courseId": "COMP 1712" },
+      { "courseId": "COMP 1800" }
+    ]
+  },
+  {
     "studentId": "A01338574",
     "first_name": "Henry",
     "last_name": "Hernandez",
@@ -137,18 +137,18 @@
     "email": "hhernandez@my.bcit.ca",
     "major": "CST",
     "year": 2024,
-      "courses": [
-        { "courseId": "COMP 1100" },
-        { "courseId": "COMP 1116" },
-        { "courseId": "COMP 1510" },
-        { "courseId": "COMP 1537" },
-        { "courseId": "COMP 1712" },
-        { "courseId": "COMP 1800" },
-        { "courseId": "COMP 2537" },
-        { "courseId": "COMP 2800" }
-      ]
-    },
-    {
+    "courses": [
+      { "courseId": "COMP 1100" },
+      { "courseId": "COMP 1116" },
+      { "courseId": "COMP 1510" },
+      { "courseId": "COMP 1537" },
+      { "courseId": "COMP 1712" },
+      { "courseId": "COMP 1800" },
+      { "courseId": "COMP 2537" },
+      { "courseId": "COMP 2800" }
+    ]
+  },
+  {
     "studentId": "A01294585",
     "first_name": "Isabella",
     "last_name": "Young",
@@ -156,16 +156,16 @@
     "email": "iyoung@my.bcit.ca",
     "major": "CST",
     "year": 2024,
-      "courses": [
-        { "courseId": "COMP 1100" },
-        { "courseId": "COMP 1113" },
-        { "courseId": "COMP 1510" },
-        { "courseId": "COMP 1537" },
-        { "courseId": "COMP 1712" },
-        { "courseId": "COMP 1800" }
-      ]
-    },
-    {
+    "courses": [
+      { "courseId": "COMP 1100" },
+      { "courseId": "COMP 1113" },
+      { "courseId": "COMP 1510" },
+      { "courseId": "COMP 1537" },
+      { "courseId": "COMP 1712" },
+      { "courseId": "COMP 1800" }
+    ]
+  },
+  {
     "studentId": "A01334876",
     "first_name": "Jack",
     "last_name": "Nguyen",
@@ -173,17 +173,17 @@
     "email": "jnguyen@my.bcit.ca",
     "major": "CST",
     "year": 2024,
-      "courses": [
-        { "courseId": "COMP 1100" },
-        { "courseId": "COMP 1510" },
-        { "courseId": "COMP 1537" },
-        { "courseId": "COMP 1712" },
-        { "courseId": "COMP 1800" },
-        { "courseId": "COMP 2537" },
-        { "courseId": "COMP 2800" }
-      ]
-    },
-    {
+    "courses": [
+      { "courseId": "COMP 1100" },
+      { "courseId": "COMP 1510" },
+      { "courseId": "COMP 1537" },
+      { "courseId": "COMP 1712" },
+      { "courseId": "COMP 1800" },
+      { "courseId": "COMP 2537" },
+      { "courseId": "COMP 2800" }
+    ]
+  },
+  {
     "studentId": "A01234577",
     "first_name": "Katherine",
     "last_name": "Kim",
@@ -191,18 +191,18 @@
     "email": "kkim@my.bcit.ca",
     "major": "CST",
     "year": 2024,
-      "courses": [
-        { "courseId": "COMP 1100" },
-        { "courseId": "COMP 1113" },
-        { "courseId": "COMP 1510" },
-        { "courseId": "COMP 1537" },
-        { "courseId": "COMP 1712" },
-        { "courseId": "COMP 1800" },
-        { "courseId": "COMP 2537" },
-        { "courseId": "COMP 2800" }
-      ]
-    },
-    {
+    "courses": [
+      { "courseId": "COMP 1100" },
+      { "courseId": "COMP 1113" },
+      { "courseId": "COMP 1510" },
+      { "courseId": "COMP 1537" },
+      { "courseId": "COMP 1712" },
+      { "courseId": "COMP 1800" },
+      { "courseId": "COMP 2537" },
+      { "courseId": "COMP 2800" }
+    ]
+  },
+  {
     "studentId": "A01344518",
     "first_name": "Liam",
     "last_name": "Tran",
@@ -210,17 +210,17 @@
     "email": "ltran@my.bcit.ca",
     "major": "CST",
     "year": 2024,
-      "courses": [
-        { "courseId": "COMP 1100" },
-        { "courseId": "COMP 1113" },
-        { "courseId": "COMP 1510" },
-        { "courseId": "COMP 1537" },
-        { "courseId": "COMP 1800" },
-        { "courseId": "COMP 2537" },
-        { "courseId": "COMP 2800" }
-      ]
-    },
-    {
+    "courses": [
+      { "courseId": "COMP 1100" },
+      { "courseId": "COMP 1113" },
+      { "courseId": "COMP 1510" },
+      { "courseId": "COMP 1537" },
+      { "courseId": "COMP 1800" },
+      { "courseId": "COMP 2537" },
+      { "courseId": "COMP 2800" }
+    ]
+  },
+  {
     "studentId": "A01364579",
     "first_name": "Mia",
     "last_name": "Patel",
@@ -228,16 +228,16 @@
     "email": "mpatel@my.bcit.ca",
     "major": "CST",
     "year": 2024,
-      "courses": [
-        { "courseId": "COMP 1100" },
-        { "courseId": "COMP 1510" },
-        { "courseId": "COMP 1537" },
-        { "courseId": "COMP 1800" },
-        { "courseId": "COMP 2537" },
-        { "courseId": "COMP 2800" }
-      ]
-    },
-    {
+    "courses": [
+      { "courseId": "COMP 1100" },
+      { "courseId": "COMP 1510" },
+      { "courseId": "COMP 1537" },
+      { "courseId": "COMP 1800" },
+      { "courseId": "COMP 2537" },
+      { "courseId": "COMP 2800" }
+    ]
+  },
+  {
     "studentId": "A01345780",
     "first_name": "Noah",
     "last_name": "Gonzalez",
@@ -245,17 +245,17 @@
     "email": "ngonzalez@my.bcit.ca",
     "major": "CST",
     "year": 2024,
-      "courses": [
-        { "courseId": "COMP 1100" },
-        { "courseId": "COMP 1113" },
-        { "courseId": "COMP 1510" },
-        { "courseId": "COMP 1537" },
-        { "courseId": "COMP 1712" },
-        { "courseId": "COMP 1800" },
-        { "courseId": "COMP 2537" }
-      ]
-    },
-    {
+    "courses": [
+      { "courseId": "COMP 1100" },
+      { "courseId": "COMP 1113" },
+      { "courseId": "COMP 1510" },
+      { "courseId": "COMP 1537" },
+      { "courseId": "COMP 1712" },
+      { "courseId": "COMP 1800" },
+      { "courseId": "COMP 2537" }
+    ]
+  },
+  {
     "studentId": "A01364581",
     "first_name": "Olivia",
     "last_name": "Wong",
@@ -263,17 +263,17 @@
     "email": "owong@my.bcit.ca",
     "major": "CST",
     "year": 2024,
-      "courses": [
-        { "courseId": "COMP 1100" },
-        { "courseId": "COMP 1113" },
-        { "courseId": "COMP 1510" },
-        { "courseId": "COMP 1712" },
-        { "courseId": "COMP 1800" },
-        { "courseId": "COMP 2537" },
-        { "courseId": "COMP 2800" }
-      ]
-    },
-    {
+    "courses": [
+      { "courseId": "COMP 1100" },
+      { "courseId": "COMP 1113" },
+      { "courseId": "COMP 1510" },
+      { "courseId": "COMP 1712" },
+      { "courseId": "COMP 1800" },
+      { "courseId": "COMP 2537" },
+      { "courseId": "COMP 2800" }
+    ]
+  },
+  {
     "studentId": "A01323482",
     "first_name": "Peter",
     "last_name": "Singh",
@@ -281,17 +281,17 @@
     "email": "psingh@my.bcit.ca",
     "major": "CST",
     "year": 2024,
-      "courses": [
-        { "courseId": "COMP 1100" },
-        { "courseId": "COMP 1113" },
-        { "courseId": "COMP 1510" },
-        { "courseId": "COMP 1537" },
-        { "courseId": "COMP 1800" },
-        { "courseId": "COMP 2537" },
-        { "courseId": "COMP 2800" }
-      ]
-    },
-    {
+    "courses": [
+      { "courseId": "COMP 1100" },
+      { "courseId": "COMP 1113" },
+      { "courseId": "COMP 1510" },
+      { "courseId": "COMP 1537" },
+      { "courseId": "COMP 1800" },
+      { "courseId": "COMP 2537" },
+      { "courseId": "COMP 2800" }
+    ]
+  },
+  {
     "studentId": "A01384583",
     "first_name": "Quinn",
     "last_name": "Chen",
@@ -299,16 +299,16 @@
     "email": "qchen@my.bcit.ca",
     "major": "CST",
     "year": 2024,
-      "courses": [
-        { "courseId": "COMP 1100" },
-        { "courseId": "COMP 1113" },
-        { "courseId": "COMP 1510" },
-        { "courseId": "COMP 1537" },
-        { "courseId": "COMP 1712" },
-        { "courseId": "COMP 1800" }
-      ]
-    },
-    {
+    "courses": [
+      { "courseId": "COMP 1100" },
+      { "courseId": "COMP 1113" },
+      { "courseId": "COMP 1510" },
+      { "courseId": "COMP 1537" },
+      { "courseId": "COMP 1712" },
+      { "courseId": "COMP 1800" }
+    ]
+  },
+  {
     "studentId": "A01374584",
     "first_name": "Rachel",
     "last_name": "Wu",
@@ -316,18 +316,18 @@
     "email": "rwu@emy.bcit.ca",
     "major": "CST",
     "year": 2024,
-      "courses": [
-        { "courseId": "COMP 1100" },
-        { "courseId": "COMP 1113" },
-        { "courseId": "COMP 1510" },
-        { "courseId": "COMP 1537" },
-        { "courseId": "COMP 1712" },
-        { "courseId": "COMP 1800" },
-        { "courseId": "COMP 2537" },
-        { "courseId": "COMP 2800" }
-      ]
-    },
-    {
+    "courses": [
+      { "courseId": "COMP 1100" },
+      { "courseId": "COMP 1113" },
+      { "courseId": "COMP 1510" },
+      { "courseId": "COMP 1537" },
+      { "courseId": "COMP 1712" },
+      { "courseId": "COMP 1800" },
+      { "courseId": "COMP 2537" },
+      { "courseId": "COMP 2800" }
+    ]
+  },
+  {
     "studentId": "A01394585",
     "first_name": "Samuel",
     "last_name": "Chan",
@@ -335,17 +335,17 @@
     "email": "schan@my.bcit.ca",
     "major": "CST",
     "year": 2024,
-      "courses": [
-        { "courseId": "COMP 1100" },
-        { "courseId": "COMP 1113" },
-        { "courseId": "COMP 1510" },
-        { "courseId": "COMP 1537" },
-        { "courseId": "COMP 1800" },
-        { "courseId": "COMP 2537" },
-        { "courseId": "COMP 2800" }
-      ]
-    },
-    {
+    "courses": [
+      { "courseId": "COMP 1100" },
+      { "courseId": "COMP 1113" },
+      { "courseId": "COMP 1510" },
+      { "courseId": "COMP 1537" },
+      { "courseId": "COMP 1800" },
+      { "courseId": "COMP 2537" },
+      { "courseId": "COMP 2800" }
+    ]
+  },
+  {
     "studentId": "A01334586",
     "first_name": "Tiffany",
     "last_name": "Kumar",
@@ -353,15 +353,14 @@
     "email": "tkumar@my.bcit.ca",
     "major": "CST",
     "year": 2024,
-      "courses": [
-        { "courseId": "COMP 1100" },
-        { "courseId": "COMP 1113" },
-        { "courseId": "COMP 1510" },
-        { "courseId": "COMP 1537" },
-        { "courseId": "COMP 1712" },
-        { "courseId": "COMP 1800" },
-        { "courseId": "COMP 2800" }
-      ]
-    }
-  ]
-  
+    "courses": [
+      { "courseId": "COMP 1100" },
+      { "courseId": "COMP 1113" },
+      { "courseId": "COMP 1510" },
+      { "courseId": "COMP 1537" },
+      { "courseId": "COMP 1712" },
+      { "courseId": "COMP 1800" },
+      { "courseId": "COMP 2800" }
+    ]
+  }
+]
