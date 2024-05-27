@@ -15,8 +15,8 @@ openai = "*"
 beautifulsoup4 = "*"
 python-dotenv = "*"
 playwright = "*"
+langchain-openai = "*"
 
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
-
