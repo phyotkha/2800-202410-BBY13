@@ -30,7 +30,7 @@ if __name__ == "__main__":
 
     # Scrape and Extract with LLM
     asyncio.run(scrape_with_playwright(
-        url=cnn_url,
+        url=wsj_url,
         tags=["span"],
         schema_pydantic=SchemaNewsWebsites
     ))
