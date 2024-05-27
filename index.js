@@ -17,7 +17,7 @@ const bcrypt = require("bcrypt");
 const axios = require("axios");
 
 const studentsRouter = require("./database/routers/students");
-const instructorRouter = require("./database/routers/routerInstructor")
+const instructorRouter = require("./database/routers/routerInstructor");
 const saltRounds = 12; //Number of rounds for bcrypt hashing
 
 /**
@@ -50,6 +50,7 @@ var { database } = include("./scripts/databaseConnection");
 const userCollection = database.db(mongodb_database).collection("students");
 // const eventModel = require("./database/schemas/events.js");
 const courseModel = require("./database/schemas/courses.js")
+const eventModel = require("./database/schemas/events.js");
 
 
 // Navigation links array
@@ -447,6 +448,14 @@ app.get('/calendar', sessionValidation, async (req, res) => {
   });
 });
 
+app.get("/events", async (req, res) => {
+  try {
+    const events = await eventModel.find();
+    res.json(events);
+  } catch (error) {
+    res.status(500).send(error);
+  }
+});
 
 app.get("/courses", async (req, res) => {
   try {
