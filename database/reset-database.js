@@ -1,5 +1,5 @@
-const mongoose = require('mongoose');
-const Student = require('./schemas/students');
+const mongoose = require("mongoose");
+const Student = require("./schemas/students");
 const Courses = require("./schemas/courses");
 const Instructors = require("./schemas/instructors");
 const Events = require("./schemas/events");
@@ -15,15 +15,16 @@ const mongodb_password = process.env.MONGODB_PASSWORD;
 const uri = `mongodb+srv://${mongodb_user}:${mongodb_password}@${mongodb_host}/?retryWrites=true&w=majority&appName=Cluster0`;
 
 // Connect to MongoDB
-mongoose.connect(uri)
-    .then(() => {
-        console.log('Connected to MongoDB');
+mongoose
+  .connect(uri)
+  .then(() => {
+    console.log("Connected to MongoDB");
 
-        // Delete all collections
-        return mongoose.connection.db.dropDatabase();
-    })
-    .then(async () => {
-        console.log('All collections deleted');
+    // Delete all collections
+    return mongoose.connection.db.dropDatabase();
+  })
+  .then(async () => {
+    console.log("All collections deleted");
 
         // Insert default data
         const defaultStudents = require('./defaultData/students.json'); // Load default data from JSON file
