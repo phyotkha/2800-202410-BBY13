@@ -5,20 +5,34 @@
 //     : [];
 
 async function fetchEvents() {
-  const [coursesResponse, eventsResponse] = await Promise.all([
+  const [coursesResponse, eventsResponse, availableTimesResponse] = await Promise.all([
     fetch("/courses"),
     fetch("/events"),
+    fetch("/available-times")
   ]);
+
+  if (!coursesResponse.ok || !eventsResponse.ok || !availableTimesResponse.ok) {
+    throw new Error("Failed to fetch data");
+  }
 
   const courses = await coursesResponse.json();
   const events = await eventsResponse.json();
+  const availableTimes = await availableTimesResponse.json();
+  if (!Array.isArray(courses) || !Array.isArray(events) || !Array.isArray(availableTimes)) {
+    throw new TypeError("Fetched data is not an array");
+  }
+
   return [
     ...courses,
-    ...events
+    ...events,
+    ...availableTimes
   ];
 }
 
+
+
 fetchEvents().then((plan) => {
+  console.log(plan)
   const schedule = new ej.schedule.Schedule({
     width: "100%",
     height: "650px",

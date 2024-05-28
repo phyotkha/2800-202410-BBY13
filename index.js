@@ -48,7 +48,7 @@ var { database } = include("./scripts/databaseConnection");
 const userCollection = database.db(mongodb_database).collection("students");
 const courseModel = require("./database/schemas/courses.js")
 const eventModel = require("./database/schemas/events.js");
-
+const availableTimesModel = require("./database/schemas/availableTimes.js");
 
 // Navigation links array
 const navLinks = [
@@ -446,8 +446,17 @@ app.get("/courses", async (req, res) => {
     console.log(error);
     res.status(500).send(error);
   }
-
 });
+
+app.get('/available-times', async (req, res) => {
+  try {
+    const availableTimes = await availableTimesModel.find();
+    res.json(availableTimes);
+  } catch (error) {
+    res.status(500).send(error);
+  }
+});
+
 
 app.get('/chatPage', sessionValidation, async (req, res) => {
   res.render("chatPage");

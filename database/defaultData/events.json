@@ -50,8 +50,8 @@
   {
     "Id": 7,
     "Subject": "Yerin's Appointment",
-    "StartTime": "2024-05-05T07:00:00.000",
-    "EndTime": "2024-05-05T08:00:00.000",
+    "StartTime": "2024-05-31T10:00:00.000",
+    "EndTime": "2024-05-31T10:30:00.000",
     "departmentId": 1,
     "instructorId": 7
   },
