@@ -280,6 +280,7 @@ app.post('/chat', sessionValidation, (req, res) => {
   chatModuleDB.executeQueryAndSendResponse(req, res);
 });
 
+
 // ------------------------------------------------------------------
 
 // Route to handle logout

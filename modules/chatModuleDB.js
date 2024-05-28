@@ -1,5 +1,5 @@
 const axios = require('axios');
-const {MongoClient} = require('mongodb');
+const { MongoClient } = require('mongodb');
 const fs = require('fs');
 const path = require('path');
 const mongoose = require('mongoose');
@@ -108,9 +108,14 @@ async function handleChatPage(session, res) {
   res.render('chatPage', { chatHistory, firstname });
 }
 
-async function executeQueryAndSendResponse(inputText, res) {
+async function executeQueryAndSendResponse(req, res) {
+  const userMessage = req.body.message;
+  const firstname = req.session.firstname;
+
   try {
     await connectDB(); // Ensure the database is connected
+    console.log("usermessage", userMessage);
+
 
     const response = await axios.post('https://api.openai.com/v1/chat/completions', {
       model: "gpt-3.5-turbo-0125",
@@ -119,7 +124,7 @@ async function executeQueryAndSendResponse(inputText, res) {
         {
           role: "user",
           content: `Generate a MongoDB aggregation pipeline query based on the following input: 
-          User question: '${inputText}', Sample: '${sample}'. 
+          User question: '${userMessage}', Sample: '${sample}'. 
           Ensure the output is a valid JSON object with double quotes around keys and values.`
         }
       ],
@@ -142,7 +147,7 @@ async function executeQueryAndSendResponse(inputText, res) {
 
     console.log("query: ", query)
 
-    const collectionName = getCollectionName(inputText);
+    const collectionName = getCollectionName(userMessage);
 
     console.log("CollectionName: ", collectionName);
 
@@ -154,18 +159,27 @@ async function executeQueryAndSendResponse(inputText, res) {
 
     const results = await collection.aggregate(query).toArray();
 
-    if (results.length > 0) {
-      const responseObject = {
-        chatHistory: [
-          ...req.session.chatHistory,
-          { role: 'user', content: inputText },
-          { role: 'bot', content: JSON.stringify(results) }
-        ]
-      };
-      res.json(responseObject);
-    } else {
-      res.json({ message: "No results found." });
+    // if (results.length > 0) {
+    //   const responseObject = {
+    //     chatHistory: [
+    //       ...req.session.chatHistory,
+    //       { role: 'user', content: userMessage },
+    //       { role: 'bot', content: JSON.stringify(results) }
+    //     ]
+    //   };
+    //   res.json(responseObject);
+    // } else {
+    //   res.json({ message: "No results found." });
+    // }
+    if (!req.session.chatHistory) {
+      req.session.chatHistory = [];
     }
+
+    // Add user message to chat history
+    req.session.chatHistory.push({ role: 'user', content: userMessage });
+    req.session.chatHistory.push({ role: 'bot', content: JSON.stringify(results) });
+    res.render('chatPage', { chatHistory: req.session.chatHistory, firstname: firstname });
+
   } catch (e) {
     res.status(500).json({ error: "Error occurred", details: e.message });
   }
