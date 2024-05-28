@@ -16,6 +16,7 @@ const axios = require("axios");
 
 const studentsRouter = require("./database/routers/students");
 const instructorRouter = require("./database/routers/routerInstructor");
+const eventRouter = require("./database/routers/events.js");
 const saltRounds = 12; //Number of rounds for bcrypt hashing
 
 /**
@@ -63,6 +64,7 @@ const navLinks = [
  */
 app.set("view engine", "ejs"); //Setting view engine to EJS
 app.use(express.urlencoded({ extended: false })); // To parse URL-encoded bodies
+app.use(express.json());
 
 //Middleware so we don't need to add these navlinks/url params into everything.
 //This add navigation links and current URL to local variables.
@@ -465,6 +467,7 @@ app.get('/chatPage', sessionValidation, async (req, res) => {
 // Students router
 app.use("/students", studentsRouter);
 app.use("/instructors", instructorRouter);
+app.use("/events", eventRouter)
 
 
 /**
