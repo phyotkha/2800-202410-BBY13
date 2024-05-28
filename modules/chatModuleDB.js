@@ -86,14 +86,11 @@ function addDollarSigns(query) {
 
 // Takes user input query string as input ('query') and attempts to determine the MongoDB collection name associated with the query.
 function getCollectionName(query) {
-  if (/students?/.test(query)) return "students";
-  if (/courses?/.test(query)) return "courses";
-  if (/instructor?/.test(query)) return "instructors";
-  if (/courseInstructor(View)?/.test(query)) return "courseInstructor";
+  if (/(student|enrolled|major)/.test(query)) return "students";
+  if (/(course|subject|school|program|credit|grade|hour|week|delivery|prerequisite|description)/.test(query)) return "courses";
+  if (/(instructor|instructors|first name|last name|email|department|courses taught)/.test(query)) return "instructors";
   return null;
 }
-
-
 
 const sampleFilePath = path.join(__dirname, 'sample.txt');
 let sample;
@@ -121,7 +118,9 @@ async function executeQueryAndSendResponse(inputText, res) {
         { role: "system", content: systemMessage },
         {
           role: "user",
-          content: `Generate a MongoDB aggregation pipeline query based on the following input: User question: '${inputText}', Sample: '${sample}'. Ensure the output is a valid JSON object with double quotes around keys and values.`
+          content: `Generate a MongoDB aggregation pipeline query based on the following input: 
+          User question: '${inputText}', Sample: '${sample}'. 
+          Ensure the output is a valid JSON object with double quotes around keys and values.`
         }
       ],
     }, {
@@ -141,7 +140,12 @@ async function executeQueryAndSendResponse(inputText, res) {
       return res.status(500).json({ error: "JSON decoding error", details: e.message });
     }
 
+    console.log("query: ", query)
+
     const collectionName = getCollectionName(inputText);
+
+    console.log("CollectionName: ", collectionName);
+
     if (!collectionName) {
       return res.status(400).json({ error: "Could not determine the collection name from the query." });
     }
@@ -163,7 +167,7 @@ async function executeQueryAndSendResponse(inputText, res) {
       res.json({ message: "No results found." });
     }
   } catch (e) {
-    res.status(500).json({ error: "An error occurred", details: e.message });
+    res.status(500).json({ error: "Error occurred", details: e.message });
   }
 }
 
@@ -171,60 +175,3 @@ module.exports = {
   handleChatPage,
   executeQueryAndSendResponse,
 };
-
-
-
-// function initializeChatHistory(session) {
-//   if (!session.chatHistory) {
-//     session.chatHistory = [];
-//   }
-// }
-
-// async function handleChatPage(session, res) {
-//   initializeChatHistory(session);
-//   const { chatHistory, firstname } = session;
-//   res.render('chatPage', { chatHistory, firstname });
-// }
-
-// async function handleChatPost(session, req, res) {
-//   const userMessage = req.body.message;
-//   const firstname = session.firstname;
-
-//   initializeChatHistory(session);
-
-//   session.chatHistory.push({ role: 'user', content: userMessage });
-
-//   try {
-//     const response = await axios.post('https://api.openai.com/v1/chat/completions', {
-//       model: "gpt-3.5-turbo",
-//       messages: [{ role: "user", content: userMessage }],
-//     }, {
-//       headers: {
-//         'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
-//         'Content-Type': 'application/json'
-//       }
-//     });
-
-//     const botMessage = response.data.choices[0].message.content;
-
-//     session.chatHistory.push({ role: 'bot', content: botMessage });
-
-//     res.render('chatPage', { chatHistory: session.chatHistory, firstname });
-
-//   } catch (error) {
-//     console.error('Error calling ChatGPT API:', error.response ? error.response.data : error.message);
-//     res.status(500).send('Error communicating with ChatGPT API');
-//   }
-// }
-
-// const username = "username";
-// const pwd = "password";
-// const client = new MongoClient(`mongodb+srv://${username}:${encodeURIComponent(pwd)}@cluster0.58jhzag.mongodb.net/`);
-// const dbName = "test";
-// let db;
-
-// async function connectDB() {
-//   await client.connect();
-//   db = client.db(dbName);
-//   console.log("Connected to MongoDB");
-// }
