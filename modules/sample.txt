@@ -1,0 +1,151 @@
+Below are several sample user questions related to the MongoDB document provided, 
+and the corresponding MongoDB aggregation pipeline queries that can be used to fetch the desired data.
+Use them wisely.
+
+Question: How many students are in the CST major?
+Answer: 
+[
+  { "$match": { "major": "CST" } },
+  { "$group": { "_id": "$major", "total_students": { "$sum": 1 } } },
+  { "$project": { "major": "$_id", "total_students": 1, "_id": 0 } }
+]
+
+Question: What are the details of the student with the student ID A0134567?
+
+Query:
+json
+[
+  { "$match": { "studentId": "A0134567" } },
+  { "$project": { "first_name": 1, "last_name": 1, "date_of_birth": 1, "email": 1, "major": 1, "year": 1, "courses": 1, "_id": 0 } }
+]
+
+Question: List all students who are in their final year.
+
+Query:
+json
+[
+  { "$match": { "year": 2024 } },
+  { "$project": { "studentId": 1, "first_name": 1, "last_name": 1, "major": 1, "year": 1, "_id": 0 } }
+]
+
+Q: What are the courses taken by the student with the student ID {studentID}?
+A:
+[
+  { "$match": { "studentId": "{studentID}" } },
+  { "$project": { 
+      "studentId": 1, 
+      "first_name": 1, 
+      "last_name": 1,
+      "courses": "$courses.courseId", 
+      "_id": 0 
+    } 
+  }
+]
+
+Question: What are the specific courses that student {first_name} {last_name} is registered for?
+Answer: 
+[
+  { "$match": { "first_name": "{first_name}", "last_name": "{last_name}" } },
+  { "$project": { 
+    "studentId": 1,
+    "first_name": 1, 
+    "last_name": 1,
+    "courses": "$courses.courseId", 
+    "_id": 0 
+    } 
+  }
+]
+
+Question: What are the courses that the student {first_name} {last_name} is enrolled in?
+Answer: 
+[
+  { "$match": { "first_name": "{first_name}", "last_name": "{last_name}" } },
+  { "$project": { 
+    "studentId": 1, 
+    "first_name": 1, 
+    "last_name": 1,
+    "courses": "$courses.courseId", 
+    "_id": 0 
+    } 
+  }
+]
+
+Question: What course is the instructor {first_name} {last_name} teaching?
+Answer: 
+[
+  { "$match": { "first_name": "{first_name}", "last_name": "{last_name}" } },
+  { "$project": { "courses": 1, "_id": 0 } }
+]
+
+
+Question: Find the total number of students for each major.
+
+Query:
+json
+[
+  { "$group": { "_id": "$major", "total_students": { "$sum": 1 } } },
+  { "$project": { "major": "$_id", "total_students": 1, "_id": 0 } }
+]
+
+Question: List the names and departments of all instructors.
+Answer: 
+[
+  { "$project": { "first_name": 1, "last_name": 1, "department": 1, "_id": 0 } }
+]
+
+Question: What are the office hours and contact details for the instructor teaching COMP 1113?
+Answer: 
+[
+  { "$match": { "courses.courseId": "COMP 1113" } },
+  { "$project": { "first_name": 1, "last_name": 1, "office": 1, "officeHrs": 1, "email": 1, "otherContact": 1, "_id": 0 } }
+]
+
+Question: List all courses offered by the "School of Computing and Academic Studies".
+Answer: 
+[
+  { "$match": { "School": "School of Computing and Academic Studies" } },
+  { "$project": { "courseId": 1, "Subject": 1, "Program": 1, "CourseCredit": 1, "_id": 0 } }
+]
+
+Question: Find all courses that have no prerequisites.
+Answer: 
+[
+  { "$match": { "Prerequisites": "No prerequisites are required for this course." } },
+  { "$project": { "courseId": 1, "Subject": 1, "Program": 1, "_id": 0 } }
+]
+
+Question:  How many courses are there in the "Computer Systems Technology" program?
+Answer: 
+[
+  { "$match": { "Program": "Computer Systems Technology" } },
+  { "$group": { "_id": null, "total_courses": { "$sum": 1 } } },
+  { "$project": { "total_courses": 1, "_id": 0 } }
+]
+
+Question: Give me the list of courses from the Computer Systems Technology.
+Answer: 
+[
+  { 
+    "$match": { "Program": "Computer Systems Technology" } 
+  },
+  { 
+    "$project": { 
+      "courseId": 1,
+      "Subject": 1,
+      "CourseCredit": 1,
+      "_id": 0 
+    }
+  }
+]
+
+Question: What is the average number of hours per week for courses in the "Computer Systems Technology" program?
+Answer: 
+[
+  { "$match": { "Program": "Computer Systems Technology" } },
+  { "$group": { "_id": null, "average_hours_per_week": { "$avg": "$HoursPerWeek" } } },
+  { "$project": { "average_hours_per_week": 1, "_id": 0 } }
+]
+
+
+Each of these queries is designed to run within MongoDB's aggregation framework to extract specific information based on the user's questions.
+ The `$project` step is used to format the output to include only relevant fields. 
