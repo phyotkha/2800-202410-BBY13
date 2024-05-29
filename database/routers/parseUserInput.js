@@ -49,7 +49,7 @@ async function executeQueryAndSendResponse(req, res) {
     }
 
     const instructor = await InstructorModel.findOne({ first_name: instructorName.split(' ')[0], last_name: instructorName.split(' ')[1] });
-    
+
     if (!instructor) {
       req.session.chatHistory.push({ role: 'bot', content: "Instructor not found." });
       return res.redirect('/chat');

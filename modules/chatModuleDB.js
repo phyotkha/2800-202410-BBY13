@@ -1,15 +1,14 @@
+require("dotenv").config();
 const axios = require('axios');
-const { MongoClient } = require('mongodb');
 const fs = require('fs');
 const path = require('path');
 const mongoose = require('mongoose');
-require("dotenv").config();
-
 const express = require('express');
 const bodyParser = require('body-parser');
 const app = express();
 app.use(bodyParser.json());
 
+// System Message with Schemas
 const systemMessage = `
 You are a very intelligent AI assistant who is an expert in identifying relevant questions from users
 and converting them into NoSQL MongoDB aggregation pipeline queries.
@@ -80,11 +79,12 @@ async function connectDB() {
   }
 }
 
+// Add dollar signs to MongoDB aggreagation pipleline stages
 function addDollarSigns(query) {
   return query.replace(/"(\$match|\$group|\$project|\$lookup|\$sum|\$avg|\$max|\$min)"/g, '"$1"');
 }
 
-// Takes user input query string as input ('query') and attempts to determine the MongoDB collection name associated with the query.
+// Determine MongoDB collection name based on user query
 function getCollectionName(query) {
   if (/(student|enrolled|major)/.test(query)) return "students";
   if (/(course|subject|school|program|credit|grade|hour|week|delivery|prerequisites|description|location)/.test(query)) return "courses";
@@ -92,6 +92,7 @@ function getCollectionName(query) {
   return null;
 }
 
+// Read sample file content
 const sampleFilePath = path.join(__dirname, 'sample.txt');
 let sample;
 try {
@@ -108,11 +109,11 @@ async function handleChatPage(session, res) {
   res.render('chatPage', { chatHistory, firstname });
 }
 
+// Generate natural language response based on user question
 async function generateNaturalLanguageResponse(userQuestion, queryResults) {
   const prompt = `User question: "${userQuestion}"
-Query results: ${JSON.stringify(queryResults)}
-
-Please provide a natural language response based on the query results.`;
+  Query results: ${JSON.stringify(queryResults)}
+  Please provide a natural language response based on the query results.`;
 
   try {
     const response = await axios.post('https://api.openai.com/v1/chat/completions', {
@@ -136,35 +137,7 @@ Please provide a natural language response based on the query results.`;
   }
 }
 
-
-async function generateNaturalLanguageResponse(userQuestion, queryResults) {
-  const prompt = `User question: "${userQuestion}"
-Query results: ${JSON.stringify(queryResults)}
-
-Please provide a natural language response based on the query results.`;
-
-  try {
-    const response = await axios.post('https://api.openai.com/v1/chat/completions', {
-      model: "gpt-3.5-turbo-0125",
-      messages: [
-        { role: "system", content: "You are an AI assistant that provides natural language responses based on MongoDB query results." },
-        { role: "user", content: prompt }
-      ],
-    }, {
-      headers: {
-        'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
-        'Content-Type': 'application/json'
-      }
-    });
-
-    const naturalLanguageResponse = response.data.choices[0].message.content.trim();
-    return naturalLanguageResponse;
-  } catch (error) {
-    console.error("Error generating natural language response:", error);
-    throw new Error("Failed to generate natural language response");
-  }
-}
-
+// Handle main interaction with chatbot
 async function chatbotInteraction(req, res) {
   const userMessage = req.body.message;
   const firstname = req.session.firstname;
@@ -191,27 +164,30 @@ async function chatbotInteraction(req, res) {
       }
     });
 
-    const rawResponseContent = response.data.choices[0].message.content.trim();
-    const responseText = addDollarSigns(rawResponseContent);
+    const rawResponse = response.data.choices[0].message.content.trim(); 
+    const responseText = addDollarSigns(rawResponse);
 
     let query;
     try {
-      query = JSON.parse(responseText);
+      // Parse response text to JSON format (MognoDB query)
+      query = JSON.parse(responseText); 
     } catch (e) {
       return res.status(500).json({ error: "JSON decoding error", details: e.message });
     }
 
     // console.log("query: ", query); // For Debugging
 
+    // Determine MongoDB collection name based on user's message
     const collectionName = getCollectionName(userMessage);
 
     if (!collectionName) {
-      const errorResponse = "I am unable to answer any questions outside of the scope of BCIT";
+      // Default response when collection name cannot be determined
+      const defaultResponse = "I am unable to answer any questions outside of the scope of BCIT";
       if (!req.session.chatHistory) {
         req.session.chatHistory = [];
       }
       req.session.chatHistory.push({ role: 'user', content: userMessage });
-      req.session.chatHistory.push({ role: 'bot', content: errorResponse });
+      req.session.chatHistory.push({ role: 'bot', content: defaultResponse });
       return res.render('chatPage', { chatHistory: req.session.chatHistory, firstname: firstname });
     }
 
@@ -256,12 +232,14 @@ const totalCoursesBySchoolQuery = [
 // Query to get all instructors in program
 const instructorsByProgramQuery = [
   { $match: { Program: 'Computer Systems Technology' } },
-  { $lookup: {
-    from: "instructors",
-    localField: "instructorId",
-    foreignField: "instructorId",
-    as: "instructor_details"
-  }},
+  {
+    $lookup: {
+      from: "instructors",
+      localField: "instructorId",
+      foreignField: "instructorId",
+      as: "instructor_details"
+    }
+  },
   { $unwind: "$instructor_details" },
   { $group: { _id: "$instructor_details.instructorId", first_name: { $first: "$instructor_details.first_name" }, last_name: { $first: "$instructor_details.last_name" }, email: { $first: "$instructor_details.email" } } },
   { $project: { _id: 0, instructorId: "$_id", first_name: 1, last_name: 1, email: 1 } }
