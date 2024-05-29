@@ -108,14 +108,41 @@ async function handleChatPage(session, res) {
   res.render('chatPage', { chatHistory, firstname });
 }
 
-async function executeQueryAndSendResponse(req, res) {
+async function generateNaturalLanguageResponse(userQuestion, queryResults) {
+  const prompt = `User question: "${userQuestion}"
+Query results: ${JSON.stringify(queryResults)}
+
+Please provide a natural language response based on the query results.`;
+
+  try {
+    const response = await axios.post('https://api.openai.com/v1/chat/completions', {
+      model: "gpt-3.5-turbo-0125",
+      messages: [
+        { role: "system", content: "You are an AI assistant that provides natural language responses based on MongoDB query results." },
+        { role: "user", content: prompt }
+      ],
+    }, {
+      headers: {
+        'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
+        'Content-Type': 'application/json'
+      }
+    });
+
+    const naturalLanguageResponse = response.data.choices[0].message.content.trim();
+    return naturalLanguageResponse;
+  } catch (error) {
+    console.error("Error generating natural language response:", error);
+    throw new Error("Failed to generate natural language response");
+  }
+}
+
+async function execQueryResp(req, res) {
   const userMessage = req.body.message;
   const firstname = req.session.firstname;
 
   try {
     await connectDB(); // Ensure the database is connected
     console.log("usermessage", userMessage);
-
 
     const response = await axios.post('https://api.openai.com/v1/chat/completions', {
       model: "gpt-3.5-turbo-0125",
@@ -145,39 +172,35 @@ async function executeQueryAndSendResponse(req, res) {
       return res.status(500).json({ error: "JSON decoding error", details: e.message });
     }
 
-    console.log("query: ", query)
+    console.log("query: ", query);
 
     const collectionName = getCollectionName(userMessage);
 
-    console.log("CollectionName: ", collectionName);
-
     if (!collectionName) {
-      return res.status(400).json({ error: "Could not determine the collection name from the query." });
+      const errorResponse = "I am unable to answer any questions outside of the scope of BCIT";
+      if (!req.session.chatHistory) {
+        req.session.chatHistory = [];
+      }
+      req.session.chatHistory.push({ role: 'user', content: userMessage });
+      req.session.chatHistory.push({ role: 'bot', content: errorResponse });
+      return res.render('chatPage', { chatHistory: req.session.chatHistory, firstname: firstname });
     }
 
     const collection = mongoose.connection.db.collection(collectionName);
 
     const results = await collection.aggregate(query).toArray();
 
-    // if (results.length > 0) {
-    //   const responseObject = {
-    //     chatHistory: [
-    //       ...req.session.chatHistory,
-    //       { role: 'user', content: userMessage },
-    //       { role: 'bot', content: JSON.stringify(results) }
-    //     ]
-    //   };
-    //   res.json(responseObject);
-    // } else {
-    //   res.json({ message: "No results found." });
-    // }
+    // Generate natural language response based on the user's question and query results
+    const naturalLanguageResponse = await generateNaturalLanguageResponse(userMessage, results);
+
     if (!req.session.chatHistory) {
       req.session.chatHistory = [];
     }
 
-    // Add user message to chat history
+    // Add user message and bot's natural language response to chat history
     req.session.chatHistory.push({ role: 'user', content: userMessage });
-    req.session.chatHistory.push({ role: 'bot', content: JSON.stringify(results) });
+    req.session.chatHistory.push({ role: 'bot', content: naturalLanguageResponse });
+
     res.render('chatPage', { chatHistory: req.session.chatHistory, firstname: firstname });
 
   } catch (e) {
@@ -185,7 +208,43 @@ async function executeQueryAndSendResponse(req, res) {
   }
 }
 
+// Additional Queries Related to BCIT
+
+// Query to get average hours per week for Computer Systems Technology
+const averageHoursQuery = [
+  { $match: { Program: 'Computer Systems Technology' } },
+  { $group: { _id: null, average_hours_per_week: { $avg: "$HoursPerWeek" } } },
+  { $project: { average_hours_per_week: 1, _id: 0 } }
+];
+
+// Query to get the total number of courses offered by the School of Computing
+const totalCoursesBySchoolQuery = [
+  { $match: { School: 'School of Computing' } },
+  { $group: { _id: "$School", total_courses: { $sum: 1 } } },
+  { $project: { total_courses: 1, _id: 0 } }
+];
+
+// Query to get all instructors in program
+const instructorsByProgramQuery = [
+  { $match: { Program: 'Computer Systems Technology' } },
+  { $lookup: {
+    from: "instructors",
+    localField: "instructorId",
+    foreignField: "instructorId",
+    as: "instructor_details"
+  }},
+  { $unwind: "$instructor_details" },
+  { $group: { _id: "$instructor_details.instructorId", first_name: { $first: "$instructor_details.first_name" }, last_name: { $first: "$instructor_details.last_name" }, email: { $first: "$instructor_details.email" } } },
+  { $project: { _id: 0, instructorId: "$_id", first_name: 1, last_name: 1, email: 1 } }
+];
+
+// Query to get all students enrolled in a specific course
+const studentsByCourseQuery = (courseId) => [
+  { $match: { courses: { $elemMatch: { courseId: courseId } } } },
+  { $project: { _id: 0, studentId: 1, first_name: 1, last_name: 1, email: 1 } }
+];
+
 module.exports = {
   handleChatPage,
-  executeQueryAndSendResponse,
+  execQueryResp,
 };

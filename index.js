@@ -277,7 +277,7 @@ app.get('/chatPage', sessionValidation, (req, res) => {
 });
 
 app.post('/chat', sessionValidation, (req, res) => {
-  chatModuleDB.executeQueryAndSendResponse(req, res);
+  chatModuleDB.execQueryResp(req, res);
 });
 
 
