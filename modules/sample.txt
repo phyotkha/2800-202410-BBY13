@@ -132,7 +132,7 @@ Answer:
 ]
 Explanation: This query finds that couseId of a specific instructor by matching the first name and last name in the database of instructor collection. 
 
-Question: What is the email addres of {first name} {last name}?
+Question: What is the email address of {first name} {last name}?
 Answer: 
 [
   {"$match": { "first_name": "{first name}", "last_name": "{last name}"} },
