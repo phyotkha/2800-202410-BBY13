@@ -87,8 +87,8 @@ function addDollarSigns(query) {
 // Takes user input query string as input ('query') and attempts to determine the MongoDB collection name associated with the query.
 function getCollectionName(query) {
   if (/(student|enrolled|major)/.test(query)) return "students";
-  if (/(course|subject|school|program|credit|grade|hour|week|delivery|prerequisite|description)/.test(query)) return "courses";
-  if (/(instructor|instructors|first name|last name|email|department|courses taught)/.test(query)) return "instructors";
+  if (/(course|subject|school|program|credit|grade|hour|week|delivery|prerequisites|description|location)/.test(query)) return "courses";
+  if (/(instructor|instructors|first name|last name|email|department|courses taught|teaches|email address)/.test(query)) return "instructors";
   return null;
 }
 
@@ -108,14 +108,41 @@ async function handleChatPage(session, res) {
   res.render('chatPage', { chatHistory, firstname });
 }
 
-async function executeQueryAndSendResponse(req, res) {
+async function generateNaturalLanguageResponse(userQuestion, queryResults) {
+  const prompt = `User question: "${userQuestion}"
+Query results: ${JSON.stringify(queryResults)}
+
+Please provide a natural language response based on the query results.`;
+
+  try {
+    const response = await axios.post('https://api.openai.com/v1/chat/completions', {
+      model: "gpt-3.5-turbo-0125",
+      messages: [
+        { role: "system", content: "You are an AI assistant that provides natural language responses based on MongoDB query results." },
+        { role: "user", content: prompt }
+      ],
+    }, {
+      headers: {
+        'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
+        'Content-Type': 'application/json'
+      }
+    });
+
+    const naturalLanguageResponse = response.data.choices[0].message.content.trim();
+    return naturalLanguageResponse;
+  } catch (error) {
+    console.error("Error generating natural language response:", error);
+    throw new Error("Failed to generate natural language response");
+  }
+}
+
+async function messagingWithChatbot(req, res) {
   const userMessage = req.body.message;
   const firstname = req.session.firstname;
 
   try {
-    await connectDB(); // Ensure the database is connected
-    console.log("usermessage", userMessage);
-
+    await connectDB();
+    // console.log("usermessage", userMessage); // For Debugging
 
     const response = await axios.post('https://api.openai.com/v1/chat/completions', {
       model: "gpt-3.5-turbo-0125",
@@ -145,39 +172,35 @@ async function executeQueryAndSendResponse(req, res) {
       return res.status(500).json({ error: "JSON decoding error", details: e.message });
     }
 
-    console.log("query: ", query)
+    // console.log("query: ", query); // For Debugging
 
     const collectionName = getCollectionName(userMessage);
 
-    console.log("CollectionName: ", collectionName);
-
     if (!collectionName) {
-      return res.status(400).json({ error: "Could not determine the collection name from the query." });
+      const errorResponse = "I am unable to answer any questions outside of the scope of BCIT";
+      if (!req.session.chatHistory) {
+        req.session.chatHistory = [];
+      }
+      req.session.chatHistory.push({ role: 'user', content: userMessage });
+      req.session.chatHistory.push({ role: 'bot', content: errorResponse });
+      return res.render('chatPage', { chatHistory: req.session.chatHistory, firstname: firstname });
     }
 
     const collection = mongoose.connection.db.collection(collectionName);
 
     const results = await collection.aggregate(query).toArray();
 
-    // if (results.length > 0) {
-    //   const responseObject = {
-    //     chatHistory: [
-    //       ...req.session.chatHistory,
-    //       { role: 'user', content: userMessage },
-    //       { role: 'bot', content: JSON.stringify(results) }
-    //     ]
-    //   };
-    //   res.json(responseObject);
-    // } else {
-    //   res.json({ message: "No results found." });
-    // }
+    // Generate natural language response based on the user's question and query results
+    const naturalLanguageResponse = await generateNaturalLanguageResponse(userMessage, results);
+
     if (!req.session.chatHistory) {
       req.session.chatHistory = [];
     }
 
-    // Add user message to chat history
+    // Add user message and bot's natural language response to chat history
     req.session.chatHistory.push({ role: 'user', content: userMessage });
-    req.session.chatHistory.push({ role: 'bot', content: JSON.stringify(results) });
+    req.session.chatHistory.push({ role: 'bot', content: naturalLanguageResponse });
+
     res.render('chatPage', { chatHistory: req.session.chatHistory, firstname: firstname });
 
   } catch (e) {
@@ -187,5 +210,5 @@ async function executeQueryAndSendResponse(req, res) {
 
 module.exports = {
   handleChatPage,
-  executeQueryAndSendResponse,
+  messagingWithChatbot,
 };

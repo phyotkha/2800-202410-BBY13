@@ -222,54 +222,7 @@ app.post("/loginSubmit", async (req, res) => {
   }
 });
 
-// -----------------------------------------------------------------------------
-// app.get('/chatPage', sessionValidation, async (req, res) => {
-//   // Initialize chat history if it doesn't exist
-//   if (!req.session.chatHistory) {
-//     req.session.chatHistory = [];
-//   }
-
-//   res.render('chatPage', { chatHistory: req.session.chatHistory, firstname: req.session.firstname });
-// });
-
-// app.post('/chat', sessionValidation, async (req, res) => {
-//   const userMessage = req.body.message;
-//   const firstname = req.session.firstname;
-
-//   // Initialize chat history if it doesn't exist
-//   if (!req.session.chatHistory) {
-//     req.session.chatHistory = [];
-//   }
-
-//   // Add user message to chat history
-//   req.session.chatHistory.push({ role: 'user', content: userMessage });
-
-
-//   try {
-//     // Call the ChatGPT API with GPT-3.5
-//     const response = await axios.post('https://api.openai.com/v1/chat/completions', {
-//       model: "gpt-3.5-turbo",
-//       messages: [{ role: "user", content: userMessage }],
-//     }, {
-//       headers: {
-//         'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
-//         'Content-Type': 'application/json'
-//       }
-//     });
-
-//     const botMessage = response.data.choices[0].message.content;
-
-//     // Add bot message to chat history
-//     req.session.chatHistory.push({ role: 'bot', content: botMessage });
-
-//     res.render('chatPage', { chatHistory: req.session.chatHistory, firstname: firstname });
-
-//   } catch (error) {
-//     console.error('Error calling ChatGPT API:', error.response ? error.response.data : error.message);
-//     res.status(500).send('Error communicating with ChatGPT API');
-//   }
-// });
-
+// ChatBot Connection with Database
 const chatModuleDB = require('./modules/chatModuleDB');
 
 app.get('/chatPage', sessionValidation, (req, res) => {
@@ -277,9 +230,8 @@ app.get('/chatPage', sessionValidation, (req, res) => {
 });
 
 app.post('/chat', sessionValidation, (req, res) => {
-  chatModuleDB.executeQueryAndSendResponse(req, res);
+  chatModuleDB.messagingWithChatbot(req, res);
 });
-
 
 // ------------------------------------------------------------------
 
