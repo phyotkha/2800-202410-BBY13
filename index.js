@@ -19,6 +19,7 @@ const instructorRouter = require("./database/routers/routerInstructor");
 const eventRouter = require("./database/routers/events.js");
 const saltRounds = 12; //Number of rounds for bcrypt hashing
 
+
 /**
  * Port Configuraton
  */
@@ -458,6 +459,8 @@ app.get('/available-times', async (req, res) => {
     res.status(500).send(error);
   }
 });
+
+
 
 
 app.get('/chatPage', sessionValidation, async (req, res) => {

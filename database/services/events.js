@@ -1,5 +1,14 @@
 const Event = require("../schemas/events");
 
+const getEvents = async (query) => {
+  try {
+    const events = await Event.find(query).lean();
+    return events;
+  } catch (error) {
+    throw error;
+  }
+};
+
 const createEvent = async ({ StartTime, EndTime, Subject, instructorId, departmentId }) => {
   try {
     const result = await Event.create({
@@ -33,4 +42,4 @@ const deleteEvent = async (eventId) => {
   }
 };
 
-module.exports = { createEvent, updateEvent, deleteEvent };
+module.exports = { createEvent, updateEvent, deleteEvent, getEvents };
