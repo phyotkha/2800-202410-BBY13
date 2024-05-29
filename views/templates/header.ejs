@@ -25,7 +25,7 @@
         height: '550px',
         selectedDate: new Date(),
         eventSettings: { dataSource: [] },
-        allowAdding: false, 
+        allowAdding: false,
         views: ['Day', 'Week', 'WorkWeek', 'Month', 'Agenda']
       });
 
@@ -47,22 +47,22 @@
           <span class="navbar-toggler-icon"></span>
         </button>
         <div class="navbar-collapse collapse" id="navbarCollapse">
-        <ul
-          class="navbar px-5 navbar-nav me-auto mb-2 nav-pills nav-fill align-items-center justify-content-center mb-md-0">
-          <% for(var i=0; i<locals.navLinks.length; i++) { %>
-            <li class="nav-item"><a href="<%= locals.navLinks[i].link %>"
-                class="nav-link <% if (locals.navLinks[i].link == locals.currentURL) { %> .nav-underline <% } %>"
-                aria-current="page">
-                <%= locals.navLinks[i].name %>
-              </a></li>
-            <% } %>
-        </ul>
-        <div class="navbar-nav px-0.5 mb-2 align-items-center justify-content-end mb-md-0">
-          <a href='/logout' method='get' class="nav-link"><button type="button"
-              class="btn btn-outline-warning">Logout</button></a>
+          <ul
+            class="navbar px-5 navbar-nav me-auto mb-2 nav-pills nav-fill align-items-center justify-content-center mb-md-0">
+            <% for(var i=0; i<locals.navLinks.length; i++) { %>
+              <li class="nav-item"><a href="<%= locals.navLinks[i].link %>"
+                  class="nav-link <% if (locals.navLinks[i].link == locals.currentURL) { %> .nav-underline <% } %>"
+                  aria-current="page">
+                  <%= locals.navLinks[i].name %>
+                </a></li>
+              <% } %>
+          </ul>
+          <div class="navbar-nav px-0.5 mb-2 align-items-center justify-content-end mb-md-0">
+            <a href='/logout' method='get' class="nav-link"><button type="button"
+                class="btn btn-outline-warning">Logout</button></a>
+          </div>
         </div>
       </div>
-    </div>
-   </nav>
+    </nav>
   </header><br>
-<div class="main mt-5 px=1">
+  <div class="main mt-5 px=1">
