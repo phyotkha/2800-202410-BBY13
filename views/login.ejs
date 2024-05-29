@@ -26,6 +26,9 @@
       <div style="color: red; margin-top: 5px;">Invalid Password. Try Again!</div>
       <% } %>
     </div>
+    <% if (validationerror) { %>
+      <div style="color: red; margin-top: 5px;">Validation Error. Try Again!</div>
+    <% } %>
     <br>
     <div class="form-group">
       <a href="/resetPasswordRequest">Forgot password?</a>

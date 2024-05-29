@@ -127,16 +127,6 @@ app.get("/signup", (req, res) => {
   res.render("signup", { error: error });
 });
 
-app.get("/login", (req, res) => {
-  const invalidPassword = req.query.invalidpassword;
-  const invalidUser = req.query.invaliduser;
-
-  res.render("login", {
-    invaliduser: invalidUser,
-    invalidpassword: invalidPassword,
-  });
-});
-
 app.post("/signupSubmit", async (req, res) => {
   const { firstname, lastname, studentid, dateofbirth, username, major, email, password } = req.body;
 
@@ -152,14 +142,12 @@ app.post("/signupSubmit", async (req, res) => {
   });
 
   const validationResult = schema.validate(req.body);
-  console.log("Valid inputs");
+  // console.log("Valid inputs", validationResult); // For debugging
 
   if (validationResult.error != null) {
-    console.log(validationResult.error);
-    res.render("signupErr", {
-      error: validationResult.error.details[0].message,
-    });
+    res.redirect(`/signup?error=1`);
     return;
+    // console.log("Signup Error", validationResult.error); // For debugging
   }
 
   var hashedPassword = await bcrypt.hash(password, saltRounds);
@@ -187,25 +175,36 @@ app.post("/signupSubmit", async (req, res) => {
   res.redirect("/chatPage");
 });
 
+app.get("/login", (req, res) => {
+  const invalidPassword = req.query.invalidpassword;
+  const invalidUser = req.query.invaliduser;
+  const validationError = req.query.validationerror;
+
+  res.render("login", {
+    invaliduser: invalidUser,
+    invalidpassword: invalidPassword,
+    validationerror: validationError,
+  });
+});
+
 // Route to handle login form submission
 app.post("/loginSubmit", async (req, res) => {
   const { email, password } = req.body;
 
   const schema = Joi.object({
     email: Joi.string().email().required(),
-    password: Joi.string().max(20).required(),
+    password: Joi.string().max(20).required()
   });
 
   // Validate input data
-  const validationResult = schema.validate(req.body);
-  if (validationResult.error != null) {
-    console.log(validationResult.error);
-    res.render("login_error", {
-      error: validationResult.error.details[0].message,
-    });
+  const validationError = schema.validate(req.body);
+  console.log(validationError);
+  if (validationError.error != null) {
+    res.redirect("/login?validationerror=1");
+
+    // console.log(validationResult.error); // For Debugging
   }
 
-  // Check for matching email in database
   const userData = await userCollection.findOne({ email });
   if (!userData) {
     return res.redirect("/login?invaliduser=1");
@@ -237,6 +236,28 @@ app.get('/chatPage', sessionValidation, (req, res) => {
 app.post('/chat', sessionValidation, (req, res) => {
   chatModuleDB.chatbotInteraction(req, res);
 });
+
+
+// const bookAppointment = require('./modules/bookAppointment');
+// app.get('/bookAppointment', (req, res) => {
+//   bookAppointment.bookAppointmentForm(req, res);
+// });
+
+// app.get('/bookAppointmentSubmit', (req, res) => {
+//   bookAppointment.bookAppointmentForm(req, res);
+// });
+
+const {
+  showAppointmentForm,
+  bookAppointmentSubmit,
+  updateAppointment,
+  deleteAppointment
+} = require('./modules/bookAppointment');
+
+app.get('/bookAppointment', showAppointmentForm);
+app.post('/bookAppointmentSubmit', bookAppointmentSubmit);
+app.put('/update/:eventId', updateAppointment);
+app.delete('/delete/:eventId', deleteAppointment);
 
 // ------------------------------------------------------------------
 
@@ -295,16 +316,17 @@ app.post("/sendResetLink", async (req, res) => {
       `You are receiving this because you (or someone else) have requested the reset of the password for your account.\n\n` +
       `Please click on the following link, or paste this into your browser to complete the process:\n\n` +
       `http://${req.headers.host}/resetPassword/${token}\n\n` +
-      `If you did not request this, please ignore this email and your password will remain unchanged. The link will expire in one hour.\n`,
+      `If you did not request this, please ignore this email and your password will remain unchanged. The link will expire in one hour.\n` +
+      `\n\n © 2024 SchoolScope AI, Inc`,
   };
 
   // Send the email to user
   transporter.sendMail(mailMessage, (err, info) => {
     if (err) {
-      console.error(err);
+      // console.error(err); // For Debugging 
       res.render('resetPasswordRequest', { message: 'Error sending email. Try Again!' });
     } else {
-      console.log('Email sent: ' + info.response);
+      // console.log('Email sent: ' + info.response); // For Debugging
       res.redirect('/resetPasswordRequest');
     }
   });
@@ -389,7 +411,6 @@ app.post('/updateProfile', sessionValidation, async (req, res) => {
 // ---------------------------------------------------------------------------------------------------- //
 
 app.get('/calendar', sessionValidation, async (req, res) => {
-
   res.render("calendar", {
     ESSENTIAL_STUDIO_KEY: process.env.ESSENTIAL_STUDIO_KEY,
   });
@@ -421,13 +442,6 @@ app.get('/available-times', async (req, res) => {
   } catch (error) {
     res.status(500).send(error);
   }
-});
-
-
-
-
-app.get('/chatPage', sessionValidation, async (req, res) => {
-  res.render("chatPage");
 });
 
 // Students router

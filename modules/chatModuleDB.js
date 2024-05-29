@@ -161,7 +161,7 @@ async function chatbotInteraction(req, res) {
     if (/(book an appointment|book me an appointment|make an appointment)/i.test(userMessage)) {
       // const appointmentInstructorName = userMessage.match(/with[^\s]+/i);
 
-      const appointmentFormLink = `http://${req.headers.host}/make-appointment`;
+      const appointmentFormLink = `http://${req.headers.host}/bookAppointment`;
 
       const appointmentResponse = `To book an appointment, please fill out the form at: ${appointmentFormLink}`;
 
