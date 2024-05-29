@@ -230,7 +230,7 @@ app.get('/chatPage', sessionValidation, (req, res) => {
 });
 
 app.post('/chat', sessionValidation, (req, res) => {
-  chatModuleDB.messagingWithChatbot(req, res);
+  chatModuleDB.chatbotInteraction(req, res);
 });
 
 // ------------------------------------------------------------------

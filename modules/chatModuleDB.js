@@ -136,7 +136,36 @@ Please provide a natural language response based on the query results.`;
   }
 }
 
-async function messagingWithChatbot(req, res) {
+
+async function generateNaturalLanguageResponse(userQuestion, queryResults) {
+  const prompt = `User question: "${userQuestion}"
+Query results: ${JSON.stringify(queryResults)}
+
+Please provide a natural language response based on the query results.`;
+
+  try {
+    const response = await axios.post('https://api.openai.com/v1/chat/completions', {
+      model: "gpt-3.5-turbo-0125",
+      messages: [
+        { role: "system", content: "You are an AI assistant that provides natural language responses based on MongoDB query results." },
+        { role: "user", content: prompt }
+      ],
+    }, {
+      headers: {
+        'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
+        'Content-Type': 'application/json'
+      }
+    });
+
+    const naturalLanguageResponse = response.data.choices[0].message.content.trim();
+    return naturalLanguageResponse;
+  } catch (error) {
+    console.error("Error generating natural language response:", error);
+    throw new Error("Failed to generate natural language response");
+  }
+}
+
+async function chatbotInteraction(req, res) {
   const userMessage = req.body.message;
   const firstname = req.session.firstname;
 
@@ -208,7 +237,43 @@ async function messagingWithChatbot(req, res) {
   }
 }
 
+// Additional Queries Related to BCIT
+
+// Query to get average hours per week for Computer Systems Technology
+const averageHoursQuery = [
+  { $match: { Program: 'Computer Systems Technology' } },
+  { $group: { _id: null, average_hours_per_week: { $avg: "$HoursPerWeek" } } },
+  { $project: { average_hours_per_week: 1, _id: 0 } }
+];
+
+// Query to get the total number of courses offered by the School of Computing
+const totalCoursesBySchoolQuery = [
+  { $match: { School: 'School of Computing' } },
+  { $group: { _id: "$School", total_courses: { $sum: 1 } } },
+  { $project: { total_courses: 1, _id: 0 } }
+];
+
+// Query to get all instructors in program
+const instructorsByProgramQuery = [
+  { $match: { Program: 'Computer Systems Technology' } },
+  { $lookup: {
+    from: "instructors",
+    localField: "instructorId",
+    foreignField: "instructorId",
+    as: "instructor_details"
+  }},
+  { $unwind: "$instructor_details" },
+  { $group: { _id: "$instructor_details.instructorId", first_name: { $first: "$instructor_details.first_name" }, last_name: { $first: "$instructor_details.last_name" }, email: { $first: "$instructor_details.email" } } },
+  { $project: { _id: 0, instructorId: "$_id", first_name: 1, last_name: 1, email: 1 } }
+];
+
+// Query to get all students enrolled in a specific course
+const studentsByCourseQuery = (courseId) => [
+  { $match: { courses: { $elemMatch: { courseId: courseId } } } },
+  { $project: { _id: 0, studentId: 1, first_name: 1, last_name: 1, email: 1 } }
+];
+
 module.exports = {
   handleChatPage,
-  messagingWithChatbot,
+  chatbotInteraction,
 };
