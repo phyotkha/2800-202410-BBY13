@@ -15,8 +15,10 @@ const bcrypt = require("bcrypt");
 const axios = require("axios");
 
 const studentsRouter = require("./database/routers/students");
-const instructorRouter = require("./database/routers/routerInstructor")
+const instructorRouter = require("./database/routers/routerInstructor");
+const eventRouter = require("./database/routers/events.js");
 const saltRounds = 12; //Number of rounds for bcrypt hashing
+
 
 /**
  * Port Configuraton
@@ -46,7 +48,9 @@ registerLicense('licenseKey');
  */
 var { database } = include("./scripts/databaseConnection");
 const userCollection = database.db(mongodb_database).collection("students");
-
+const courseModel = require("./database/schemas/courses.js")
+const eventModel = require("./database/schemas/events.js");
+const availableTimesModel = require("./database/schemas/availableTimes.js");
 
 // Navigation links array
 const navLinks = [
@@ -61,6 +65,7 @@ const navLinks = [
  */
 app.set("view engine", "ejs"); //Setting view engine to EJS
 app.use(express.urlencoded({ extended: false })); // To parse URL-encoded bodies
+app.use(express.json());
 
 //Middleware so we don't need to add these navlinks/url params into everything.
 //This add navigation links and current URL to local variables.
@@ -384,8 +389,42 @@ app.post('/updateProfile', sessionValidation, async (req, res) => {
 // ---------------------------------------------------------------------------------------------------- //
 
 app.get('/calendar', sessionValidation, async (req, res) => {
-  res.render("calendar");
+
+  res.render("calendar", {
+    ESSENTIAL_STUDIO_KEY: process.env.ESSENTIAL_STUDIO_KEY,
+  });
 });
+
+app.get("/events", async (req, res) => {
+  try {
+    const events = await eventModel.find();
+    res.json(events);
+  } catch (error) {
+    res.status(500).send(error);
+  }
+});
+
+app.get("/courses", async (req, res) => {
+  try {
+    const courses = await courseModel.find();
+    res.json(courses);
+  } catch (error) {
+    console.log(error);
+    res.status(500).send(error);
+  }
+});
+
+app.get('/available-times', async (req, res) => {
+  try {
+    const availableTimes = await availableTimesModel.find();
+    res.json(availableTimes);
+  } catch (error) {
+    res.status(500).send(error);
+  }
+});
+
+
+
 
 app.get('/chatPage', sessionValidation, async (req, res) => {
   res.render("chatPage");
@@ -394,6 +433,7 @@ app.get('/chatPage', sessionValidation, async (req, res) => {
 // Students router
 app.use("/students", studentsRouter);
 app.use("/instructors", instructorRouter);
+app.use("/events", eventRouter)
 
 
 /**

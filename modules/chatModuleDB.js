@@ -1,15 +1,14 @@
+require("dotenv").config();
 const axios = require('axios');
-const { MongoClient } = require('mongodb');
 const fs = require('fs');
 const path = require('path');
 const mongoose = require('mongoose');
-require("dotenv").config();
-
 const express = require('express');
 const bodyParser = require('body-parser');
 const app = express();
 app.use(bodyParser.json());
 
+// System Message with Schemas
 const systemMessage = `
 You are a very intelligent AI assistant who is an expert in identifying relevant questions from users
 and converting them into NoSQL MongoDB aggregation pipeline queries.
@@ -17,7 +16,7 @@ Note: You have to just return the query to use in the aggregation pipeline, noth
 Please use the below schema to write the MongoDB queries, don't use any other queries.
 
 Schemas:
-Events Collection:
+**Events Collection Schema:**
 - Id: Unique identifier for the event document.
 - Subject: Subject of the event.
 - StartTime: Start time of the event.
@@ -25,7 +24,7 @@ Events Collection:
 - departmentId: Identifier for the department associated with the event.
 - instructorId: Identifier for the instructor associated with the event.
 
-Instructors Collection:
+**Instructors Collection Schema:**
 - instructorId: Unique identifier for the instructor document.
 - first_name: First name of the instructor.
 - last_name: Last name of the instructor.
@@ -33,7 +32,7 @@ Instructors Collection:
 - department: Department of the instructor.
 - courses: Array of objects containing courseId of the courses taught by the instructor.
 
-Students Collection:
+**Students Collection Schema:**
 - studentId: Unique identifier for the student document.
 - first_name: First name of the student.
 - last_name: Last name of the student.
@@ -63,8 +62,19 @@ Students Collection:
 - location: Location where the course is held.
 - departmentId: ID of the department offering the course.
 
+**AvailableTimes Collection Schema:**
+- Id: Unique identifier for the available time slot document.
+- Subject: Subject of the available time slot (default is 'Available').
+- StartTime: Start time of the available time slot.
+- EndTime: End time of the available time slot.
+- CategoryColor: Color category for the time slot.
+- RecurrenceRule: Recurrence rule for the time slot.
+- departmentId: Identifier for the department associated with the time slot.
+- instructorId: Identifier for the instructor associated with the time slot.
+
 Note: You have to just return the query, nothing else. Don't return any additional text with the query.
 `;
+
 
 // Database Connection
 const mongodb_host = process.env.MONGODB_HOST;
@@ -80,23 +90,26 @@ async function connectDB() {
   }
 }
 
+// Add dollar signs to MongoDB aggreagation pipleline stages
 function addDollarSigns(query) {
   return query.replace(/"(\$match|\$group|\$project|\$lookup|\$sum|\$avg|\$max|\$min)"/g, '"$1"');
 }
 
-// Takes user input query string as input ('query') and attempts to determine the MongoDB collection name associated with the query.
+// Determine MongoDB collection name based on user query
 function getCollectionName(query) {
   if (/(student|enrolled|major)/.test(query)) return "students";
   if (
-    /(course|subject|school|program|credit|grade|hour|week|delivery|prerequisites|description|location|course outline|start|end|program|week|full name|days)/.test(
+    /(course|subject|school|program|credit|grade|week|delivery|prerequisites|description|location|course outline|start|end|program|week|full name|days)/.test(
       query
     )
   )
     return "courses";
   if (/(instructor|instructors|first name|last name|email|department|courses taught|teaches|email address)/.test(query)) return "instructors";
+  if (/(book an appointment|available|office hours)/.test(query)) return "availabletimes";
   return null;
 }
 
+// Read sample file content
 const sampleFilePath = path.join(__dirname, 'sample.txt');
 let sample;
 try {
@@ -113,11 +126,11 @@ async function handleChatPage(session, res) {
   res.render('chatPage', { chatHistory, firstname });
 }
 
+// Generate natural language response based on user question
 async function generateNaturalLanguageResponse(userQuestion, queryResults) {
   const prompt = `User question: "${userQuestion}"
-Query results: ${JSON.stringify(queryResults)}
-
-Please provide a natural language response based on the query results.`;
+  Query results: ${JSON.stringify(queryResults)}
+  Please provide a natural language response based on the query results.`;
 
   try {
     const response = await axios.post('https://api.openai.com/v1/chat/completions', {
@@ -141,35 +154,7 @@ Please provide a natural language response based on the query results.`;
   }
 }
 
-
-async function generateNaturalLanguageResponse(userQuestion, queryResults) {
-  const prompt = `User question: "${userQuestion}"
-Query results: ${JSON.stringify(queryResults)}
-
-Please provide a natural language response based on the query results.`;
-
-  try {
-    const response = await axios.post('https://api.openai.com/v1/chat/completions', {
-      model: "gpt-3.5-turbo-0125",
-      messages: [
-        { role: "system", content: "You are an AI assistant that provides natural language responses based on MongoDB query results." },
-        { role: "user", content: prompt }
-      ],
-    }, {
-      headers: {
-        'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
-        'Content-Type': 'application/json'
-      }
-    });
-
-    const naturalLanguageResponse = response.data.choices[0].message.content.trim();
-    return naturalLanguageResponse;
-  } catch (error) {
-    console.error("Error generating natural language response:", error);
-    throw new Error("Failed to generate natural language response");
-  }
-}
-
+// Handle main interaction with chatbot
 async function chatbotInteraction(req, res) {
   const userMessage = req.body.message;
   const firstname = req.session.firstname;
@@ -177,6 +162,20 @@ async function chatbotInteraction(req, res) {
   try {
     await connectDB();
     // console.log("usermessage", userMessage); // For Debugging
+
+    if (/(book an appointment|book me an appointment|make an appointment)/i.test(userMessage)) {
+      // const appointmentInstructorName = userMessage.match(/with[^\s]+/i);
+
+      const appointmentFormLink = `http://${req.headers.host}/make-appointment`;
+
+      const appointmentResponse = `To book an appointment, please fill out the form at: ${appointmentFormLink}`;
+
+      req.session.chatHistory = req.session.chatHistory || [];
+      req.session.chatHistory.push({ role: 'user', content: userMessage });
+      req.session.chatHistory.push({ role: 'bot', content: appointmentResponse });
+
+      return res.render('chatPage', { chatHistory: req.session.chatHistory, firstname: firstname });
+    }
 
     const response = await axios.post('https://api.openai.com/v1/chat/completions', {
       model: "gpt-3.5-turbo-0125",
@@ -196,36 +195,38 @@ async function chatbotInteraction(req, res) {
       }
     });
 
-    const rawResponseContent = response.data.choices[0].message.content.trim();
-    const responseText = addDollarSigns(rawResponseContent);
+    const rawResponse = response.data.choices[0].message.content.trim(); 
+    const responseText = addDollarSigns(rawResponse);
 
     let query;
     try {
-      query = JSON.parse(responseText);
+      // Parse response text to JSON format (MognoDB query)
+      query = JSON.parse(responseText); 
     } catch (e) {
       return res.status(500).json({ error: "JSON decoding error", details: e.message });
     }
-
-    // console.log("query: ", query); // For Debugging
+    console.log("Query: ", query); // For Debugging
 
     const collectionName = getCollectionName(userMessage);
+    console.log("Collection: ", collectionName); // For Debugging
 
     if (!collectionName) {
-      const errorResponse = "I am unable to answer any questions outside of the scope of BCIT";
+      // Default response when collection name cannot be determined
+      const defaultResponse = "I am unable to answer any questions outside of the scope of BCIT";
       if (!req.session.chatHistory) {
         req.session.chatHistory = [];
       }
       req.session.chatHistory.push({ role: 'user', content: userMessage });
-      req.session.chatHistory.push({ role: 'bot', content: errorResponse });
+      req.session.chatHistory.push({ role: 'bot', content: defaultResponse });
       return res.render('chatPage', { chatHistory: req.session.chatHistory, firstname: firstname });
     }
 
     const collection = mongoose.connection.db.collection(collectionName);
 
-    const results = await collection.aggregate(query).toArray();
+    const queryResults = await collection.aggregate(query).toArray();
+    console.log("QueryResults: ", queryResults); // For Debugging
 
-    // Generate natural language response based on the user's question and query results
-    const naturalLanguageResponse = await generateNaturalLanguageResponse(userMessage, results);
+    const naturalLanguageResponse = await generateNaturalLanguageResponse(userMessage, queryResults);
 
     if (!req.session.chatHistory) {
       req.session.chatHistory = [];
@@ -241,42 +242,6 @@ async function chatbotInteraction(req, res) {
     res.status(500).json({ error: "Error occurred", details: e.message });
   }
 }
-
-// Additional Queries Related to BCIT
-
-// Query to get average hours per week for Computer Systems Technology
-const averageHoursQuery = [
-  { $match: { Program: 'Computer Systems Technology' } },
-  { $group: { _id: null, average_hours_per_week: { $avg: "$HoursPerWeek" } } },
-  { $project: { average_hours_per_week: 1, _id: 0 } }
-];
-
-// Query to get the total number of courses offered by the School of Computing
-const totalCoursesBySchoolQuery = [
-  { $match: { School: 'School of Computing' } },
-  { $group: { _id: "$School", total_courses: { $sum: 1 } } },
-  { $project: { total_courses: 1, _id: 0 } }
-];
-
-// Query to get all instructors in program
-const instructorsByProgramQuery = [
-  { $match: { Program: 'Computer Systems Technology' } },
-  { $lookup: {
-    from: "instructors",
-    localField: "instructorId",
-    foreignField: "instructorId",
-    as: "instructor_details"
-  }},
-  { $unwind: "$instructor_details" },
-  { $group: { _id: "$instructor_details.instructorId", first_name: { $first: "$instructor_details.first_name" }, last_name: { $first: "$instructor_details.last_name" }, email: { $first: "$instructor_details.email" } } },
-  { $project: { _id: 0, instructorId: "$_id", first_name: 1, last_name: 1, email: 1 } }
-];
-
-// Query to get all students enrolled in a specific course
-const studentsByCourseQuery = (courseId) => [
-  { $match: { courses: { $elemMatch: { courseId: courseId } } } },
-  { $project: { _id: 0, studentId: 1, first_name: 1, last_name: 1, email: 1 } }
-];
 
 module.exports = {
   handleChatPage,
