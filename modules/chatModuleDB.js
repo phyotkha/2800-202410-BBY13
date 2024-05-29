@@ -87,7 +87,12 @@ function addDollarSigns(query) {
 // Takes user input query string as input ('query') and attempts to determine the MongoDB collection name associated with the query.
 function getCollectionName(query) {
   if (/(student|enrolled|major)/.test(query)) return "students";
-  if (/(course|subject|school|program|credit|grade|hour|week|delivery|prerequisites|description|location)/.test(query)) return "courses";
+  if (
+    /(course|subject|school|program|credit|grade|hour|week|delivery|prerequisites|description|location|course outline|start|end|program|week|full name|days)/.test(
+      query
+    )
+  )
+    return "courses";
   if (/(instructor|instructors|first name|last name|email|department|courses taught|teaches|email address)/.test(query)) return "instructors";
   return null;
 }
