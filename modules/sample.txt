@@ -135,7 +135,14 @@ Explanation: This query finds that couseId of a specific instructor by matching 
 Question: What is the email addres of {first name} {last name}?
 Answer: 
 [
-  {"$match": { "first_name": "{first name}", "last_name": "{last name}"} },\
+  {"$match": { "first_name": "{first name}", "last_name": "{last name}"} },
   {"$project": { "email": 1, "_id": 0 } }
 ]
 
+Question: What are the office hours of {first_name} {last_name}? / Can you tell me {first_name} {last_name}'s office hours?
+Answer: 
+[
+  {"$match": {"first_name": "{first_name}", "last_name": "{last_name}" } },
+  {"$project": {"StartTime": 1, "EndTime": 1, "_id": 0 } }
+]
+Explanation: This query finds the start time and end time of a specific instructor from availabletimes database and gives user the office hour of said instructor.

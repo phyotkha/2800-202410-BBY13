@@ -16,7 +16,7 @@ Note: You have to just return the query to use in the aggregation pipeline, noth
 Please use the below schema to write the MongoDB queries, don't use any other queries.
 
 Schemas:
-Events Collection:
+**Events Collection Schema:**
 - Id: Unique identifier for the event document.
 - Subject: Subject of the event.
 - StartTime: Start time of the event.
@@ -24,7 +24,7 @@ Events Collection:
 - departmentId: Identifier for the department associated with the event.
 - instructorId: Identifier for the instructor associated with the event.
 
-Instructors Collection:
+**Instructors Collection Schema:**
 - instructorId: Unique identifier for the instructor document.
 - first_name: First name of the instructor.
 - last_name: Last name of the instructor.
@@ -32,7 +32,7 @@ Instructors Collection:
 - department: Department of the instructor.
 - courses: Array of objects containing courseId of the courses taught by the instructor.
 
-Students Collection:
+**Students Collection Schema:**
 - studentId: Unique identifier for the student document.
 - first_name: First name of the student.
 - last_name: Last name of the student.
@@ -62,8 +62,19 @@ Students Collection:
 - location: Location where the course is held.
 - departmentId: ID of the department offering the course.
 
+**AvailableTimes Collection Schema:**
+- Id: Unique identifier for the available time slot document.
+- Subject: Subject of the available time slot (default is 'Available').
+- StartTime: Start time of the available time slot.
+- EndTime: End time of the available time slot.
+- CategoryColor: Color category for the time slot.
+- RecurrenceRule: Recurrence rule for the time slot.
+- departmentId: Identifier for the department associated with the time slot.
+- instructorId: Identifier for the instructor associated with the time slot.
+
 Note: You have to just return the query, nothing else. Don't return any additional text with the query.
 `;
+
 
 // Database Connection
 const mongodb_host = process.env.MONGODB_HOST;
@@ -87,8 +98,9 @@ function addDollarSigns(query) {
 // Determine MongoDB collection name based on user query
 function getCollectionName(query) {
   if (/(student|enrolled|major)/.test(query)) return "students";
-  if (/(course|subject|school|program|credit|grade|hour|week|delivery|prerequisites|description|location)/.test(query)) return "courses";
+  if (/(course|subject|school|program|credit|grade|week|delivery|prerequisites|description|location)/.test(query)) return "courses";
   if (/(instructor|instructors|first name|last name|email|department|courses taught|teaches|email address)/.test(query)) return "instructors";
+  if (/(book an appointment|available|office hours)/.test(query)) return "availabletimes";
   return null;
 }
 
@@ -146,6 +158,20 @@ async function chatbotInteraction(req, res) {
     await connectDB();
     // console.log("usermessage", userMessage); // For Debugging
 
+    if (/(book an appointment|book me an appointment|make an appointment)/i.test(userMessage)) {
+      // const appointmentInstructorName = userMessage.match(/with[^\s]+/i);
+
+      const appointmentFormLink = `http://${req.headers.host}/make-appointment`;
+
+      const appointmentResponse = `To book an appointment, please fill out the form at: ${appointmentFormLink}`;
+
+      req.session.chatHistory = req.session.chatHistory || [];
+      req.session.chatHistory.push({ role: 'user', content: userMessage });
+      req.session.chatHistory.push({ role: 'bot', content: appointmentResponse });
+
+      return res.render('chatPage', { chatHistory: req.session.chatHistory, firstname: firstname });
+    }
+
     const response = await axios.post('https://api.openai.com/v1/chat/completions', {
       model: "gpt-3.5-turbo-0125",
       messages: [
@@ -174,11 +200,10 @@ async function chatbotInteraction(req, res) {
     } catch (e) {
       return res.status(500).json({ error: "JSON decoding error", details: e.message });
     }
+    console.log("Query: ", query); // For Debugging
 
-    // console.log("query: ", query); // For Debugging
-
-    // Determine MongoDB collection name based on user's message
     const collectionName = getCollectionName(userMessage);
+    console.log("Collection: ", collectionName); // For Debugging
 
     if (!collectionName) {
       // Default response when collection name cannot be determined
@@ -193,10 +218,10 @@ async function chatbotInteraction(req, res) {
 
     const collection = mongoose.connection.db.collection(collectionName);
 
-    const results = await collection.aggregate(query).toArray();
+    const queryResults = await collection.aggregate(query).toArray();
+    console.log("QueryResults: ", queryResults); // For Debugging
 
-    // Generate natural language response based on the user's question and query results
-    const naturalLanguageResponse = await generateNaturalLanguageResponse(userMessage, results);
+    const naturalLanguageResponse = await generateNaturalLanguageResponse(userMessage, queryResults);
 
     if (!req.session.chatHistory) {
       req.session.chatHistory = [];
@@ -212,44 +237,6 @@ async function chatbotInteraction(req, res) {
     res.status(500).json({ error: "Error occurred", details: e.message });
   }
 }
-
-// Additional Queries Related to BCIT
-
-// Query to get average hours per week for Computer Systems Technology
-const averageHoursQuery = [
-  { $match: { Program: 'Computer Systems Technology' } },
-  { $group: { _id: null, average_hours_per_week: { $avg: "$HoursPerWeek" } } },
-  { $project: { average_hours_per_week: 1, _id: 0 } }
-];
-
-// Query to get the total number of courses offered by the School of Computing
-const totalCoursesBySchoolQuery = [
-  { $match: { School: 'School of Computing' } },
-  { $group: { _id: "$School", total_courses: { $sum: 1 } } },
-  { $project: { total_courses: 1, _id: 0 } }
-];
-
-// Query to get all instructors in program
-const instructorsByProgramQuery = [
-  { $match: { Program: 'Computer Systems Technology' } },
-  {
-    $lookup: {
-      from: "instructors",
-      localField: "instructorId",
-      foreignField: "instructorId",
-      as: "instructor_details"
-    }
-  },
-  { $unwind: "$instructor_details" },
-  { $group: { _id: "$instructor_details.instructorId", first_name: { $first: "$instructor_details.first_name" }, last_name: { $first: "$instructor_details.last_name" }, email: { $first: "$instructor_details.email" } } },
-  { $project: { _id: 0, instructorId: "$_id", first_name: 1, last_name: 1, email: 1 } }
-];
-
-// Query to get all students enrolled in a specific course
-const studentsByCourseQuery = (courseId) => [
-  { $match: { courses: { $elemMatch: { courseId: courseId } } } },
-  { $project: { _id: 0, studentId: 1, first_name: 1, last_name: 1, email: 1 } }
-];
 
 module.exports = {
   handleChatPage,
