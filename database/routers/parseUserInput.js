@@ -57,15 +57,15 @@ async function executeQueryAndSendResponse(req, res) {
 
     const { _id: instructorId, department: departmentId } = instructor;
 
-    const appointmentResponse = await axios.post('http://localhost:3000/book-appointment', {
+    const appointmentResponse = await axios.post('http://localhost:4000/book-appointment', {
       instructorId,
-      requestedStartTime,
-      requestedEndTime,
+      StartTime,
+      EndTime,
       Subject: `Appointment with ${instructorName}`,
       departmentId
     });
 
-    req.session.chatHistory.push({ role: 'bot', content: `Appointment successfully booked with ${instructorName} on ${requestedStartTime}.` });
+    req.session.chatHistory.push({ role: 'bot', content: `Appointment successfully booked with ${instructorName} on ${StartTime}.` });
     return res.redirect('/chat');
 
   } catch (error) {
