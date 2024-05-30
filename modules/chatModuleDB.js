@@ -158,64 +158,95 @@ async function chatbotInteraction(req, res) {
     await connectDB();
     // console.log("usermessage", userMessage); // For Debugging
 
-    if (/(book an appointment|book me an appointment|make an appointment)/i.test(userMessage)) {
-      // const appointmentInstructorName = userMessage.match(/with[^\s]+/i);
+    if (
+      /(book an appointment|book me an appointment|make an appointment)/i.test(
+        userMessage
+      )
+    ) {
+      // Construct the appointment form link
+      const appointmentFormLink = `<a href="http://${req.headers.host}/bookAppointment">Book Appointment</a>`;
 
-      const appointmentFormLink = `http://${req.headers.host}/bookAppointment`;
-
+      // Generate the response with the link
       const appointmentResponse = `To book an appointment, please fill out the form at: ${appointmentFormLink}`;
 
+      // Store chat history in session
       req.session.chatHistory = req.session.chatHistory || [];
-      req.session.chatHistory.push({ role: 'user', content: userMessage });
-      req.session.chatHistory.push({ role: 'bot', content: appointmentResponse });
+      req.session.chatHistory.push({ role: "user", content: userMessage });
+      req.session.chatHistory.push({
+        role: "bot",
+        content: appointmentResponse,
+      });
 
-      return res.render('chatPage', { chatHistory: req.session.chatHistory, firstname: firstname });
+      // Render the chat page with the updated chat history
+      return res.render("chatPage", {
+        chatHistory: req.session.chatHistory,
+        firstname: firstname,
+      });
     }
 
-    const response = await axios.post('https://api.openai.com/v1/chat/completions', {
-      model: "gpt-3.5-turbo-0125",
-      messages: [
-        { role: "system", content: systemMessage },
-        {
-          role: "user",
-          content: `Generate a MongoDB aggregation pipeline query based on the following input: 
-          User question: '${userMessage}', Sample: '${sample}'. 
-          Ensure the output is a valid JSON object with double quotes around keys and values.`
-        }
-      ],
-    }, {
-      headers: {
-        'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
-        'Content-Type': 'application/json'
-      }
-    });
-
-    const rawResponse = response.data.choices[0].message.content.trim(); 
-    const responseText = addDollarSigns(rawResponse);
-
-    let query;
+    // If the message is not related to booking an appointment, proceed with OpenAI API call
     try {
-      // Parse response text to JSON format (MognoDB query)
-      query = JSON.parse(responseText); 
-    } catch (e) {
-      return res.status(500).json({ error: "JSON decoding error", details: e.message });
-    }
-    console.log("Query: ", query); // For Debugging
+      const response = await axios.post(
+        "https://api.openai.com/v1/chat/completions",
+        {
+          model: "gpt-3.5-turbo-0125",
+          messages: [
+            { role: "system", content: systemMessage },
+            {
+              role: "user",
+              content: `Generate a MongoDB aggregation pipeline query based on the following input: 
+                    User question: '${userMessage}', Sample: '${sample}'. 
+                    Ensure the output is a valid JSON object with double quotes around keys and values.`,
+            },
+          ],
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
 
-    const collectionName = getCollectionName(userMessage);
-    console.log("Collection: ", collectionName); // For Debugging
+      const rawResponse = response.data.choices[0].message.content.trim();
+      const responseText = addDollarSigns(rawResponse);
 
-    if (!collectionName) {
-      // Default response when collection name cannot be determined
-      const defaultResponse = "I am unable to answer any questions outside of the scope of BCIT";
-      if (!req.session.chatHistory) {
-        req.session.chatHistory = [];
+      // Parse the OpenAI API response and perform further actions
+      let query;
+      try {
+        query = JSON.parse(responseText);
+      } catch (e) {
+        return res
+          .status(500)
+          .json({ error: "JSON decoding error", details: e.message });
       }
-      req.session.chatHistory.push({ role: 'user', content: userMessage });
-      req.session.chatHistory.push({ role: 'bot', content: defaultResponse });
-      return res.render('chatPage', { chatHistory: req.session.chatHistory, firstname: firstname });
-    }
+      console.log("Query: ", query); // For Debugging
 
+      // Determine the collection name
+      const collectionName = getCollectionName(userMessage);
+      console.log("Collection: ", collectionName); // For Debugging
+
+      // If the collection name cannot be determined, provide a default response
+      if (!collectionName) {
+        const defaultResponse =
+          "I am unable to answer any questions outside of the scope of BCIT";
+        if (!req.session.chatHistory) {
+          req.session.chatHistory = [];
+        }
+        req.session.chatHistory.push({ role: "user", content: userMessage });
+        req.session.chatHistory.push({ role: "bot", content: defaultResponse });
+        return res.render("chatPage", {
+          chatHistory: req.session.chatHistory,
+          firstname: firstname,
+        });
+      }
+    } catch (error) {
+      // Handle errors from the API call
+      console.error("Error:", error);
+      return res
+        .status(500)
+        .json({ error: "Error processing request", details: error.message });
+    }
     const collection = mongoose.connection.db.collection(collectionName);
 
     const queryResults = await collection.aggregate(query).toArray();
