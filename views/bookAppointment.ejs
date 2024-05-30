@@ -1,72 +1,40 @@
 <%- include("templates/header") %>
 <div class="container">
-  <h1>Book Appointment</h1>
+  <h1>Book An Appointment</h1>
   <form action="/bookAppointmentSubmit" method="post">
-    <div class="form-row">
-      <div class="form-group col-md-6">
-        <label for="firstnameinput">First Name</label>
-        <input
-          name="firstname"
-          type="text"
-          class="form-control"
-          id="firstnameinput"
-          placeholder="First Name"
-        />
+    <div class="row">
+      <div class="col">
+        <label>First Name</label>
+        <input name="firstname" type="text" class="form-control" placeholder="First name">
       </div>
-      <div class="form-group col-md-6">
-        <label for="lastnameinput">Last Name</label>
-        <input
-          name="lastname"
-          type="text"
-          class="form-control"
-          id="lastnameinput"
-          placeholder="Last Name"
-        />
+      <div class="col">
+        <label>Last Name</label>
+        <input name="lastname" type="text" class="form-control" placeholder="Last name">
       </div>
     </div>
-    <div class="form-row">
+    <br>
+    <div class="row">
       <div class="form-group col-md-6">
-        <label for="starttimeinput">Start Time</label>
-        <input
-          name="StartTime"
-          type="datetime-local"
-          class="form-control"
-          id="starttimeinput"
-        />
+        <label for="starttimeinput">Start Time<span class="required">*</span></label>
+        <input name="StartTime" type="datetime-local" class="form-control" id="starttimeinput">
       </div>
       <div class="form-group col-md-6">
-        <label for="endtimeinput">End Time</label>
-        <input
-          name="EndTime"
-          type="datetime-local"
-          class="form-control"
-          id="endtimeinput"
-        />
+        <label for="endtimeinput">End Time<span class="required">*</span></label>
+        <input name="EndTime" type="datetime-local" class="form-control" id="endtimeinput">
       </div>
     </div>
+    <% if (timeslotbooked) { %>
+      <div style="color: red;">This time slot is booked. Please try another time slot!</div>
+    <% } %>
+    <br>
     <div class="form-group">
-      <label for="subjectinput">Subject</label>
-      <input
-        name="Subject"
-        type="text"
-        class="form-control"
-        id="subjectinput"
-        placeholder="Subject"
-      />
+      <label for="subjectinput">Subject<span class="required">*</span></label>
+      <input name="Subject" type="text" class="form-control" id="subjectinput" placeholder="Subject">
     </div>
-    <div class="form-row">
+    <br>
+    <div class="row">
       <div class="form-group col-md-6">
-        <label for="departmentinput">Department ID</label>
-        <input
-          name="departmentId"
-          type="number"
-          class="form-control"
-          id="departmentinput"
-          placeholder="Department ID"
-        />
-      </div>
-      <div class="form-group col-md-6">
-        <label for="instructorinput">Instructor</label>
+        <label for="instructorinput">Instructor<span class="required">*</span></label>
         <select name="instructorId" id="instructorinput" class="form-control">
           <option selected>Choose Instructor...</option>
           <option value="1">Thorsten Ewald</option>
@@ -79,9 +47,24 @@
           <option value="8">Patrick Guichon</option>
         </select>
       </div>
+      <div class="form-group col-md-6">
+        <label for="departmentinput">Department<span class="required">*</span></label>
+        <select name="deparetmentId" id="departmentinput" class="form-control">
+          <option selected>Choose Department...</option>
+          <option value="1">School of Computing</option>
+        </select>
+      </div>
     </div>
+    <% if (missing) { %>
+      <div style="color: red;">Fields with asterisk should not be left blanked!</div>
+    <% } %>
     <br>
     <button type="submit" class="btn btn-primary">Submit</button>
   </form>
 </div>
+<style>
+  .required {
+    color: red;
+  }
+</style>
 <%- include("templates/footer") %>
