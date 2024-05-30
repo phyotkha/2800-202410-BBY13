@@ -146,6 +146,7 @@ Answer:
   {"$project": {"StartTime": 1, "EndTime": 1, "_id": 0 } }
 ]
 Explanation: This query finds the start time and end time of a specific instructor from availabletimes database and gives user the office hour of said instructor.Question: Who is the instructor for {courseId}?
+
 Answer:
 [
 { "$match": { "courseId": "{courseId}" } },
@@ -246,3 +247,18 @@ Answer:
 { "$project": { "courseTime.courseDay": 1, "_id": 0 } }
 ]
 Explanation: This query matches the course by courseId and projects the courseDay field from the courseTime subdocument indicating the days the course is held.
+
+Question: What are courses {first_name} {last_name} is enrolled in? 
+Answer: 
+[
+  {"$match": {"first_name": "{first_name}" } },
+  {"$unwind": {"courses" } },
+  {"$project": {"courseId": courses.courseId, "_id" : 0}}
+]
+
+Question: When is {courseId}? 
+Answer: 
+[
+  {"$match": {"courseId": "{courseId}" } },
+  {"$project": {"StartTime": 1, "EndTime": 1, "_id": 0}}
+]
