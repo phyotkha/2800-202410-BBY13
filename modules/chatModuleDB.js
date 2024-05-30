@@ -1,10 +1,10 @@
 require("dotenv").config();
-const axios = require('axios');
-const fs = require('fs');
-const path = require('path');
-const mongoose = require('mongoose');
-const express = require('express');
-const bodyParser = require('body-parser');
+const axios = require("axios");
+const fs = require("fs");
+const path = require("path");
+const mongoose = require("mongoose");
+const express = require("express");
+const bodyParser = require("body-parser");
 const app = express();
 app.use(bodyParser.json());
 
@@ -75,7 +75,6 @@ Schemas:
 Note: You have to just return the query, nothing else. Don't return any additional text with the query.
 `;
 
-
 // Database Connection
 const mongodb_host = process.env.MONGODB_HOST;
 const mongodb_user = process.env.MONGODB_USER;
@@ -83,34 +82,46 @@ const mongodb_password = process.env.MONGODB_PASSWORD;
 
 async function connectDB() {
   if (mongoose.connection.readyState === 0) {
-    await mongoose.connect(
-      `mongodb+srv://${mongodb_user}:${mongodb_password}@${mongodb_host}/test?retryWrites=true&w=majority&appName=Cluster0`
-    );
-    console.log("MongoDB Connected!");
+    try {
+      await mongoose.connect(
+        `mongodb+srv://${mongodb_user}:${mongodb_password}@${mongodb_host}/test?retryWrites=true&w=majority&appName=Cluster0`
+      );
+      console.log("MongoDB Connected!");
+    } catch (error) {
+      console.error("Error connecting to MongoDB:", error);
+      throw new Error("Failed to connect to MongoDB");
+    }
   }
 }
 
-// Add dollar signs to MongoDB aggreagation pipleline stages
+// Add dollar signs to MongoDB aggregation pipeline stages
 function addDollarSigns(query) {
-  return query.replace(/"(\$match|\$group|\$project|\$lookup|\$sum|\$avg|\$max|\$min)"/g, '"$1"');
+  return query.replace(
+    /"(\$match|\$group|\$project|\$lookup|\$sum|\$avg|\$max|\$min)"/g,
+    '"$1"'
+  );
 }
 
 // Determine MongoDB collection name based on user query
 function getCollectionName(query) {
   if (/(student|enrolled|major)/.test(query)) return "students";
-  if (/(course|subject|school|program|credit|grade|week|delivery|prerequisites|description|location|course outline|start|end|program|week|full name|days|time|When)/.test(query)) return "courses";
-  if (/(instructor|instructors|first name|last name|email|department|courses taught|teaches|email address)/.test(query)) return "instructors";
+  if (
+    /(time|course|subject|school|program|credit|grade|week|delivery|prerequisites|description|location|course outline|start|end|program|week|full name|days)/
+      .test(query)) return "courses";
+  if (
+    /(instructor|instructors|first name|last name|email|department|courses taught|teaches|email address)/
+      .test(query)) return "instructors";
   if (/(book an appointment|available|office hours)/.test(query)) return "availabletimes";
   return null;
 }
 
 // Read sample file content
-const sampleFilePath = path.join(__dirname, 'sample.txt');
+const sampleFilePath = path.join(__dirname, "sample.txt");
 let sample;
 try {
-  sample = fs.readFileSync(sampleFilePath, 'utf-8');
+  sample = fs.readFileSync(sampleFilePath, "utf-8");
 } catch (err) {
-  console.error('Error reading sample.txt:', err);
+  console.error("Error reading sample.txt:", err);
 }
 
 async function handleChatPage(session, res) {
@@ -118,7 +129,7 @@ async function handleChatPage(session, res) {
     session.chatHistory = [];
   }
   const { chatHistory, firstname } = session;
-  res.render('chatPage', { chatHistory, firstname });
+  res.render("chatPage", { chatHistory, firstname });
 }
 
 // Generate natural language response based on user question
@@ -128,20 +139,29 @@ async function generateNaturalLanguageResponse(userQuestion, queryResults) {
   Please provide a natural language response based on the query results.`;
 
   try {
-    const response = await axios.post('https://api.openai.com/v1/chat/completions', {
-      model: "gpt-3.5-turbo-0125",
-      messages: [
-        { role: "system", content: "You are an AI assistant that provides natural language responses based on MongoDB query results." },
-        { role: "user", content: prompt }
-      ],
-    }, {
-      headers: {
-        'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
-        'Content-Type': 'application/json'
+    const response = await axios.post(
+      "https://api.openai.com/v1/chat/completions",
+      {
+        model: "gpt-3.5-turbo-0125",
+        messages: [
+          {
+            role: "system",
+            content:
+              "You are an AI assistant that provides natural language responses based on MongoDB query results.",
+          },
+          { role: "user", content: prompt },
+        ],
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
+          "Content-Type": "application/json",
+        },
       }
-    });
+    );
 
-    const naturalLanguageResponse = response.data.choices[0].message.content.trim();
+    const naturalLanguageResponse =
+      response.data.choices[0].message.content.trim();
     return naturalLanguageResponse;
   } catch (error) {
     console.error("Error generating natural language response:", error);
@@ -156,7 +176,6 @@ async function chatbotInteraction(req, res) {
 
   try {
     await connectDB();
-    // console.log("usermessage", userMessage); // For Debugging
 
     if (/(book an appointment|book me an appointment|make an appointment)/i.test(userMessage)) {
       // Construct the appointment form link
@@ -168,10 +187,7 @@ async function chatbotInteraction(req, res) {
       // Store chat history in session
       req.session.chatHistory = req.session.chatHistory || [];
       req.session.chatHistory.push({ role: "user", content: userMessage });
-      req.session.chatHistory.push({
-        role: "bot",
-        content: appointmentResponse,
-      });
+      req.session.chatHistory.push({ role: "bot", content: appointmentResponse });
 
       // Render the chat page with the updated chat history
       return res.render("chatPage", { chatHistory: req.session.chatHistory, firstname: firstname });
@@ -227,30 +243,29 @@ async function chatbotInteraction(req, res) {
         req.session.chatHistory.push({ role: "bot", content: defaultResponse });
         return res.render("chatPage", { chatHistory: req.session.chatHistory, firstname: firstname });
       }
-    } catch (error) {
-      // Handle errors from the API call
-      console.error("Error:", error);
-      return res.status(500).json({ error: "Error processing request", details: error.message });
+
+      const collection = mongoose.connection.db.collection(collectionName);
+
+      const queryResults = await collection.aggregate(query).toArray();
+      console.log("QueryResults: ", queryResults); // For Debugging
+
+      const naturalLanguageResponse = await generateNaturalLanguageResponse(userMessage, queryResults);
+
+      if (!req.session.chatHistory) {
+        req.session.chatHistory = [];
+      }
+
+      // Add user message and bot's natural language response to chat history
+      req.session.chatHistory.push({ role: "user", content: userMessage });
+      req.session.chatHistory.push({ role: "bot", content: naturalLanguageResponse });
+
+      res.render("chatPage", { chatHistory: req.session.chatHistory, firstname: firstname });
+    } catch (e) {
+      res.status(500).json({ error: "Error occurred", details: e.message });
     }
-    const collection = mongoose.connection.db.collection(collectionName);
-
-    const queryResults = await collection.aggregate(query).toArray();
-    console.log("QueryResults: ", queryResults); // For Debugging
-
-    const naturalLanguageResponse = await generateNaturalLanguageResponse(userMessage, queryResults);
-
-    if (!req.session.chatHistory) {
-      req.session.chatHistory = [];
-    }
-
-    // Add user message and bot's natural language response to chat history
-    req.session.chatHistory.push({ role: 'user', content: userMessage });
-    req.session.chatHistory.push({ role: 'bot', content: naturalLanguageResponse });
-
-    res.render('chatPage', { chatHistory: req.session.chatHistory, firstname: firstname });
-
   } catch (e) {
-    res.status(500).json({ error: "Error occurred", details: e.message });
+    console.error("Error:", e);
+    res.status(500).json({ error: "Internal Server Error", details: e.message });
   }
 }
 

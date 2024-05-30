@@ -262,3 +262,10 @@ Answer:
   {"$match": {"courseId": "{courseId}" } },
   {"$project": {"StartTime": 1, "EndTime": 1, "_id": 0}}
 ]
+
+Question: What is the class time for {courseId}?
+Answer: 
+[
+  {"$match": {"courseId": "{courseId}" } },
+  {"$project": {"StartTime": 1, "EndTime": 1, "_id": 0 } }
+]
