@@ -1,14 +1,14 @@
 require("dotenv").config();
-const axios = require("axios");
-const fs = require("fs");
-const path = require("path");
-const mongoose = require("mongoose");
-const express = require("express");
-const bodyParser = require("body-parser");
+const axios = require('axios');
+const fs = require('fs');
+const path = require('path');
+const mongoose = require('mongoose');
+const express = require('express');
+const bodyParser = require('body-parser');
 const app = express();
 app.use(bodyParser.json());
+const { createEvent } = require('../database/services/events'); 
 
-// System Message with Schemas
 const systemMessage = `
 You are a very intelligent AI assistant who is an expert in identifying relevant questions from users
 and converting them into NoSQL MongoDB aggregation pipeline queries.
@@ -75,53 +75,42 @@ Schemas:
 Note: You have to just return the query, nothing else. Don't return any additional text with the query.
 `;
 
-// Database Connection
 const mongodb_host = process.env.MONGODB_HOST;
 const mongodb_user = process.env.MONGODB_USER;
 const mongodb_password = process.env.MONGODB_PASSWORD;
 
 async function connectDB() {
   if (mongoose.connection.readyState === 0) {
-    try {
-      await mongoose.connect(
-        `mongodb+srv://${mongodb_user}:${mongodb_password}@${mongodb_host}/test?retryWrites=true&w=majority&appName=Cluster0`
-      );
-      console.log("MongoDB Connected!");
-    } catch (error) {
-      console.error("Error connecting to MongoDB:", error);
-      throw new Error("Failed to connect to MongoDB");
-    }
+    await mongoose.connect(
+      `mongodb+srv://${mongodb_user}:${mongodb_password}@${mongodb_host}/test?retryWrites=true&w=majority&appName=Cluster0`
+    );
+    console.log("MongoDB Connected!");
   }
 }
 
-// Add dollar signs to MongoDB aggregation pipeline stages
 function addDollarSigns(query) {
-  return query.replace(
-    /"(\$match|\$group|\$project|\$lookup|\$sum|\$avg|\$max|\$min)"/g,
-    '"$1"'
-  );
+  return query.replace(/"(\$match|\$group|\$project|\$lookup|\$sum|\$avg|\$max|\$min)"/g, '"$1"');
 }
 
-// Determine MongoDB collection name based on user query
 function getCollectionName(query) {
   if (/(student|enrolled|major)/.test(query)) return "students";
   if (
-    /(time|course|subject|school|program|credit|grade|week|delivery|prerequisites|description|location|course outline|start|end|program|week|full name|days)/
-      .test(query)) return "courses";
-  if (
-    /(instructor|instructors|first name|last name|email|department|courses taught|teaches|email address)/
-      .test(query)) return "instructors";
+    /(course|subject|school|program|credit|grade|week|delivery|prerequisites|description|location|course outline|start|end|program|week|full name|days)/.test(
+      query
+    )
+  )
+    return "courses";
+  if (/(instructor|instructors|first name|last name|email|department|courses taught|teaches|email address)/.test(query)) return "instructors";
   if (/(book an appointment|available|office hours)/.test(query)) return "availabletimes";
   return null;
 }
 
-// Read sample file content
-const sampleFilePath = path.join(__dirname, "sample.txt");
+const sampleFilePath = path.join(__dirname, 'sample.txt');
 let sample;
 try {
-  sample = fs.readFileSync(sampleFilePath, "utf-8");
+  sample = fs.readFileSync(sampleFilePath, 'utf-8');
 } catch (err) {
-  console.error("Error reading sample.txt:", err);
+  console.error('Error reading sample.txt:', err);
 }
 
 async function handleChatPage(session, res) {
@@ -129,39 +118,29 @@ async function handleChatPage(session, res) {
     session.chatHistory = [];
   }
   const { chatHistory, firstname } = session;
-  res.render("chatPage", { chatHistory, firstname });
+  res.render('chatPage', { chatHistory, firstname });
 }
 
-// Generate natural language response based on user question
 async function generateNaturalLanguageResponse(userQuestion, queryResults) {
   const prompt = `User question: "${userQuestion}"
   Query results: ${JSON.stringify(queryResults)}
   Please provide a natural language response based on the query results.`;
 
   try {
-    const response = await axios.post(
-      "https://api.openai.com/v1/chat/completions",
-      {
-        model: "gpt-3.5-turbo-0125",
-        messages: [
-          {
-            role: "system",
-            content:
-              "You are an AI assistant that provides natural language responses based on MongoDB query results.",
-          },
-          { role: "user", content: prompt },
-        ],
-      },
-      {
-        headers: {
-          Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
-          "Content-Type": "application/json",
-        },
+    const response = await axios.post('https://api.openai.com/v1/chat/completions', {
+      model: "gpt-3.5-turbo-0125",
+      messages: [
+        { role: "system", content: "You are an AI assistant that provides natural language responses based on MongoDB query results." },
+        { role: "user", content: prompt }
+      ],
+    }, {
+      headers: {
+        'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
+        'Content-Type': 'application/json'
       }
-    );
+    });
 
-    const naturalLanguageResponse =
-      response.data.choices[0].message.content.trim();
+    const naturalLanguageResponse = response.data.choices[0].message.content.trim();
     return naturalLanguageResponse;
   } catch (error) {
     console.error("Error generating natural language response:", error);
@@ -169,7 +148,6 @@ async function generateNaturalLanguageResponse(userQuestion, queryResults) {
   }
 }
 
-// Handle main interaction with chatbot
 async function chatbotInteraction(req, res) {
   const userMessage = req.body.message;
   const firstname = req.session.firstname;
@@ -178,94 +156,104 @@ async function chatbotInteraction(req, res) {
     await connectDB();
 
     if (/(book an appointment|book me an appointment|make an appointment)/i.test(userMessage)) {
-      // Construct the appointment form link
-      const appointmentFormLink = `<a href="http://${req.headers.host}/bookAppointment">Book Appointment</a>`;
+      const userEmail = req.session.email;
+      const studentsCollection = mongoose.connection.db.collection('students');
+      const user = await studentsCollection.findOne({ email: userEmail });
 
-      // Generate the response with the link
-      const appointmentResponse = `To book an appointment, please fill out the form at: ${appointmentFormLink}`;
+      if (!user) {
+        return res.status(400).json({ error: "User not found in the database" });
+      }
 
-      // Store chat history in session
+      const availableTimesCollection = mongoose.connection.db.collection('availabletimes');
+      let availableSlot = await availableTimesCollection.findOne({ Subject: 'Available' });
+
+      // Fallback if no slot found with 'Available' subject
+      if (!availableSlot) {
+        availableSlot = await availableTimesCollection.findOne({});
+      }
+
+      console.log("Available Slot:", availableSlot); // Debugging log
+
+      if (!availableSlot) {
+        const noSlotsResponse = `
+        There are no available time slots at the moment. 
+        Click <a href="http://${req.headers.host}/bookAppointment">here</a><br> to book or check for available <a href="http://${req.headers.host}/calendar">times</a>
+        `;
+        req.session.chatHistory = req.session.chatHistory || [];
+        req.session.chatHistory.push({ role: 'user', content: userMessage });
+        req.session.chatHistory.push({ role: 'bot', content: noSlotsResponse });
+        return res.render('chatPage', { chatHistory: req.session.chatHistory, firstname: firstname });
+      }
+
+      await createEvent({
+        Subject: `Booked by ${user.first_name} ${user.last_name}`,
+        StartTime: availableSlot.StartTime,
+        EndTime: availableSlot.EndTime,
+        departmentId: availableSlot.departmentId,
+        instructorId: availableSlot.instructorId
+      });
+
+      const bookedResponse = `Your appointment has been booked successfully for ${availableSlot.StartTime} - ${availableSlot.EndTime}.`;
       req.session.chatHistory = req.session.chatHistory || [];
-      req.session.chatHistory.push({ role: "user", content: userMessage });
-      req.session.chatHistory.push({ role: "bot", content: appointmentResponse });
-
-      // Render the chat page with the updated chat history
-      return res.render("chatPage", { chatHistory: req.session.chatHistory, firstname: firstname });
+      req.session.chatHistory.push({ role: 'user', content: userMessage });
+      req.session.chatHistory.push({ role: 'bot', content: bookedResponse });
+      return res.render('chatPage', { chatHistory: req.session.chatHistory, firstname: firstname });
     }
 
-    // If the message is not related to booking an appointment, proceed with OpenAI API call
+    const response = await axios.post('https://api.openai.com/v1/chat/completions', {
+      model: "gpt-3.5-turbo-0125",
+      messages: [
+        { role: "system", content: systemMessage },
+        {
+          role: "user",
+          content: `Generate a MongoDB aggregation pipeline query based on the following input: 
+          User question: '${userMessage}', Sample: '${sample}'. 
+          Ensure the output is a valid JSON object with double quotes around keys and values.`
+        }
+      ],
+    }, {
+      headers: {
+        'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
+        'Content-Type': 'application/json'
+      }
+    });
+
+    const rawResponse = response.data.choices[0].message.content.trim(); 
+    const responseText = addDollarSigns(rawResponse);
+
+    let query;
     try {
-      const response = await axios.post(
-        "https://api.openai.com/v1/chat/completions",
-        {
-          model: "gpt-3.5-turbo-0125",
-          messages: [
-            { role: "system", content: systemMessage },
-            {
-              role: "user",
-              content: `Generate a MongoDB aggregation pipeline query based on the following input: 
-                    User question: '${userMessage}', Sample: '${sample}'. 
-                    Ensure the output is a valid JSON object with double quotes around keys and values.`,
-            },
-          ],
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
-            "Content-Type": "application/json",
-          },
-        }
-      );
-
-      const rawResponse = response.data.choices[0].message.content.trim();
-      const responseText = addDollarSigns(rawResponse);
-
-      // Parse the OpenAI API response and perform further actions
-      let query;
-      try {
-        query = JSON.parse(responseText);
-      } catch (e) {
-        return res.status(500).json({ error: "JSON decoding error", details: e.message });
-      }
-      console.log("Query: ", query); // For Debugging
-
-      // Determine the collection name
-      const collectionName = getCollectionName(userMessage);
-      console.log("Collection: ", collectionName); // For Debugging
-
-      // If the collection name cannot be determined, provide a default response
-      if (!collectionName) {
-        const defaultResponse = "I am unable to answer any questions outside of the scope of BCIT";
-        if (!req.session.chatHistory) {
-          req.session.chatHistory = [];
-        }
-        req.session.chatHistory.push({ role: "user", content: userMessage });
-        req.session.chatHistory.push({ role: "bot", content: defaultResponse });
-        return res.render("chatPage", { chatHistory: req.session.chatHistory, firstname: firstname });
-      }
-
-      const collection = mongoose.connection.db.collection(collectionName);
-
-      const queryResults = await collection.aggregate(query).toArray();
-      console.log("QueryResults: ", queryResults); // For Debugging
-
-      const naturalLanguageResponse = await generateNaturalLanguageResponse(userMessage, queryResults);
-
-      if (!req.session.chatHistory) {
-        req.session.chatHistory = [];
-      }
-
-      // Add user message and bot's natural language response to chat history
-      req.session.chatHistory.push({ role: "user", content: userMessage });
-      req.session.chatHistory.push({ role: "bot", content: naturalLanguageResponse });
-
-      res.render("chatPage", { chatHistory: req.session.chatHistory, firstname: firstname });
+      query = JSON.parse(responseText); 
     } catch (e) {
-      res.status(500).json({ error: "Error occurred", details: e.message });
+      return res.status(500).json({ error: "JSON decoding error", details: e.message });
     }
+    console.log("Query: ", query);
+
+    const collectionName = getCollectionName(userMessage);
+    console.log("Collection: ", collectionName);
+
+    if (!collectionName) {
+      const defaultResponse = "I am unable to answer any questions outside of the scope of BCIT";
+      req.session.chatHistory = req.session.chatHistory || [];
+      req.session.chatHistory.push({ role: 'user', content: userMessage });
+      req.session.chatHistory.push({ role: 'bot', content: defaultResponse });
+      return res.render('chatPage', { chatHistory: req.session.chatHistory, firstname: firstname });
+    }
+
+    const collection = mongoose.connection.db.collection(collectionName);
+    const queryResults = await collection.aggregate(query).toArray();
+    console.log("QueryResults: ", queryResults);
+
+    const naturalLanguageResponse = await generateNaturalLanguageResponse(userMessage, queryResults);
+
+    req.session.chatHistory = req.session.chatHistory || [];
+    req.session.chatHistory.push({ role: 'user', content: userMessage });
+    req.session.chatHistory.push({ role: 'bot', content: naturalLanguageResponse });
+
+    res.render('chatPage', { chatHistory: req.session.chatHistory, firstname: firstname });
+
   } catch (e) {
-    console.error("Error:", e);
-    res.status(500).json({ error: "Internal Server Error", details: e.message });
+    res.status(500).json({ error: "Error occurred", details: e.message });
   }
 }
 
