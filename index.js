@@ -56,7 +56,7 @@ const navLinks = [
   { name: "Chat", link: "/chatPage" },
   { name: "Calendar", link: "/calendar" },
   { name: "Account", link: "/profile" },
-  { name: "About Us", link: "/aboutus" }
+  { name: "Contact Us", link: "/contact"}
 ];
 
 /** 
@@ -118,7 +118,16 @@ function sessionValidation(req, res, next) {
  * Start of Route Definitons
  */
 app.get("/", async (req, res) => {
-  res.render("startingPage");
+  var username = req.session.username;
+  if (username) {
+    res.render("homePage");
+    return;
+  } 
+  else {
+    res.render("startingPage");
+    return;
+  }
+
 });
 
 app.get("/signup", (req, res) => {
@@ -202,6 +211,7 @@ app.post("/loginSubmit", async (req, res) => {
     res.render("login_error", {
       error: validationResult.error.details[0].message,
     });
+    return;
   }
 
   // Check for matching email in database
@@ -220,7 +230,7 @@ app.post("/loginSubmit", async (req, res) => {
     req.session.lastname = userData.last_name;
     req.session.username = userData.username;
     req.session.cookie.maxAge = expireTime;
-    return res.redirect("/chatPage");
+    return res.redirect("/");
   } else {
     return res.redirect("/login?invalidpassword=1");
   }

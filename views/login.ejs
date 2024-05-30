@@ -1,39 +1,37 @@
 <%- include("templates/header") %>
 <br><br><br>
-<div class="container">
-  <form action="/loginSubmit" method="post">
-    <ul class="nav nav-pills nav-justified mb-3" id="ex1" role="tablist">
-      <li class="nav-item" role="presentation">
-        <a class="nav-link active" id="tab-login" data-mdb-pill-init href="/login" role="tab" aria-controls="pills-login" aria-selected="true" style="background-color:#003C71; border-radius: 0;">Login</a>
-      </li>
-      <li class="nav-item" role="presentation">
-        <a class="nav-link bg-outline-warning px-0.5 mb-2 align-items-center justify-content-end mb-md-0 data-mdb-pill-init" id="tab-register" href="/signup" role="tab" aria-controls="pills-register" aria-selected="false" style="color:#003C71;">Signup</a>
-      </li>
-    </ul>
-    <br>
-    <div class="form-group">
-      <label for="exampleInputEmail1">Email address</label>
-      <input name="email" type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Enter email">
-      <% if (invaliduser) { %>
-      <div style="color: red; margin-top: 5px;">Cannot find email address. Please register!</div>
-      <% } %>
-    </div>
-    <br>
-    <div class="form-group">
-      <label for="exampleInputPassword1">Password</label>
-      <input name="password" type="password" class="form-control" id="exampleInputPassword1" placeholder="Password">
-      <% if (invalidpassword) { %>
-      <div style="color: red; margin-top: 5px;">Invalid Password. Try Again!</div>
-      <% } %>
-    </div>
-    <br>
-    <div class="form-group">
-      <a href="/restPasswordRequest">Forgot password?</a>
-    </div>
-    <br>
-    <button type="submit" class="btn btn-primary">Submit</button>
-  </form>
-</div>
+<form action="/loginSubmit" method="post">
+  <ul class="nav nav-pills nav-justified mb-3" id="ex1" role="tablist">
+    <li class="nav-item" role="presentation">
+      <a class="nav-link active" id="tab-login" data-mdb-pill-init href="/login" role="tab" aria-controls="pills-login" aria-selected="true" style="background-color:#003C71; border-radius: 0;">Login</a>
+    </li>
+    <li class="nav-item" role="presentation">
+      <a class="nav-link bg-outline-warning px-0.5 mb-2 align-items-center justify-content-end mb-md-0 data-mdb-pill-init" id="tab-register"  href="/signup" role="tab" aria-controls="pills-register" aria-selected="false" style="color:#003C71;">Signup</a>
+    </li>
+  </ul>
+  <br><br>
+  <div class="form-group">
+    <label for="exampleInputEmail1">Email address</label>
+    <input name="email" type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Enter email">
+    <% if (invaliduser) { %>
+    <div style="color: red; margin-top: 5px;">Cannot find email address. Please register!</div>
+    <% } %>
+  </div>
+  <br>
+  <div class="form-group">
+    <label for="exampleInputPassword1">Password</label>
+    <input name="password" type="password" class="form-control" id="exampleInputPassword1" placeholder="Password">
+    <% if (invalidpassword) { %>
+    <div style="color: red; margin-top: 5px;">Invalid Password. Try Again!</div>
+    <% } %>
+  </div>
+  <br>
+  <div class="form-group">
+    <a href="/resetPasswordRequest">Forgot password?</a>
+  </div>
+  <br><br>
+  <button type="submit" class="btn btn-primary">Submit</button>
+</form>
 
 <%- include("templates/footer") %>
 
