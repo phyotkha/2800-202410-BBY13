@@ -158,11 +158,7 @@ async function chatbotInteraction(req, res) {
     await connectDB();
     // console.log("usermessage", userMessage); // For Debugging
 
-    if (
-      /(book an appointment|book me an appointment|make an appointment)/i.test(
-        userMessage
-      )
-    ) {
+    if (/(book an appointment|book me an appointment|make an appointment)/i.test(userMessage)) {
       // Construct the appointment form link
       const appointmentFormLink = `<a href="http://${req.headers.host}/bookAppointment">Book Appointment</a>`;
 
@@ -178,10 +174,7 @@ async function chatbotInteraction(req, res) {
       });
 
       // Render the chat page with the updated chat history
-      return res.render("chatPage", {
-        chatHistory: req.session.chatHistory,
-        firstname: firstname,
-      });
+      return res.render("chatPage", { chatHistory: req.session.chatHistory, firstname: firstname });
     }
 
     // If the message is not related to booking an appointment, proceed with OpenAI API call
@@ -216,9 +209,7 @@ async function chatbotInteraction(req, res) {
       try {
         query = JSON.parse(responseText);
       } catch (e) {
-        return res
-          .status(500)
-          .json({ error: "JSON decoding error", details: e.message });
+        return res.status(500).json({ error: "JSON decoding error", details: e.message });
       }
       console.log("Query: ", query); // For Debugging
 
@@ -228,24 +219,18 @@ async function chatbotInteraction(req, res) {
 
       // If the collection name cannot be determined, provide a default response
       if (!collectionName) {
-        const defaultResponse =
-          "I am unable to answer any questions outside of the scope of BCIT";
+        const defaultResponse = "I am unable to answer any questions outside of the scope of BCIT";
         if (!req.session.chatHistory) {
           req.session.chatHistory = [];
         }
         req.session.chatHistory.push({ role: "user", content: userMessage });
         req.session.chatHistory.push({ role: "bot", content: defaultResponse });
-        return res.render("chatPage", {
-          chatHistory: req.session.chatHistory,
-          firstname: firstname,
-        });
+        return res.render("chatPage", { chatHistory: req.session.chatHistory, firstname: firstname });
       }
     } catch (error) {
       // Handle errors from the API call
       console.error("Error:", error);
-      return res
-        .status(500)
-        .json({ error: "Error processing request", details: error.message });
+      return res.status(500).json({ error: "Error processing request", details: error.message });
     }
     const collection = mongoose.connection.db.collection(collectionName);
 
