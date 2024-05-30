@@ -36,12 +36,12 @@ async function bookAppointmentSubmit(req, res) {
             instructorId,
             departmentId
         });
-
-        return res.send(data);
+        res.render('appointmentConfirmed', {Subject: Subject, StartTime: StartTime, EndTime: EndTime, instructorId: instructorId, departmentId: departmentId});
     } catch (error) {
         console.error("Error booking appointment:", error);
         return res.status(500).send("An error occurred while booking the appointment.");
     }
+    
 }
 
 // Update event

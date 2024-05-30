@@ -1,0 +1,17 @@
+<%- include("templates/header") %>
+<div class="container">
+<h3>Your appointment has been confirmed</h3>
+<h5>
+  Here are details of your appointment:
+  <ul>
+    <li>Subject: <%-Subject%></li>
+    <li>Start Time: <%-StartTime%></li>
+    <li>End Time: <%-EndTime%></li>
+    <li>Instructor's Id: <%-instructorId%></li>
+    <li>Department's Id: <%-departmentId%></li>
+  </ul>
+</h5>
+<button type="button" class="btn btn-primary" Onclick="location.href='/calendar'">Calendar</button>
+<button type="button" class="btn btn-primary" Onclick="location.href='/bookAppointment'">Appointment</button>
+</div>
+<%- include("templates/footer") %>

@@ -2,49 +2,86 @@
 <div class="container">
   <h1>Book Appointment</h1>
   <form action="/bookAppointmentSubmit" method="post">
-      <div class="form-row">
-          <div class="form-group col-md-6">
-              <label for="firstnameinput">First Name</label>
-              <input name="firstname" type="text" class="form-control" id="firstnameinput" placeholder="First Name">
-          </div>
-          <div class="form-group col-md-6">
-              <label for="lastnameinput">Last Name</label>
-              <input name="lastname" type="text" class="form-control" id="lastnameinput" placeholder="Last Name">
-          </div>
+    <div class="form-row">
+      <div class="form-group col-md-6">
+        <label for="firstnameinput">First Name</label>
+        <input
+          name="firstname"
+          type="text"
+          class="form-control"
+          id="firstnameinput"
+          placeholder="First Name"
+        />
       </div>
-      <div class="form-row">
-          <div class="form-group col-md-6">
-              <label for="starttimeinput">Start Time</label>
-              <input name="StartTime" type="datetime-local" class="form-control" id="starttimeinput">
-          </div>
-          <div class="form-group col-md-6">
-              <label for="endtimeinput">End Time</label>
-              <input name="EndTime" type="datetime-local" class="form-control" id="endtimeinput">
-          </div>
+      <div class="form-group col-md-6">
+        <label for="lastnameinput">Last Name</label>
+        <input
+          name="lastname"
+          type="text"
+          class="form-control"
+          id="lastnameinput"
+          placeholder="Last Name"
+        />
       </div>
-      <div class="form-group">
-          <label for="subjectinput">Subject</label>
-          <input name="Subject" type="text" class="form-control" id="subjectinput" placeholder="Subject">
+    </div>
+    <div class="form-row">
+      <div class="form-group col-md-6">
+        <label for="starttimeinput">Start Time</label>
+        <input
+          name="StartTime"
+          type="datetime-local"
+          class="form-control"
+          id="starttimeinput"
+        />
       </div>
-      <div class="form-row">
-          <div class="form-group col-md-6">
-              <label for="departmentinput">Department ID</label>
-              <input name="departmentId" type="number" class="form-control" id="departmentinput" placeholder="Department ID">
-          </div>
-          <div class="form-group col-md-6">
-              <label for="instructorinput">Instructor</label>
-              <select name="instructorId" id="instructorinput" class="form-control">
-                  <option selected>Choose Instructor...</option>
-                  <option value="1">Dr. John Smith (ID: 1)</option>
-                  <option value="2">Prof. Jane Doe (ID: 2)</option>
-                  <option value="3">Dr. Michael Brown (ID: 3)</option>
-                  <option value="4">Prof. Emily Davis (ID: 4)</option>
-                  <option value="5">Dr. William Johnson (ID: 5)</option>
-                  <option value="6">Prof. Olivia Wilson (ID: 6)</option>
-              </select>
-          </div>
+      <div class="form-group col-md-6">
+        <label for="endtimeinput">End Time</label>
+        <input
+          name="EndTime"
+          type="datetime-local"
+          class="form-control"
+          id="endtimeinput"
+        />
       </div>
-      <button type="submit" class="btn btn-primary">Submit</button>
+    </div>
+    <div class="form-group">
+      <label for="subjectinput">Subject</label>
+      <input
+        name="Subject"
+        type="text"
+        class="form-control"
+        id="subjectinput"
+        placeholder="Subject"
+      />
+    </div>
+    <div class="form-row">
+      <div class="form-group col-md-6">
+        <label for="departmentinput">Department ID</label>
+        <input
+          name="departmentId"
+          type="number"
+          class="form-control"
+          id="departmentinput"
+          placeholder="Department ID"
+        />
+      </div>
+      <div class="form-group col-md-6">
+        <label for="instructorinput">Instructor</label>
+        <select name="instructorId" id="instructorinput" class="form-control">
+          <option selected>Choose Instructor...</option>
+          <option value="1">Thorsten Ewald</option>
+          <option value="2">Rahul Kukreja</option>
+          <option value="3">Simin Jolfaee</option>
+          <option value="4">Arron Ferguson</option>
+          <option value="5">Bruce Link</option>
+          <option value="6">Maryam Khezrzadeh</option>
+          <option value="7">Carly Orr</option>
+          <option value="8">Patrick Guichon</option>
+        </select>
+      </div>
+    </div>
+    <br>
+    <button type="submit" class="btn btn-primary">Submit</button>
   </form>
 </div>
 <%- include("templates/footer") %>
