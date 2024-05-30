@@ -12,7 +12,7 @@
     </ul>
     <br>
     <div class="form-group">
-      <label for="exampleInputEmail1">Email address</label>
+      <label for="exampleInputEmail1">Email address<span class="required">*</span></label>
       <input name="email" type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Enter email">
       <% if (invaliduser) { %>
       <div style="color: red; margin-top: 5px;">Cannot find email address. Please register!</div>
@@ -20,7 +20,7 @@
     </div>
     <br>
     <div class="form-group">
-      <label for="exampleInputPassword1">Password</label>
+      <label for="exampleInputPassword1">Password<span class="required">*</span></label>
       <input name="password" type="password" class="form-control" id="exampleInputPassword1" placeholder="Password">
       <% if (invalidpassword) { %>
       <div style="color: red; margin-top: 5px;">Invalid Password. Try Again!</div>
@@ -37,13 +37,9 @@
     <button type="submit" class="btn btn-primary">Submit</button>
   </form>
 </div>
-
-<%- include("templates/footer") %>
-
-
-<!-- <style>
-  .centered-form {
-    width: 700px;
+<style>
+  .required{
+    color: red;
   }
 </style>
-<div class="container align-items-center centered-form"> </div>  -->
+<%- include("templates/footer") %>
