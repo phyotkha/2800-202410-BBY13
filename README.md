@@ -7,7 +7,7 @@ Our project, BBY-13, is developing BCIT ChatBot, an AI chatBot to help students 
 * Phyo
 * Richard 
 * Kyle
-* Dina 
+* Zhaoqiu
 * Yerin
 	
 ## 3. Technologies and Resources Used
@@ -80,18 +80,23 @@ It has the following subfolders and files:
 |   |   ├── instructors.json    # JSON file for instructors information
 |   |   └── students.json       # JSON file for students information
 |   ├── routers                 # Router Folder
-|   |   ├── events.js           #
-|   |   ├── parseUserInput.js   #
-|   |   ├── routerInstructor.js #
-|   |   └── student.js          #
+|   |   ├── events.js           # This file defines a set of API endpoints for managing appointment
+|   |   ├── parseUserInput.js   # This file sets up an intelligent AI-driven appointment booking system using Express.js
+|   |   ├── routerInstructor.js # This file defines an Express.js route for retrieving courses taught by a specific instructor based on their ID
+|   |   └── student.js          # This file defines an Express.js route for retrieving courses enrolled by a specific student based on their ID
+|   ├── schemas                 # Datbase Schemas Folder
+|   |   ├── avaliableTime.js    # JS File for avaliable time collection schema
+|   |   ├── courses.js          # JS File for courses collection schema
+|   |   ├── events.js           # JS File for events collection schema
+|   |   ├── instructors.js      # JS File for instructors collection schema
+|   |   └── students.js          # JS File for students collection schema
 |   ├── services                # Services Folder
-|   |   ├── avaliableTimes.json #
-|   |   ├── events.js           #
-|   |   ├── serviceInstructor.js#
-|   |   └── student.js          #
+|   |   ├── avaliableTimes.js   # This file defines a service function for retrieving available time slots.
+|   |   ├── events.js           # This file defines service functions for managing event data in the database.
+|   |   ├── serviceInstructor.js# This file defines a service function for retrieving courses.
+|   |   └── student.js          # This file defines a service function for retrieving courses enrolled by a specific student.
 |   ├── mongooseConnection.js   # JS file for connecting mongodb database
 |   └── reset-database.js       # JS file for resetting database
-├── datasets
 ├── modules                     # Modules folder to keep index.js clean
 |   ├── bookAppointment.js      # JS file for booking an appointment (used in index.js)
 |   ├── chatModuleDB.js         # JS file for user's interaction with chatbot

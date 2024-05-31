@@ -3,7 +3,7 @@ const mongoose = require("mongoose");
 
 const Schema = mongoose.Schema;
 
-const coursesSchema = new mongoose.Schema({
+const coursesSchema = new Schema({
   courseId: String,
   Subject: String,
   School: String,
