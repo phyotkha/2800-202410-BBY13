@@ -24,10 +24,8 @@ Our project, BBY-13, is developing BCIT ChatBot, an AI chatBot to help students 
     * Users will need to ensure that Node.js is installed on their machine. They can visit the official Node.js website (https://nodejs.org/en) to download and install the appropriate version for their operating system.
 * Clone the repository
     * ```git clone https://github.com/phyotkha/2800-202410-BBY13
-      ```
 * Install dependencies
-    * ```npm install
-      ```
+    * ```npm install 
 * Set up environment variables
     * Users will need to create an .env file in the root directory of the project. 
     * Here is an example of the env variables you may need: 
@@ -45,9 +43,6 @@ Our project, BBY-13, is developing BCIT ChatBot, an AI chatBot to help students 
     ```
     * To start the application
     ```node .
-    ```
-      (or)
-    ```node index.js
     ```
     * To access the application
       * From your local machine: http://localhost:YourPort
