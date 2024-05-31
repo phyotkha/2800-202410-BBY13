@@ -55,8 +55,7 @@ const availableTimesModel = require("./database/schemas/availableTimes.js");
 const navLinks = [
   { name: "Chat", link: "/chatPage" },
   { name: "Calendar", link: "/calendar" },
-  { name: "Account", link: "/profile" },
-  { name: "About Us", link: "/aboutus"}
+  { name: "Account", link: "/profile" }
 ];
 
 /** 
@@ -83,14 +82,6 @@ var mongoStore = MongoStore.create({
   },
 });
 
-app.use((req, res, next) => {
-  res.cookie('myCookie', 'myValue', {
-    sameSite: 'None',
-    secure: true
-  });
-  next();
-});
-
 //Session middleware setup
 app.use(
   session({
@@ -102,8 +93,6 @@ app.use(
 );
 
 app.use(express.static(__dirname + "/public")); // Serve static files from the "public" directory
-app.use(express.static(__dirname + "/database"));
-app.use(express.urlencoded({ extended: false })); // To parse URL-encoded bodies
 
 
 /**
@@ -151,7 +140,7 @@ app.get("/", async (req, res) => {
   if (username) {
     res.render("homePage");
     return;
-  } 
+  }
   else {
     res.render("startingPage");
     return;
@@ -160,17 +149,7 @@ app.get("/", async (req, res) => {
 
 app.get("/signup", (req, res) => {
   const error = req.query.error;
-  res.render("signup", { error: error});
-});
-
-app.get("/login", (req, res) => {
-  const invalidPassword = req.query.invalidpassword;
-  const invalidUser = req.query.invaliduser;
-
-  res.render("login", {
-    invaliduser: invalidUser,
-    invalidpassword: invalidPassword,
-  });
+  res.render("signup", { error: error });
 });
 
 app.post("/signupSubmit", async (req, res) => {
@@ -270,7 +249,7 @@ app.post('/chat', sessionValidation, (req, res) => {
   chatModuleDB.chatbotInteraction(req, res);
 });
 
-const { bookAppointment, bookAppointmentSubmit,} = require('./modules/bookAppointment');
+const { bookAppointment, bookAppointmentSubmit, } = require('./modules/bookAppointment');
 app.get('/bookAppointment', bookAppointment);
 app.post('/bookAppointmentSubmit', bookAppointmentSubmit);
 
@@ -279,7 +258,7 @@ app.get('/resetPasswordRequest', (req, res) => {
   const emailSent = req.query.emailsent;
   const invalidUser = req.query.invaliduser;
   const invalidToken = req.query.invalidtoken;
-  res.render('resetPasswordRequest', {  emailsent: emailSent, invaliduser: invalidUser, invalidtoken: invalidToken});
+  res.render('resetPasswordRequest', { emailsent: emailSent, invaliduser: invalidUser, invalidtoken: invalidToken });
 });
 
 /**
@@ -316,20 +295,20 @@ app.post("/sendResetLink", async (req, res) => {
     },
   });
 
-const mailMessage = {
-  to: email,
-  from: `SchoolScope <${process.env.EMAIL}>`,
-  subject: "SchoolScope Password Reset",
-  text:
-    `Dear ${user.first_name} ${user.last_name},\n\n` +
-    `You are receiving this because you (or someone else) have requested the reset of the password for your account.\n\n` +
-    `Please click on the following link, or paste this into your browser to complete the process:\n\n` +
-    `http://${req.headers.host}/resetPassword/${token}\n\n` +
-    `If you did not request this, please ignore this email and your password will remain unchanged. The link will expire in one hour.\n\n` +
-    `Best regards,\n` +
-    `SchoolScope Team\n\n` +
-    `© 2024 SchoolScope AI, Inc`,
-};
+  const mailMessage = {
+    to: email,
+    from: `SchoolScope <${process.env.EMAIL}>`,
+    subject: "SchoolScope Password Reset",
+    text:
+      `Dear ${user.first_name} ${user.last_name},\n\n` +
+      `You are receiving this because you (or someone else) have requested the reset of the password for your account.\n\n` +
+      `Please click on the following link, or paste this into your browser to complete the process:\n\n` +
+      `http://${req.headers.host}/resetPassword/${token}\n\n` +
+      `If you did not request this, please ignore this email and your password will remain unchanged. The link will expire in one hour.\n\n` +
+      `Best regards,\n` +
+      `SchoolScope Team\n\n` +
+      `© 2024 SchoolScope AI, Inc`,
+  };
 
   transporter.sendMail(mailMessage, (err, info) => {
     if (err) {
