@@ -84,7 +84,7 @@ async function connectDB() {
     await mongoose.connect(
       `mongodb+srv://${mongodb_user}:${mongodb_password}@${mongodb_host}/test?retryWrites=true&w=majority&appName=Cluster0`
     );
-    console.log("MongoDB Connected!");
+    // console.log("MongoDB Connected!"); // Debugging log
   }
 }
 

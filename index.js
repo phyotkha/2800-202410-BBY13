@@ -190,7 +190,7 @@ app.post("/loginSubmit", async (req, res) => {
 
   // Validate input data
   const validationError = schema.validate(req.body);
-  console.log(validationError); // For Debugging
+  // console.log(validationError); // For Debugging
 
   if (validationError.error != null) {
     return res.redirect("/login?validationerror=1");
@@ -235,7 +235,7 @@ app.post('/bookAppointmentSubmit', bookAppointmentSubmit);
 // Route to handle logout
 app.get("/logout", async (req, res) => {
   req.session.destroy(); // Destory Session
-  console.log("Session Destroyed (User logged out)");
+  // console.log("Session Destroyed (User logged out)"); 
   res.redirect("/");
 });
 
