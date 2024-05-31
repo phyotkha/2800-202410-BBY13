@@ -56,6 +56,7 @@ const navLinks = [
   { name: "Chat", link: "/chatPage" },
   { name: "Calendar", link: "/calendar" },
   { name: "Account", link: "/profile" },
+  { name: "About Us", link: "/aboutus"}
 ];
 
 /** 
@@ -82,6 +83,14 @@ var mongoStore = MongoStore.create({
   },
 });
 
+app.use((req, res, next) => {
+  res.cookie('myCookie', 'myValue', {
+    sameSite: 'None',
+    secure: true
+  });
+  next();
+});
+
 //Session middleware setup
 app.use(
   session({
@@ -93,6 +102,9 @@ app.use(
 );
 
 app.use(express.static(__dirname + "/public")); // Serve static files from the "public" directory
+app.use(express.static(__dirname + "/database"));
+app.use(express.urlencoded({ extended: false })); // To parse URL-encoded bodies
+
 
 /**
  * Middlewares for session validation and admin authorization
@@ -148,7 +160,17 @@ app.get("/", async (req, res) => {
 
 app.get("/signup", (req, res) => {
   const error = req.query.error;
-  res.render("signup", { error: error });
+  res.render("signup", { error: error});
+});
+
+app.get("/login", (req, res) => {
+  const invalidPassword = req.query.invalidpassword;
+  const invalidUser = req.query.invaliduser;
+
+  res.render("login", {
+    invaliduser: invalidUser,
+    invalidpassword: invalidPassword,
+  });
 });
 
 app.post("/signupSubmit", async (req, res) => {

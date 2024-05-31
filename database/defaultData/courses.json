@@ -16,7 +16,7 @@
     "courseStart": "2024-01-08",
     "courseEnd": "2024-04-19",
     "courseTime": [
-      { "courseDay": "Tuesday", "courseSHour": "13:30", "courseEHour": "15:20" }
+      { "courseDay": "Tuesday", "courseSHour": "15:30", "courseEHour": "17:20" }
     ],
     "location": "SW09-110",
     "StartTime": "2024-01-09T15:30:00.000",
@@ -99,7 +99,10 @@
     "courseStart": "2024-01-08",
     "courseEnd": "2024-04-19",
     "courseTime": [
-      { "courseDay": "Monday", "courseSHour": "15:30", "courseEHour": "16:20" },
+      { "courseDay": "Monday",
+        "courseSHour": "15:30", 
+        "courseEHour": "16:20" 
+      },
       {
         "courseDay": "Wednesday",
         "courseSHour": "13:30",
