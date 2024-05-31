@@ -227,11 +227,11 @@ async function chatbotInteraction(req, res) {
       } catch (e) {
         return res.status(500).json({ error: "JSON decoding error", details: e.message });
       }
-      console.log("Query: ", query); // For Debugging
+      // console.log("Query: ", query); // For Debugging
 
       // Determine the collection name
       const collectionName = getCollectionName(userMessage);
-      console.log("Collection: ", collectionName); // For Debugging
+      // console.log("Collection: ", collectionName); // For Debugging
 
       // If the collection name cannot be determined, provide a default response
       if (!collectionName) {
@@ -247,7 +247,7 @@ async function chatbotInteraction(req, res) {
       const collection = mongoose.connection.db.collection(collectionName);
 
       const queryResults = await collection.aggregate(query).toArray();
-      console.log("QueryResults: ", queryResults); // For Debugging
+      // console.log("QueryResults: ", queryResults); // For Debugging
 
       const naturalLanguageResponse = await generateNaturalLanguageResponse(userMessage, queryResults);
 
