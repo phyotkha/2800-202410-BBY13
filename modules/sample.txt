@@ -1,0 +1,271 @@
+Below are several sample user questions related to the MongoDB document provided,
+and the corresponding MongoDB aggregation pipeline queries that can be used to fetch the desired data.
+Use them wisely.
+
+Question: How many students are in the CST major?
+Answer:
+[
+  { "$match": { "major": "CST" } },
+  { "$group": { "_id": "$major", "total_students": { "$sum": 1 } } },
+  { "$project": { "major": "$_id", "total_students": 1, "_id": 0 } }
+]
+Explanation: This query counts the number of students majoring in CST by first matching the major, then grouping by the major, and finally projecting the total count.
+
+Question: What are the details of the student with the student ID A0134567?
+Query:
+[
+  { "$match": { "studentId": "A0134567" } },
+  { "$project": { "first_name": 1, "last_name": 1, "date_of_birth": 1, "email": 1, "major": 1, "year": 1, "courses": 1, "_id": 0 } }
+]
+Explanation: This query retrieves the details of the student with the specified student ID by matching the studentId and projecting the relevant fields.
+
+Question: List all students who are in their final year.
+Query:
+[
+  { "$match": { "year": 2024 } },
+  { "$project": { "studentId": 1, "first_name": 1, "last_name": 1, "major": 1, "year": 1, "_id": 0 } }
+]
+Explanation: This query lists all students in their final year (e.g., 2024) by matching the year and projecting the relevant student information.
+
+Question: What are the courses taken by the student with the student ID {studentID}?
+Answer:
+[
+  { "$match": { "studentId": "{studentID}" } },
+  { "$project": { "studentId": 1, "first_name": 1, "last_name": 1, "courses": "$courses.courseId", "_id": 0 } }
+]
+Explanation: This query lists the courses taken by a specific student by matching the studentId and projecting the course IDs.
+
+Question: What are the specific courses that student {first_name} {last_name} is registered for?
+Answer:
+[
+  { "$match": { "first_name": "{first_name}", "last_name": "{last_name}" } },
+  { "$project": { "studentId": 1, "first_name": 1, "last_name": 1, "courses": "$courses.courseId", "_id": 0 } }
+]
+Explanation: This query retrieves the specific courses registered by a student by matching the first and last name and projecting the course IDs.
+
+Question: What course is the instructor {first_name} {last_name} teaching?
+Answer:
+[
+  { "$match": { "first_name": "{first_name}", "last_name": "{last_name}" } },
+  { "$project": { "courses": 1, "_id": 0 } }
+]
+Explanation: This query finds the courses taught by a specific instructor by matching their first and last name and projecting the courses they teach.
+
+Question: Find the total number of students for each major.
+Query:
+[
+  { "$group": { "_id": "$major", "total_students": { "$sum": 1 } } },
+  { "$project": { "major": "$_id", "total_students": 1, "_id": 0 } }
+]
+Explanation: This query calculates the total number of students in each major by grouping by the major and summing the student counts.
+
+Question: List the names and departments of all instructors.
+Answer:
+[
+  { "$project": { "first_name": 1, "last_name": 1, "department": 1, "_id": 0 } }
+]
+Explanation: This query lists the names and departments of all instructors by projecting the relevant fields.
+
+Question: What are the office hours and contact details for the instructor teaching COMP 1113?
+Answer:
+[
+  { "$match": { "courses.courseId": "COMP 1113" } },
+  { "$project": { "first_name": 1, "last_name": 1, "office": 1, "officeHrs": 1, "email": 1, "otherContact": 1, "_id": 0 } }
+]
+Explanation: This query retrieves the office hours and contact details of the instructor teaching a specific course by matching the course ID and projecting the relevant fields.
+
+Question: List all courses offered by the "School of Computing and Academic Studies".
+Answer:
+[
+  { "$match": { "School": "School of Computing and Academic Studies" } },
+  { "$project": { "courseId": 1, "Subject": 1, "Program": 1, "CourseCredit": 1, "_id": 0 } }
+]
+Explanation: This query lists all courses offered by a specific school by matching the school name and projecting the relevant course details.
+
+Question: Find all courses that have no prerequisites.
+Answer:
+[
+  { "$match": { "Prerequisites": "No prerequisites are required for this course." } },
+  { "$project": { "courseId": 1, "Name": 1, "_id": 0 } }
+]
+Explanation: This query finds all courses without prerequisites by matching the prerequisite field and projecting the relevant course details.
+
+Question: How many courses are there in the "Computer Systems Technology" program?
+Answer:
+[
+  { "$match": { "Program": "Computer Systems Technology" } },
+  { "$group": { "_id": null, "total_courses": { "$sum": 1 } } },
+  { "$project": { "total_courses": 1, "_id": 0 } }
+]
+Explanation: This query counts the total number of courses in a specific program by matching the program name and summing the course counts.
+
+Question: Give me the list of courses from the Computer Systems Technology.
+Answer:
+[
+  { "$match": { "Program": "Computer Systems Technology" } },
+  { "$project": { "courseId": 1, "Subject": 1, "CourseCredit": 1, "_id": 0 } }
+]
+Explanation: This query lists the courses in a specific program by matching the program name and projecting the relevant course details.
+
+Question: What is the average number of hours per week for courses in the Computer Systems Technology program?
+Answer:
+[
+  { "$match": { "Program": "Computer Systems Technology" } },
+  { "$group": { "_id": null, "average_hours_per_week": { "$avg": "$HoursPerWeek" } } },
+  { "$project": { "average_hours_per_week": 1, "_id": 0 } }
+]
+Explanation: This query calculates the average number of hours per week for courses in a specific program by matching the program name and averaging the weekly hours.
+
+Question: What is the location of {courseId}?
+Answer:
+[
+  { "$match": { "courseId": "{courseId}" } },
+  { "$project": { "courseId": 1, "location": 1, "_id": 0 } }
+]
+Explanation: This query finds the location of a specific course by matching the course ID and projecting the location.
+
+Question: Which course does {first name} {last name} teaches?
+Answer: 
+[
+  {"$match": { "first_name": "{first name}", "last_name": "{last name}"} },\
+  {"$project": { "courses.courseId": 1, "_id": 0 } }
+]
+Explanation: This query finds that couseId of a specific instructor by matching the first name and last name in the database of instructor collection. 
+
+Question: What is the email address of {first name} {last name}?
+Answer: 
+[
+  {"$match": { "first_name": "{first name}", "last_name": "{last name}"} },
+  {"$project": { "email": 1, "_id": 0 } }
+]
+
+Question: What are the office hours of {first_name} {last_name}? / Can you tell me {first_name} {last_name}'s office hours?
+Answer: 
+[
+  {"$match": {"first_name": "{first_name}", "last_name": "{last_name}" } },
+  {"$project": {"StartTime": 1, "EndTime": 1, "_id": 0 } }
+]
+Explanation: This query finds the start time and end time of a specific instructor from availabletimes database and gives user the office hour of said instructor.Question: Who is the instructor for {courseId}?
+
+Answer:
+[
+{ "$match": { "courseId": "{courseId}" } },
+{ "$lookup": {
+"from": "instructors",
+"localField": "instructorId",
+"foreignField": "instructorId",
+"as": "instructor"
+}},
+{ "$project": { "instructor": 1, "_id": 0 } }
+]
+Explanation: This query first matches the course by courseId, then performs a lookup to join the instructors collection based on the instructorId, and finally projects the instructor information.
+
+Question: What is the course outline for {courseId}?
+Answer:
+[
+{ "$match": { "courseId": "{courseId}" } },
+{ "$project": { "description": 1, "_id": 0 } }
+]
+Explanation: This query matches the course by courseId and then projects the description field containing the course outline.
+
+Question: What courses does CST offer?
+Answer:
+[
+{ "$match": { "Program": "Computer Systems Technology" } },
+{ "$project": { "courseId": 1, "_id": 0 } }
+]
+Explanation: This query matches all courses in the Computer Systems Technology program and projects the courseId for each course.
+
+Question: What is the course time for {courseId}?
+Answer:
+[
+{ "$match": { "courseId": "{courseId}" } },
+{ "$project": { "courseTime": 1, "_id": 0 } }
+]
+Explanation: This query matches the course by courseId and projects the courseTime field containing the details about the course schedule.
+
+Question: When does {courseId} start?
+Answer:
+[
+{ "$match": { "courseId": "{courseId}" } },
+{ "$project": { "courseStart": 1, "_id": 0 } }
+]
+Explanation: This query matches the course by courseId and projects the courseStart field.
+
+Question: When does {courseId} end?
+Answer:
+[
+{ "$match": { "courseId": "{courseId}" } },
+{ "$project": { "courseEnd": 1, "_id": 0 } }
+]
+Explanation: This query matches the course by courseId and projects the courseEnd field.
+
+Question: Which program includes {courseId}?
+Answer:
+[
+{ "$match": { "courseId": "{courseId}" } },
+{ "$project": { "Program": 1, "_id": 0 } }
+]
+Explanation: This query matches the course by courseId and projects the Program field indicating the associated program.
+
+Question: What are the prerequisites for {courseId}?
+Answer:
+[
+{ "$match": { "courseId": "{courseId}" } },
+{ "$project": { "Prerequisites": 1, "_id": 0 } }
+]
+Explanation: This query matches the course by courseId and projects the Prerequisites field.
+
+Question: How many weeks does {courseId} run?
+Answer:
+[
+{ "$match": { "courseId": "{courseId}" } },
+{ "$project": { "TotalWeeks": 1, "_id": 0 } }
+]
+Explanation: This query matches the course by courseId and projects the TotalWeeks field indicating the number of weeks the course runs.
+
+Question: What is the full name for {courseId}?
+Answer:
+[
+{ "$match": { "courseId": "{courseId}" } },
+{ "$project": { "Subject": 1, "_id": 0 } }
+]
+Explanation: This query matches the course by courseId and projects the Subject field containing the full name or subject of the course.
+
+Question: How many credits is {courseId} worth?
+Answer:
+[
+{ "$match": { "courseId": "{courseId}" } },
+{ "$project": { "CourseCredit": 1, "_id": 0 } }
+]
+Explanation: This query matches the course by courseId and projects the CourseCredit field indicating the credit value of the course.
+
+Question: What days do I have {courseId}?
+Answer:
+[
+{ "$match": { "courseId": "{courseId}" } },
+{ "$project": { "courseTime.courseDay": 1, "_id": 0 } }
+]
+Explanation: This query matches the course by courseId and projects the courseDay field from the courseTime subdocument indicating the days the course is held.
+
+Question: What are courses {first_name} {last_name} is enrolled in? 
+Answer: 
+[
+  {"$match": {"first_name": "{first_name}" } },
+  {"$unwind": {"courses" } },
+  {"$project": {"courseId": courses.courseId, "_id" : 0}}
+]
+
+Question: When is {courseId}? 
+Answer: 
+[
+  {"$match": {"courseId": "{courseId}" } },
+  {"$project": {"StartTime": 1, "EndTime": 1, "_id": 0}}
+]
+
+Question: What is the class time for {courseId}?
+Answer: 
+[
+  {"$match": {"courseId": "{courseId}" } },
+  {"$project": {"StartTime": 1, "EndTime": 1, "_id": 0 } }
+]

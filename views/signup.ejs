@@ -1,76 +1,56 @@
 <%- include("templates/header") %>
   <br><br><br>
-
+  <div class="container">
   <form action="/signupSubmit" method="post">
     <ul class="nav nav-pills nav-justified mb-3" id="ex1" role="tablist">
       <li class="nav-item" role="presentation">
-        <a class="nav-link" id="tab-login" data-mdb-pill-init href="/login" role="tab" 
-        aria-controls="pills-login" aria-selected="true" style="color: #003C71">Login</a>
+        <a class="nav-link" id="tab-login" data-mdb-pill-init href="/login" role="tab" aria-controls="pills-login" aria-selected="true" style="color: #003C71">Login</a>
       </li>
       <li class="nav-item" role="presentation">
-        <a class="nav-link active" id="tab-register" data-mdb-pill-init href="/signup" role="tab" 
-        aria-controls="pills-register" aria-selected="false" style="background-color: #003C71; border-radius: 0;">Signup</a>
+        <a class="nav-link active" id="tab-register" data-mdb-pill-init href="/signup" role="tab" aria-controls="pills-register" aria-selected="false" style="background-color: #003C71; border-radius: 0;">Signup</a>
       </li>
     </ul>
-    <br>
+    <% if (error) { %>
+    <div style="color: red; margin-top: 5px;">Error signing up. Please try again!</div>
+    <% } %>
     <div class="row">
       <div class="col">
-        <label>First Name</label>
+        <label>First Name<span class="required">*</span></label>
         <input name="firstname" type="text" class="form-control" placeholder="First name">
-        <% if (error) { %>
-        <div style="color: red; margin-top: 5px;">Error: <%= error %> </div>
-        <% } %>
       </div>
       <div class="col">
-        <label>Last Name</label>
+        <label>Last Name<span class="required">*</span></label>
         <input name="lastname" type="text" class="form-control" placeholder="Last name">
-        <% if (error) { %>
-        <div style="color: red; margin-top: 5px;">Error: <%= error %> </div>
-        <% } %>
       </div>
     </div>
     <br>
     <div class="row">
       <div class="col">
-        <label>Student ID</label>
+        <label>Student ID<span class="required">*</span></label>
         <input name="studentid" type="text" class="form-control" placeholder="Enter Student ID">
       </div>
       <div class="col">
-        <label>Date of Birth</label>
-        <input name="dateofbirth" type="date" class="form-control">
-      </div>
-    </div>
-    <br>
-    <div class="row">
-      <div class="col">
-        <label>Username</label>
-        <input name="username" type="text" class="form-control" placeholder="Enter username">
-      </div>
-      <div class="col">
-        <label>Major</label>
+        <label>Major<span class="required">*</span></label>
         <input name="major" type="text" class="form-control" placeholder="Enter your program">
       </div>
     </div>
     <br>
     <div class="form-group">
-      <label for="exampleInputEmail1">Email Address</label>
-      <input name="email" type="email" class="form-control" id="exampleInputEmail1" 
-      aria-describedby="emailHelp" placeholder="Enter email">
+      <label for="exampleInputEmail1">Email address<span class="required">*</span></label>
+      <input name="email" type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Enter email">
     </div>
     <br>
     <div class="form-group">
-      <label for="exampleInputPassword1">Password</label>
+      <label for="exampleInputPassword1">Password<span class="required">*</span></label>
       <input name="password" type="password" class="form-control" id="exampleInputPassword1" placeholder="Password">
     </div>
     <br>
     <button type="submit" class="btn btn-primary">Submit</button>
   </form>
 </div>
-<%- include("templates/footer") %>
-
-<!-- <style>
-  .centered-form {
-    width: 700px;
+<style>
+  .required{
+    color: red;
   }
 </style>
-<div class="container align-items-center centered-form"> </div>  -->
+<%- include("templates/footer") %>

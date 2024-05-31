@@ -12,37 +12,38 @@ Our project, BBY-13, is developing BCIT ChatBot, an AI chatBot to help students 
 	
 ## 3. Technologies and Resources Used
 List technologies (with version numbers), API's, icons, fonts, images, media or data sources, and other resources that were used.
-* HTML, CSS, JavaScript
-* Bootstrap 5.0 (Frontend library)
-* Firebase 8.0 (BAAS - Backend as a Service)
-* ...
+* CSS (Front-end)
+* Bootstrap 5.0 (Front-end)
+* Node.js 1.0.0 (Back-end)
+* JavaScript (Back-end)
+* OpenAI API (API)
+* MongoDB (Database)
 
 ## 4. Complete setup/installion/usage
-State what a user needs to do when they come to your project.  How do others start using your code or application?
-Here are the steps ...
-* ...
-* ...
-* ...
+* Install Node.js 
+    * Users will need to ensure that Node.js is installed on their machine. They can visit the official Node.js website (https://nodejs.org/en) to download and install the appropriate version for their operating system.
+* Clone the repository
+    * `git clone https://github.com/phyotkha/2800-202410-BBY13`
+* Install dependencies
+    * `npm install`
 
-## 5. Known Bugs and Limitations
-Here are some known bugs:
-* ...
-* ...
-* ...
 
-## 6. Features for Future
+## 5. Features for Future
 What we'd like to build in the future:
-* ...
-* ...
-* ...
+* Integrate our custom AI model that will provide better service to our users.
+* A reliable booking service
+* 
 	
-## 7. Contents of Folder
+## 6. Contents of Folder
 Content of the project folder:
 
 ```
  Top level of project folder: 
 ├── .gitignore               # Git ignore file
-├── index.html               # landing HTML file, this is what users see when you come to url
+├── index.js                 # Main JavaScript file
+├── package-lock.json
+├── package.json
+├── utils.js
 └── README.md
 
 It has the following subfolders and files:

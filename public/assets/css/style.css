@@ -94,14 +94,14 @@
     flex: 1;
     padding: 10px;
     margin-right: 10px;
-    border-radius: 20px;
+    border-radius: 10px;
     border: 1px solid #ccc;
 }
 
 .chat-input button {
     padding: 10px;
     width: 10%;
-    border-radius: 20px;
+    border-radius: 10px;
 }
 
 .typing-indicator {
@@ -125,4 +125,9 @@
     .chat-input button {
         width: 28%;
     }
+}
+
+#aptbtn {
+    float:right;
+    margin: 1rem;
 }
