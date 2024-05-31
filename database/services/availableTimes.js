@@ -1,4 +1,3 @@
-// services/availableTimes.js
 
 const AvailableTimes = require("../schemas/availableTimes");
 
