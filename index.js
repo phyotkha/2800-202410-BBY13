@@ -45,7 +45,7 @@ registerLicense('licenseKey');
 /**
  * Database Connection
  */
-var { database } = include("./scripts/databaseConnection");
+var { database } = include("./databaseConnection");
 const userCollection = database.db(mongodb_database).collection("students");
 const courseModel = require("./database/schemas/courses.js")
 const eventModel = require("./database/schemas/events.js");
@@ -135,6 +135,7 @@ function adminAuthorization(req, res, next) {
  */
 app.get("/", async (req, res) => {
   var username = req.session.username;
+  console.log(username);
   if (username) {
     res.render("homePage");
     return;
@@ -143,7 +144,6 @@ app.get("/", async (req, res) => {
     res.render("startingPage");
     return;
   }
-
 });
 
 app.get("/signup", (req, res) => {
