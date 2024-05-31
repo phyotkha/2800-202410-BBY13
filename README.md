@@ -23,9 +23,9 @@ Our project, BBY-13, is developing BCIT ChatBot, an AI chatBot to help students 
 * Install Node.js 
     * Users will need to ensure that Node.js is installed on their machine. They can visit the official Node.js website (https://nodejs.org/en) to download and install the appropriate version for their operating system.
 * Clone the repository
-    * ```git clone https://github.com/phyotkha/2800-202410-BBY13
+    * `git clone https://github.com/phyotkha/2800-202410-BBY13 `
 * Install dependencies
-    * ```npm install 
+    * `npm install` 
 * Set up environment variables
     * Users will need to create an .env file in the root directory of the project. 
     * Here is an example of the env variables you may need: 
@@ -42,8 +42,9 @@ Our project, BBY-13, is developing BCIT ChatBot, an AI chatBot to help students 
        ESSENTIAL_STUDIO_KEY=YourEssentialStudioKeyHere
     ```
     * To start the application
-    ```node .
-    ```
+    `node .`
+    (or)
+    `node index.js`
     * To access the application
       * From your local machine: http://localhost:YourPort
 
@@ -62,12 +63,12 @@ Content of the project folder:
 ├── public                      # Public folder; contains resources, such as css files, images
 ├── views                       # Views folder; contains ejs files 
 ├── .gitignore                  # Git ignore file
-├── databaseConnection.js       #
+├── databaseConnection.js       # databaseConnection.js, allow for the database connection with mongodb 
 ├── index.js                    # Main JS file to start the application 
 ├── package-lock.json           # Includes dependencies for app to run
 ├── package.json                # Includes dependencies for app to run
-├── utils.js                    # 
-└── README.md                   #
+├── utils.js                    # utils.js file, removes the need for the use of "/public"
+└── README.md                   # Readme file
 
 It has the following subfolders and files:
 ├── .git                        # Folder for git repo
