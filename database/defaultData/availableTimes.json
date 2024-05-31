@@ -1,0 +1,98 @@
+[
+  {
+    "Id": 1,
+    "Subject": "Available",
+    "first_name": "Thorsten",
+    "last_name": "Ewald",
+    "StartTime": "2024-01-08T10:00:00.000",
+    "EndTime": "2024-01-08T12:00:00.000",
+    "CategoryColor": "#00FF00",
+    "RecurrenceRule": "FREQ=WEEKLY;BYDAY=MO;INTERVAL=1;UNTIL=20240419T235959Z",
+    "departmentId": 1,
+    "instructorId": 1
+  },
+  {
+    "Id": 2,
+    "Subject": "Available",
+    "first_name": "Rahul",
+    "last_name": "Kukreja",
+    "StartTime": "2024-01-09T13:00:00.000",
+    "EndTime": "2024-01-09T15:00:00.000",
+    "CategoryColor": "#00FF00",
+    "RecurrenceRule": "FREQ=WEEKLY;BYDAY=TU;INTERVAL=1;UNTIL=20240419T235959Z",
+    "departmentId": 1,
+    "instructorId": 2
+  },
+  {
+    "Id": 3,
+    "Subject": "Available",
+    "first_name": "Simin",
+    "last_name": "Jolfaee",
+    "StartTime": "2024-01-09T12:00:00.000",
+    "EndTime": "2024-01-09T14:00:00.000",
+    "CategoryColor": "#00FF00",
+    "RecurrenceRule": "FREQ=WEEKLY;BYDAY=TU;INTERVAL=1;UNTIL=20240419T235959Z",
+    "departmentId": 1,
+    "instructorId": 3
+  },
+  {
+    "Id": 4,
+    "Subject": "Available",
+    "first_name": "Arron",
+    "last_name": "Ferguson",
+    "StartTime": "2024-01-10T09:00:00.000",
+    "EndTime": "2024-01-10T14:11:00.000",
+    "CategoryColor": "#00FF00",
+    "RecurrenceRule": "FREQ=WEEKLY;BYDAY=WE;INTERVAL=1;UNTIL=20240419T235959Z",
+    "departmentId": 1,
+    "instructorId": 4
+  },
+  {
+    "Id": 5,
+    "Subject": "Available",
+    "first_name": "Bruce",
+    "last_name": "Link",
+    "StartTime": "2024-01-10T14:00:00.000",
+    "EndTime": "2024-01-10T16:00:00.000",
+    "CategoryColor": "#00FF00",
+    "RecurrenceRule": "FREQ=WEEKLY;BYDAY=WE;INTERVAL=1;UNTIL=20240419T235959Z",
+    "departmentId": 1,
+    "instructorId": 5
+  },
+  {
+    "Id": 6,
+    "Subject": "Available",
+    "first_name": "Maryam",
+    "last_name": "Khezrzadeh",
+    "StartTime": "2024-01-11T13:30:00.000",
+    "EndTime": "2024-01-11T15:30:00.000",
+    "CategoryColor": "#00FF00",
+    "RecurrenceRule": "FREQ=WEEKLY;BYDAY=TH;INTERVAL=1;UNTIL=20240419T235959Z",
+    "departmentId": 1,
+    "instructorId": 6
+  },
+  {
+    "Id": 7,
+    "Subject": "Available",
+    "first_name": "Carly",
+    "last_name": "Orr",
+    "StartTime": "2024-01-12T10:00:00.000",
+    "EndTime": "2024-01-12T12:00:00.000",
+    "CategoryColor": "#00FF00",
+    "RecurrenceRule": "FREQ=WEEKLY;BYDAY=FR;INTERVAL=1;UNTIL=20240531T235959Z",
+    "departmentId": 1,
+    "instructorId": 7
+  },
+  {
+    "Id": 8,
+    "Subject": "Available",
+    "first_name": "Patrick",
+    "last_name": "Guichon",
+    "StartTime": "2024-04-29T14:30:00.000",
+    "EndTime": "2024-04-29T16:30:00.000",
+    "CategoryColor": "#00FF00",
+    "RecurrenceRule": "FREQ=WEEKLY;BYDAY=MO;INTERVAL=1;UNTIL=20240531T235959Z",
+    "departmentId": 1,
+    "instructorId": 8
+  }
+]
