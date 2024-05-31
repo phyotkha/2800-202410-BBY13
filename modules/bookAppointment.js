@@ -23,7 +23,6 @@ async function bookAppointmentSubmit(req, res) {
       if (validationResult.error != null) {
         res.redirect(`/bookAppointment?missing=1`);
         return;
-        // console.log("Signup Error", validationResult.error); // For debugging
       }
     try {
         const data = await createEvent({
@@ -37,8 +36,7 @@ async function bookAppointmentSubmit(req, res) {
     } catch (error) {
         console.error("Error booking appointment:", error);
         return res.status(500).send("An error occurred while booking the appointment.");
-    }
-    
+    } 
 }
 
 module.exports = {

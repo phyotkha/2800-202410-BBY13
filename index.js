@@ -113,6 +113,23 @@ function sessionValidation(req, res, next) {
   }
 }
 
+function isAdmin(req) {
+  if (req.session.user_type == 'admin') {
+    return true;
+  } else {
+    return false;
+  }
+}
+
+function adminAuthorization(req, res, next) {
+  if (!isAdmin(req)) {
+    res.status(403);
+    res.send("<h1 style='color: red;'>Error 403! Not Authorized</h1>");
+  } else {
+    next();
+  }
+}
+
 /**
  * Start of Route Definitons
  */
@@ -147,12 +164,10 @@ app.post("/signupSubmit", async (req, res) => {
   });
 
   const validationResult = schema.validate(req.body);
-  // console.log("Valid inputs", validationResult); // For debugging
 
   if (validationResult.error != null) {
     res.redirect(`/signup?error=1`);
     return;
-    // console.log("Signup Error", validationResult.error); // For debugging
   }
 
   var hashedPassword = await bcrypt.hash(password, saltRounds);
@@ -199,11 +214,9 @@ app.post("/loginSubmit", async (req, res) => {
 
   // Validate input data
   const validationError = schema.validate(req.body);
-  // console.log(validationError); // For Debugging
 
   if (validationError.error != null) {
     return res.redirect("/login?validationerror=1");
-    // console.log(validationResult.error); // For Debugging
   }
 
   const userData = await userCollection.findOne({ email });
@@ -213,7 +226,6 @@ app.post("/loginSubmit", async (req, res) => {
 
   var isValidPassword = await bcrypt.compare(password, userData.password);
   if (isValidPassword) {
-    // console.log(userData); // For Debugging
     req.session.authenticated = true;
     req.session.email = email;
     req.session.firstname = userData.first_name;
@@ -239,14 +251,6 @@ app.post('/chat', sessionValidation, (req, res) => {
 const { bookAppointment, bookAppointmentSubmit,} = require('./modules/bookAppointment');
 app.get('/bookAppointment', bookAppointment);
 app.post('/bookAppointmentSubmit', bookAppointmentSubmit);
-
-
-// Route to handle logout
-app.get("/logout", async (req, res) => {
-  req.session.destroy(); // Destory Session
-  // console.log("Session Destroyed (User logged out)"); 
-  res.redirect("/");
-});
 
 /* Password Reset Routes */
 app.get('/resetPasswordRequest', (req, res) => {
@@ -304,10 +308,8 @@ app.post("/sendResetLink", async (req, res) => {
 
   transporter.sendMail(mailMessage, (err, info) => {
     if (err) {
-      // console.error(err); // For Debugging 
       return res.render('resetPasswordRequest', { message: 'Error sending email. Try Again!' });
     } else {
-      // console.log('Email sent: ' + info.response); // For Debugging
       return res.redirect('/resetPasswordRequest?emailsent=1');
     }
   });
@@ -349,7 +351,6 @@ app.post("/resetPassword", async (req, res) => {
   );
   res.redirect("/login");
 });
-// ---------------------------------------------------------------------------------------------------- //
 
 /* Profile Routes */
 app.get('/profile', sessionValidation, async (req, res) => {
@@ -427,6 +428,11 @@ app.get('/available-times', async (req, res) => {
 app.use("/students", studentsRouter);
 app.use("/instructors", instructorRouter);
 app.use("/events", eventRouter)
+
+app.get("/logout", async (req, res) => {
+  req.session.destroy();
+  res.redirect("/");
+});
 
 
 /**

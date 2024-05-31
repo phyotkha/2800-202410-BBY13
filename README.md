@@ -11,10 +11,10 @@ Our project, BBY-13, is developing BCIT ChatBot, an AI chatBot to help students 
 * Yerin
 	
 ## 3. Technologies and Resources Used
-List technologies (with version numbers), API's, icons, fonts, images, media or data sources, and other resources that were used.
 * CSS (Front-end)
-* Bootstrap 5.0 (Front-end)
-* Node.js 1.0.0 (Back-end)
+* EJS (Front-end)
+* Bootstrap (Front-end)
+* Node.js (Back-end)
 * JavaScript (Back-end)
 * OpenAI API (API)
 * MongoDB (Database)
@@ -26,13 +26,27 @@ List technologies (with version numbers), API's, icons, fonts, images, media or 
     * `git clone https://github.com/phyotkha/2800-202410-BBY13`
 * Install dependencies
     * `npm install`
-
+* Set up environment variables
+    * Users will need to create an .env file in the root directory of the project. 
+    * Here is an example of the env variables you may need: 
+    ```PORT= YourDesiredPortHere
+       MONGODB_HOST=YourMongoDBClusterHere
+       MONGODB_USER=YourUsernameHere
+       MONGODB_PASSWORD=YourPasswordHere
+       MONGODB_DATABASE=YourMongoDBDatabaseHere
+       MONGODB_SESSION_SECRET=SomeSecretSessionKey
+       NODE_SESSION_SECRET=SomeSecretSessionKey
+       EMAIL=YourEmailAddressHere
+       EMAIL_PASSWORD= YourEmailAddressPasswordHere
+       OPENAI_API_KEY= YourOpenAIKeyHere
+       ESSENTIAL_STUDIO_KEY=YourEssentialStudioKeyHere```
+    
 
 ## 5. Features for Future
 What we'd like to build in the future:
 * Integrate our custom AI model that will provide better service to our users.
 * A reliable booking service
-* 
+
 	
 ## 6. Contents of Folder
 Content of the project folder:

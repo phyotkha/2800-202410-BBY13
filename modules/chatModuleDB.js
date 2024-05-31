@@ -84,7 +84,6 @@ async function connectDB() {
     await mongoose.connect(
       `mongodb+srv://${mongodb_user}:${mongodb_password}@${mongodb_host}/test?retryWrites=true&w=majority&appName=Cluster0`
     );
-    // console.log("MongoDB Connected!"); // Debugging log
   }
 }
 
@@ -176,8 +175,6 @@ async function chatbotInteraction(req, res) {
         availableSlot = await availableTimesCollection.findOne({});
       }
 
-      // console.log("Available Slot:", availableSlot); // Debugging log
-
       if (!availableSlot) {
         const noSlotsResponse = `
         There are no available time slots at the moment. 
@@ -231,10 +228,8 @@ async function chatbotInteraction(req, res) {
     } catch (e) {
       return res.status(500).json({ error: "JSON decoding error", details: e.message });
     }
-    // console.log("Query: ", query); // Debugging log
 
     const collectionName = getCollectionName(userMessage);
-    // console.log("Collection: ", collectionName); // Debugging log
 
     if (!collectionName) {
       const defaultResponse = "I am unable to answer any questions outside of the scope of BCIT.";
@@ -246,7 +241,6 @@ async function chatbotInteraction(req, res) {
 
     const collection = mongoose.connection.db.collection(collectionName);
     const queryResults = await collection.aggregate(query).toArray();
-    // console.log("QueryResults: ", queryResults); // Debugging log
 
     const naturalLanguageResponse = await generateNaturalLanguageResponse(userMessage, queryResults);
 
