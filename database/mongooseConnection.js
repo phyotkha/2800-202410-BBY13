@@ -3,7 +3,6 @@ require('./schemas/students');
 require('./schemas/courses');
 require("./schemas/instructors");
 require("./schemas/events");
-require('./schemas/chat');
 
 require("dotenv").config();
 const mongodb_host = process.env.MONGODB_HOST;
