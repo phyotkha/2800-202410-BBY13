@@ -1,7 +1,7 @@
 <%- include("templates/header") %>
 <br>
 <h1 style="font-weight: bold;">
-  <%= firstName %>'s profile:
+  <%= firstName %>'s Profile:
 </h1><br>
 <form action="/updateProfile" method="post">
   <div class="row"><br>
@@ -25,7 +25,7 @@
     </div>
   </div><br>
   <div class="form-group">
-    <label for="exampleInputEmail1">Email address</label>
+    <label for="exampleInputEmail1">Email Address</label>
     <input name="email" type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Enter email" value="<%= emailAddress %>" disabled>
   </div>
   <br>
