@@ -1,9 +1,3 @@
-// let nav = 0;
-// let clicked = null;
-// let events = localStorage.getItem("events")
-//     ? JSON.parse(localStorage.getItem("events"))
-//     : [];
-
 async function fetchEvents() {
   const [coursesResponse, eventsResponse, availableTimesResponse] = await Promise.all([
     fetch("/courses"),
@@ -29,10 +23,7 @@ async function fetchEvents() {
   ];
 }
 
-
-
 fetchEvents().then((plan) => {
-  console.log(plan)
   const schedule = new ej.schedule.Schedule({
     width: "100%",
     height: "650px",

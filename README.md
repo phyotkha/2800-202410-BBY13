@@ -14,6 +14,7 @@ Our project, BBY-13, is developing BCIT ChatBot, an AI chatBot to help students 
 * CSS (Front-end)
 * EJS (Front-end)
 * Bootstrap (Front-end)
+* Essential Studio (Front-end)
 * Node.js (Back-end)
 * JavaScript (Back-end)
 * OpenAI API (API)

@@ -136,7 +136,6 @@ function adminAuthorization(req, res, next) {
  */
 app.get("/", async (req, res) => {
   var username = req.session.username;
-  console.log(username);
   if (username) {
     res.render("homePage");
     return;
@@ -394,6 +393,9 @@ app.post('/updateProfile', sessionValidation, async (req, res) => {
   res.redirect("/profile");
 });
 
+/**
+ * Calendar injected with ESSENTIAL STUDIO
+ */
 app.get('/calendar', sessionValidation, async (req, res) => {
   res.render("calendar", {
     ESSENTIAL_STUDIO_KEY: process.env.ESSENTIAL_STUDIO_KEY,
@@ -414,7 +416,6 @@ app.get("/courses", async (req, res) => {
     const courses = await courseModel.find();
     res.json(courses);
   } catch (error) {
-    console.log(error);
     res.status(500).send(error);
   }
 });
@@ -451,7 +452,7 @@ app.get("*", (req, res) => {
  * Server
  */
 app.listen(port, () => {
-  console.log(`Server running at http://localhost:${port}`);
+  
 });
 
 
