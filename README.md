@@ -90,7 +90,7 @@ It has the following subfolders and files:
 |   |   ├── courses.js          # JS File for courses collection schema
 |   |   ├── events.js           # JS File for events collection schema
 |   |   ├── instructors.js      # JS File for instructors collection schema
-|   |   └── students.js          # JS File for students collection schema
+|   |   └── students.js         # JS File for students collection schema
 |   ├── services                # Services Folder
 |   |   ├── avaliableTimes.js   # This file defines a service function for retrieving available time slots.
 |   |   ├── events.js           # This file defines service functions for managing event data in the database.
