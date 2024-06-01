@@ -60,13 +60,23 @@ What we'd like to build in the future:
 * Integrate our custom AI model that will provide better service to our users.
 * A reliable booking service
 
-## 7. Usage of AI 
-*
+## 7. Credits, References, and Licenses
+* BCIT: Patrick Guichon(Instructor), Charles Tapp (Instructor), Carly Orr(Instructor), Marco Ho(Instructor)
+References: openAI, w3Schools, BCIT's COMP2800 course notes/resources, BCIT's COMP2537 course notes/resources
+Licenses: syncfusion essential studio
 
-## 8. Contact Information
+## 8. Usage Of AI
+We used openAI to help us with our chatBOT, essentially it is our chatBOT. Our initial plan was to have a trained LLM, but because of time constraints and other factors
+we had to go with plan B. openAI takes the user input, converts it into a mongoDB query for keywords, the query results are then fed through openAI with a prompt asking it to generate a natural language response based on these query results, if nothing matches it’ll respond with a default string.
+We also used AI to help us with some code debugging, as we had trouble converting and generating a proper response from our database that was a natural language instead of literal
+JSON objects.
+Limitations that happens with AI generated code is that they won't provide you what you want all the time, and you cannot just copy and paste their code. It is not an answer key for you
+you need to understand what it is that you need to code yourself. 
+
+## 9. Contact Information
 * Our contact information : schoolscopeai@gmail.com
 
-## 9. Contents of Folder
+## 10. Contents of Folder
 Content of the project folder:
 
 ```
@@ -144,16 +154,7 @@ It has the following subfolders and files:
 
 
 
-## 7. Credits, References, and Licenses
-BCIT: Patrick Guichon(Instructor), Charles Tapp (Instructor), Carly Orr(Instructor), Marco Ho(Instructor)
-References: openAI, w3Schools, BCIT's COMP2800 course notes/resources, BCIT's COMP2537 course notes/resources
-Licenses: syncfusion essential studio
 
-## 8. AI use
-We used openAI to help us with our chatBOT, essentially it is our chatBOT. Our initial plan was to have a trained LLM, but because of time constraints and other factors
-we had to go with plan B. openAI takes the user input, converts it into a mongoDB query for keywords, the query results are then fed through openAI with a prompt asking it to generate a natural language response based on these query results, if nothing matches it’ll respond with a default string.
-We also used AI to help us with some code debugging, as we had trouble converting and generating a proper response from our database that was a natural language instead of literal
-JSON objects.
-Limitations that happens with AI generated code is that they won't provide you what you want all the time, and you cannot just copy and paste their code. It is not an answer key for you
-you need to understand what it is that you need to code yourself. 
+
+
 
