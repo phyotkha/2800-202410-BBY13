@@ -129,3 +129,19 @@ It has the following subfolders and files:
     ├── signup.ejs              # EJS File for sign up page
     ├── startingPage.ejs        # EJS File for starting page 
     └── userProfile.ejs         # EJS File for user profile page
+
+
+
+## 7. Credits, References, and Licenses
+BCIT: Patrick Guichon(Instructor), Charles Tapp (Instructor), Carly Orr(Instructor), Marco Ho(Instructor)
+References: openAI, w3Schools, BCIT's COMP2800 course notes/resources, BCIT's COMP2537 course notes/resources
+Licenses: syncfusion essential studio
+
+## 8. AI use
+We used openAI to help us with our chatBOT, essentially it is our chatBOT. Our initial plan was to have a trained LLM, but because of time constraints and other factors
+we had to go with plan B. openAI takes the user input, converts it into a mongoDB query for keywords, the query results are then fed through openAI with a prompt asking it to generate a natural language response based on these query results, if nothing matches it’ll respond with a default string.
+We also used AI to help us with some code debugging, as we had trouble converting and generating a proper response from our database that was a natural language instead of literal
+JSON objects.
+Limitations that happens with AI generated code is that they won't provide you what you want all the time, and you cannot just copy and paste their code. It is not an answer key for you
+you need to understand what it is that you need to code yourself. 
+
