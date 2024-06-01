@@ -49,12 +49,24 @@ Our project, BBY-13, is developing BCIT ChatBot, an AI chatBot to help students 
     * To access the application
       * From your local machine: http://localhost:YourPort
 
-## 5. Features for Future
+## 5. How to use the product (Features)
+* Once installation is complate, go to signup page and sigup as a user. 
+* After signing up, you can interact with the chatbot by sending messages to it. (Messages should be related to BCIT, such as "What is the location of COMP 1510?")
+* You can go into calender feauture and check the office hours of each instructors, you can also use book an appointment button and filled out the form to make an appointment. 
+* You can edit your profile information in your profile page.
+
+## 6. Features for Future
 What we'd like to build in the future:
 * Integrate our custom AI model that will provide better service to our users.
 * A reliable booking service
 
-## 6. Contents of Folder
+## 7. Usage of AI 
+*
+
+## 8. Contact Information
+* Our contact information : schoolscopeai@gmail.com
+
+## 9. Contents of Folder
 Content of the project folder:
 
 ```
