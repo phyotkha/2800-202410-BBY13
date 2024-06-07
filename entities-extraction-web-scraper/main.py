@@ -3,7 +3,7 @@ import requests
 import json
 import os
 from dotenv import load_dotenv
-import openai
+from openai import AsyncOpenAI
 
 # Load environment variables from .env file
 load_dotenv()
@@ -13,7 +13,6 @@ url_to_scrape = "https://www.bcit.ca/study/programs/applied-natural-sciences"
 
 # OpenAI API key from environment variable
 openai_api_key = os.getenv("OPENAI_API_KEY")
-openai.api_key = openai_api_key
 
 async def fetch_content(url):
     # Prepend the URL with Jina AI Reader prefix
@@ -30,27 +29,32 @@ async def fetch_content(url):
         response.raise_for_status()
 
 async def process_with_gpt(content):
-    # Send content to GPT model for processing
-    prompt = (
-        "You are given the following content fetched from a webpage. "
-        "Please format it into JSONL format where each line is a JSON object with relevant data:\n\n"
-        f"{content}\n\n"
-        "Return the content as JSONL format."
-    )
+    client = AsyncOpenAI(api_key=openai_api_key)
 
-    response = openai.ChatCompletion.create(
+    # Send content to GPT model for processing
+    messages = [
+        {"role": "system", "content": "You are a helpful assistant."},
+        {"role": "user", "content": (
+            "You are given the following content fetched from a webpage. "
+            "Please format it into JSONL format where each line is a JSON object with relevant data:\n\n"
+            f"{content}\n\n"
+            "Return the content as JSONL format."
+        )}
+    ]
+
+    response = await client.chat.completions.create(
         model="gpt-3.5-turbo",
-        messages=[
-            {"role": "system", "content": "You are a helpful assistant."},
-            {"role": "user", "content": prompt}
-        ],
+        messages=messages,
         max_tokens=2048,
-        n=1,
-        stop=None,
         temperature=0.5,
     )
 
-    return response['choices'][0]['message']['content']
+    return response.choices[0].message.content.strip()
+
+def wrap_in_main_bracket(data):
+    # Wrap the JSONL data within one main curly bracket
+    wrapped_data = {"text": "{" + ', '.join(data.strip().splitlines()) + "}"}
+    return wrapped_data
 
 if __name__ == "__main__":
     try:
@@ -60,8 +64,9 @@ if __name__ == "__main__":
         # Process the content with GPT
         if content:
             gpt_response = asyncio.run(process_with_gpt(content))
+            wrapped_response = wrap_in_main_bracket(gpt_response)
             with open('output.jsonl', 'w') as f:
-                f.write(gpt_response)
+                f.write(json.dumps(wrapped_response))
             print("Content fetched and saved to output.jsonl")
         else:
             print("Failed to fetch content.")
