@@ -36,17 +36,18 @@ async def process_with_gpt(content):
         {"role": "system", "content": "You are a helpful assistant."},
         {"role": "user", "content": (
             "You are given the following content fetched from a webpage. "
-            "Please format it into JSONL format where each line is a JSON object with relevant data:\n\n"
+            "Please format it into a valid JSONL format where each line is a JSON object with relevant data. "
+            "Do not include any extraneous characters such as markdown or code block delimiters. Only return valid JSON objects.\n\n"
             f"{content}\n\n"
             "Return the content as JSONL format."
         )}
     ]
 
     response = await client.chat.completions.create(
-        model="gpt-3.5-turbo",
+        model="gpt-3.5-turbo-0125",
         messages=messages,
         max_tokens=2048,
-        temperature=0.5,
+        temperature=0.1,
     )
 
     return response.choices[0].message.content.strip()
