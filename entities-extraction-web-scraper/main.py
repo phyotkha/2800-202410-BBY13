@@ -36,10 +36,10 @@ async def process_with_gpt(content):
         {"role": "system", "content": "You are a helpful assistant."},
         {"role": "user", "content": (
             "You are given the following content fetched from a webpage. "
-            "Please format it into a valid JSONL format where each line is a JSON object with relevant data. "
-            "Do not include any extraneous characters such as markdown or code block delimiters. Only return valid JSON objects.\n\n"
+            "Please format it into a valid JSON array where each element is a JSON object with relevant data. "
+            "Ensure there are no extraneous characters and the output is valid JSON.\n\n"
             f"{content}\n\n"
-            "Return the content as JSONL format."
+            "Return the content as a JSON array."
         )}
     ]
 
@@ -50,11 +50,33 @@ async def process_with_gpt(content):
         temperature=0.1,
     )
 
-    return response.choices[0].message.content.strip()
+    # Clean up response to ensure it's valid JSON
+    gpt_output = response.choices[0].message.content.strip()
+
+    # Remove any unwanted characters and ensure valid JSON
+    if gpt_output.startswith('[') and gpt_output.endswith(']'):
+        return gpt_output
+    else:
+        # Attempt to fix common formatting issues
+        try:
+            json_start = gpt_output.index('[')
+            json_end = gpt_output.rindex(']') + 1
+            gpt_output = gpt_output[json_start:json_end]
+            return gpt_output
+        except ValueError:
+            print("Failed to identify valid JSON array in GPT response.")
+            return None
 
 def wrap_in_main_bracket(data):
-    # Wrap the JSONL data within one main curly bracket
-    wrapped_data = {"text": "{" + ', '.join(data.strip().splitlines()) + "}"}
+    # Attempt to parse the response text as a JSON array
+    try:
+        json_objects = json.loads(data)
+    except json.JSONDecodeError as e:
+        print(f"Error parsing JSON: {e}")
+        return None
+
+    # Wrap the list of JSON objects in a main object
+    wrapped_data = {"text": json_objects}
     return wrapped_data
 
 if __name__ == "__main__":
@@ -66,9 +88,12 @@ if __name__ == "__main__":
         if content:
             gpt_response = asyncio.run(process_with_gpt(content))
             wrapped_response = wrap_in_main_bracket(gpt_response)
-            with open('output.jsonl', 'w') as f:
-                f.write(json.dumps(wrapped_response))
-            print("Content fetched and saved to output.jsonl")
+            if wrapped_response:
+                with open('output.jsonl', 'w') as f:
+                    f.write(json.dumps(wrapped_response))
+                print("Content fetched and saved to output.jsonl")
+            else:
+                print("Failed to wrap GPT response.")
         else:
             print("Failed to fetch content.")
     except Exception as e:
