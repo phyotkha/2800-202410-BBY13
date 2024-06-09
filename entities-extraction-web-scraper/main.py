@@ -109,6 +109,7 @@ async def scrape_batch(urls):
     return results
 
 
+
 def load_checkpoint():
     if os.path.exists(CHECKPOINT_FILE):
         with open(CHECKPOINT_FILE, 'r') as f:
@@ -117,15 +118,11 @@ def load_checkpoint():
         processed_urls = set()
     return processed_urls
 
+
 def save_checkpoint(url):
-    if not os.path.exists(CHECKPOINT_FILE):
-        with open(CHECKPOINT_FILE, 'w') as f:
-            f.write(url + '\n')
-    else:
-        with open(CHECKPOINT_FILE, 'r+') as f:
-            processed_urls = set(f.read().splitlines())
-            if url not in processed_urls:
-                f.write(url + '\n')
+    with open(CHECKPOINT_FILE, 'a') as f:
+        f.write(url + '\n')
+
 
 
 
@@ -146,13 +143,15 @@ def main():
         urls = file.read().splitlines()
 
     processed_urls = load_checkpoint()
+    print(f"Processed URLs: {len(processed_urls)}")
+
     urls_to_process = [url for url in urls if url not in processed_urls]
     total_urls = len(urls_to_process)
     print(f"Total URLs to process: {total_urls}")
 
     # Process URLs in batches
     for i in range(0, total_urls, BATCH_SIZE):
-        batch_urls = urls[i:i + BATCH_SIZE]
+        batch_urls = urls_to_process[i:i + BATCH_SIZE]
         print(f"Processing batch {i//BATCH_SIZE + 1}/{(total_urls + BATCH_SIZE - 1) // BATCH_SIZE}")
 
         results = asyncio.run(scrape_batch(batch_urls))
@@ -167,3 +166,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
