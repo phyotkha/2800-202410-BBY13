@@ -14,34 +14,34 @@ openai_api_key = os.getenv("OPENAI_API_KEY")
 
 # Define the batch size
 BATCH_SIZE = 5
+CHECKPOINT_FILE = "checkpoint.txt"
+
+SAMPLE_OUTPUT = """
+{"text": "{\"section\": \"About BCIT\", \"subsections\": [{\"title\": \"Visit Us\", \"url\": \"https://www.bcit.ca/about/visit/\"}, {\"title\": \"Our Schools\", \"url\": \"https://www.bcit.ca/about/schools/\"}, {\"title\": \"Community\", \"url\": \"https://www.bcit.ca/community/\"}, {\"title\": \"Leadership & Vision\", \"url\": \"https://www.bcit.ca/about/leadership-vision/\"}, {\"title\": \"News & Events\", \"url\": \"https://www.bcit.ca/news-events/\"}, {\"title\": \"Careers at BCIT\", \"url\": \"https://www.bcit.ca/careers/\"}]}"}
+"""
 
 async def fetch_content(url):
     # Prepend the URL with Jina AI Reader prefix
     reader_url = f"https://r.jina.ai/{url}"
     response = requests.get(reader_url)
     if response.status_code == 200:
-        try:
-            return response.json()
-        except json.JSONDecodeError:
-            # Handle non-JSON response by processing text
-            print(f"Received response from {url} is not in JSON format.")
-            return response.text
+        return response.text
     else:
-        print(f"Failed to fetch content from {url}")
-        response.raise_for_status()
+        print(f"Failed to fetch content from {url} with status code {response.status_code}")
+        return None
 
-async def process_with_gpt(content):
+async def process_with_gpt(content, url):
     client = AsyncOpenAI(api_key=openai_api_key)
 
     # Send content to GPT model for processing
     messages = [
-        {"role": "system", "content": "You are a helpful assistant."},
-        {"role": "user", "content": (
-            "You are given the following content fetched from a webpage. "
-            "Please format it into a valid JSON object with relevant data. "
+        {"role": "system", "content": (
+            "You are a helpful assistant. Here is a sample output to follow for formatting the content:\n"
+            f"{SAMPLE_OUTPUT}\n\n"
+            "Now, please format the following content fetched from a webpage into a valid JSON object with relevant data. "
             "Ensure there are no extraneous characters and the output is valid JSON.\n\n"
             f"{content}\n\n"
-            "Return the content as a JSON object."
+            "Return the content as a JSON object without wrapping it in additional text or quotes."
         )}
     ]
 
@@ -54,13 +54,23 @@ async def process_with_gpt(content):
 
     gpt_output = response.choices[0].message.content.strip()
 
+    # Print the raw output for debugging
+    # print(f"Raw GPT output for {url}:\n{gpt_output}\n")
+
     # Remove any unwanted characters and ensure valid JSON
     try:
+        # Attempt to remove any wrapping "text": "" if present
+        if gpt_output.startswith('{"text":'):
+            json_start = gpt_output.index('{', gpt_output.index(':') + 1)
+            json_end = gpt_output.rindex('}')
+            gpt_output = gpt_output[json_start:json_end + 1]
+
         json_object = json.loads(gpt_output)
         return json_object
     except json.JSONDecodeError:
-        print("Failed to identify valid JSON object in GPT response.")
+        print(f"Failed to identify valid JSON object in GPT response for {url}:\n{gpt_output}")
         return None
+
 
 async def scrape_batch(urls):
     results = []
@@ -68,24 +78,37 @@ async def scrape_batch(urls):
         start_time = time.time()
         content = await fetch_content(url)
         if content:
-            gpt_response = await process_with_gpt(content)
+            gpt_response = await process_with_gpt(content, url)
             if gpt_response:
                 wrapped_response = {"text": gpt_response}
                 results.append(wrapped_response)
                 end_time = time.time()
                 print(f"Successfully scraped {url} in {end_time - start_time:.2f} seconds.")
+                # Save the checkpoint
+                with open(CHECKPOINT_FILE, 'a') as f:
+                    f.write(url + '\n')
             else:
                 print(f"Failed to wrap GPT response for {url}")
         else:
             print(f"Failed to fetch content from {url}")
     return results
 
+def load_checkpoint():
+    if os.path.exists(CHECKPOINT_FILE):
+        with open(CHECKPOINT_FILE, 'r') as f:
+            processed_urls = set(f.read().splitlines())
+    else:
+        processed_urls = set()
+    return processed_urls
+
 def main():
     # Load URLs from file
     with open('urls_list.txt', 'r') as file:
         urls = file.read().splitlines()
 
-    total_urls = len(urls)
+    processed_urls = load_checkpoint()
+    urls_to_process = [url for url in urls if url not in processed_urls]
+    total_urls = len(urls_to_process)
     print(f"Total URLs to process: {total_urls}")
 
     # Process URLs in batches
