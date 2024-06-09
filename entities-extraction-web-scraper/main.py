@@ -30,6 +30,20 @@ async def fetch_content(url):
         print(f"Failed to fetch content from {url} with status code {response.status_code}")
         return None
 
+def split_content(content, max_length=2000):
+    """
+    Splits the content into smaller chunks to fit within the token limit.
+    """
+    content_chunks = []
+    while len(content) > max_length:
+        split_index = content.rfind(' ', 0, max_length)
+        if split_index == -1:
+            split_index = max_length
+        content_chunks.append(content[:split_index])
+        content = content[split_index:]
+    content_chunks.append(content)
+    return content_chunks
+
 async def process_with_gpt(content, url):
     client = AsyncOpenAI(api_key=openai_api_key)
 
@@ -39,7 +53,7 @@ async def process_with_gpt(content, url):
             "You are a helpful assistant. Here is a sample output to follow for formatting the content:\n"
             f"{SAMPLE_OUTPUT}\n\n"
             "Now, please format the following content fetched from a webpage into a valid JSON object with relevant data. "
-            "Ensure there are no extraneous characters and the output is valid JSON.\n\n"
+            "Ensure there are no extraneous characters and the output is valid JSON. Use consistent field names as shown in the sample.\n\n"
             f"{content}\n\n"
             "Return the content as a JSON object without wrapping it in additional text or quotes."
         )}
@@ -49,26 +63,24 @@ async def process_with_gpt(content, url):
         model="gpt-3.5-turbo-0125",
         messages=messages,
         max_tokens=2048,
-        temperature=0.1,
+        temperature=0.0,  # Set temperature to 0.0 for consistent responses
     )
 
     gpt_output = response.choices[0].message.content.strip()
 
     # Print the raw output for debugging
-    print(f"Raw GPT output for {url}:\n{gpt_output}\n")
+    # print(f"Raw GPT output for {url}:\n{gpt_output}\n")
 
-    # Remove any unwanted characters and ensure valid JSON
-    try:
-        # Attempt to remove any wrapping "text": "" if present
-        if gpt_output.startswith('{"text":'):
-            json_start = gpt_output.index('{', gpt_output.index(':') + 1)
-            json_end = gpt_output.rindex('}')
-            gpt_output = gpt_output[json_start:json_end + 1]
-
-        json_object = json.loads(gpt_output)
-        return json_object
-    except json.JSONDecodeError:
-        print(f"Failed to identify valid JSON object in GPT response for {url}:\n{gpt_output}")
+    # Check if the response starts with a valid JSON character
+    if gpt_output.startswith('{') or gpt_output.startswith('['):
+        try:
+            json_object = json.loads(gpt_output)
+            return json_object
+        except json.JSONDecodeError:
+            print(f"Failed to parse JSON object in GPT response for {url}:\n{gpt_output}")
+            return None
+    else:
+        print(f"Invalid JSON format in GPT response for {url}:\n{gpt_output}")
         return None
 
 async def scrape_batch(urls):
@@ -77,17 +89,22 @@ async def scrape_batch(urls):
         start_time = time.time()
         content = await fetch_content(url)
         if content:
-            gpt_response = await process_with_gpt(content, url)
-            if gpt_response:
-                wrapped_response = {"text": gpt_response}
-                results.append(wrapped_response)
-                end_time = time.time()
-                print(f"Successfully scraped {url} in {end_time - start_time:.2f} seconds.")
-                # Save the checkpoint
-                with open(CHECKPOINT_FILE, 'a') as f:
-                    f.write(url + '\n')
+            max_retries = 3
+            for attempt in range(max_retries):
+                gpt_response = await process_with_gpt(content, url)
+                if gpt_response:
+                    wrapped_response = {"text": gpt_response}
+                    results.append(wrapped_response)
+                    end_time = time.time()
+                    print(f"Successfully scraped {url} in {end_time - start_time:.2f} seconds.")
+                    # Save the checkpoint
+                    with open(CHECKPOINT_FILE, 'a') as f:
+                        f.write(url + '\n')
+                    break
+                else:
+                    print(f"Retry {attempt + 1} for {url}")
             else:
-                print(f"Failed to wrap GPT response for {url}")
+                print(f"Failed to wrap GPT response for {url} after {max_retries} attempts")
         else:
             print(f"Failed to fetch content from {url}")
     return results
