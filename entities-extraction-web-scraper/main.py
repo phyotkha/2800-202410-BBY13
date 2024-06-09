@@ -55,7 +55,7 @@ async def process_with_gpt(content, url):
     gpt_output = response.choices[0].message.content.strip()
 
     # Print the raw output for debugging
-    # print(f"Raw GPT output for {url}:\n{gpt_output}\n")
+    print(f"Raw GPT output for {url}:\n{gpt_output}\n")
 
     # Remove any unwanted characters and ensure valid JSON
     try:
@@ -70,7 +70,6 @@ async def process_with_gpt(content, url):
     except json.JSONDecodeError:
         print(f"Failed to identify valid JSON object in GPT response for {url}:\n{gpt_output}")
         return None
-
 
 async def scrape_batch(urls):
     results = []
@@ -101,7 +100,18 @@ def load_checkpoint():
         processed_urls = set()
     return processed_urls
 
+def clear_checkpoints_if_output_deleted():
+    if not os.path.exists('output.jsonl'):
+        if os.path.exists(CHECKPOINT_FILE):
+            os.remove(CHECKPOINT_FILE)
+            print("Checkpoint file deleted because output file does not exist. Starting fresh.")
+        else:
+            print("Output file does not exist, but no checkpoint file found. Starting fresh.")
+
 def main():
+    # Clear checkpoints if output.jsonl is deleted
+    clear_checkpoints_if_output_deleted()
+
     # Load URLs from file
     with open('urls_list.txt', 'r') as file:
         urls = file.read().splitlines()
