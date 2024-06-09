@@ -98,8 +98,7 @@ async def scrape_batch(urls):
                     end_time = time.time()
                     print(f"Successfully scraped {url} in {end_time - start_time:.2f} seconds.")
                     # Save the checkpoint
-                    with open(CHECKPOINT_FILE, 'a') as f:
-                        f.write(url + '\n')
+                    save_checkpoint(url)
                     break
                 else:
                     print(f"Retry {attempt + 1} for {url}")
@@ -109,6 +108,7 @@ async def scrape_batch(urls):
             print(f"Failed to fetch content from {url}")
     return results
 
+
 def load_checkpoint():
     if os.path.exists(CHECKPOINT_FILE):
         with open(CHECKPOINT_FILE, 'r') as f:
@@ -116,6 +116,18 @@ def load_checkpoint():
     else:
         processed_urls = set()
     return processed_urls
+
+def save_checkpoint(url):
+    if not os.path.exists(CHECKPOINT_FILE):
+        with open(CHECKPOINT_FILE, 'w') as f:
+            f.write(url + '\n')
+    else:
+        with open(CHECKPOINT_FILE, 'r+') as f:
+            processed_urls = set(f.read().splitlines())
+            if url not in processed_urls:
+                f.write(url + '\n')
+
+
 
 def clear_checkpoints_if_output_deleted():
     if not os.path.exists('output.jsonl'):
