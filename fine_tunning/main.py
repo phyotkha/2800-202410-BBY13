@@ -27,8 +27,8 @@ def load_model_and_tokenizer():
     model = AutoModelForCausalLM.from_pretrained(
         MODEL_PATH, 
         device_map='auto',
-        torch_dtype=torch.float16,
-        load_in_8bit=True
+        torch_dtype=torch.float16,  # Use float16 for mixed precision
+        load_in_8bit=True           # Load model in 8-bit precision to save memory
     )
 
     if num_gpus > 1:
@@ -62,16 +62,20 @@ Always be polite, professional, and eager to help.
 
 # Function to generate response (Modified for longer output)
 def generate_response(new_user_input):
-    start_preprocessing = time.time()
+    # print("Starting response generation workflow...")
     
-    # Combine system prompt and new user input (Removed conversation history)
+    # Preprocessing
+    start_preprocessing = time.time()
+    # print("Preprocessing step: Encoding input text...")
     input_text = SYSTEM_PROMPT + f"\nUser: {new_user_input}\nChatbot:"
     inputs = tokenizer.encode(input_text, return_tensors="pt").to(device)
-    
     end_preprocessing = time.time()
     preprocessing_time = end_preprocessing - start_preprocessing
+    print(f"Preprocessing completed in {preprocessing_time:.4f} seconds")
 
+    # Inference
     start_inference = time.time()
+    # print("Inference step: Generating response...")
     with torch.cuda.amp.autocast():  # Mixed precision context
         if num_gpus > 1:
             print("Performing inference on multiple GPUs...")
@@ -81,15 +85,18 @@ def generate_response(new_user_input):
             outputs = model.generate(inputs, max_length=750, num_return_sequences=1)
     end_inference = time.time()
     inference_time = end_inference - start_inference
-    
+    print(f"Inference completed in {inference_time:.4f} seconds")
+
+    # Postprocessing
     start_postprocessing = time.time()
+    # print("Postprocessing step: Decoding output text...")
     response = tokenizer.decode(outputs[0], skip_special_tokens=True)
     response_text = response.split("Chatbot:")[-1].strip()
-    
     end_postprocessing = time.time()
     postprocessing_time = end_postprocessing - start_postprocessing
+    # print(f"Postprocessing completed in {postprocessing_time:.4f} seconds")
 
-    # Print times to terminal
+    # Print detailed workflow logs
     print(f"Preprocessing time: {preprocessing_time:.4f} seconds")
     print(f"Inference time: {inference_time:.4f} seconds")
     print(f"Postprocessing time: {postprocessing_time:.4f} seconds")
@@ -106,18 +113,26 @@ if 'conversation_history' not in st.session_state:
 # User input
 user_input = st.text_input("You:", "")
 
-if st.button("Send"):
+send_button_disabled = st.session_state.get('send_button_disabled', False)
+
+if st.button("Send", disabled=send_button_disabled):
     if user_input:
-        # Generate response
-        response = generate_response(user_input)  # Modified to remove conversation history
-        
-        # Update conversation history
-        st.session_state.conversation_history.append({"user": user_input, "bot": response})
-        
-        # Display conversation
-        for i, chat in enumerate(st.session_state.conversation_history):
-            st.markdown(f'<div class="chat-message"><img src="./images/user_icon.png" class="user-icon"/><div class="user-message">{chat["user"]}</div></div>', unsafe_allow_html=True)
-            st.markdown(f'<div class="chat-message"><img src="./images/bot_icon.jpg" class="bot-icon"/><div class="bot-message">{chat["bot"]}</div></div>', unsafe_allow_html=True)
+        # Disable the send button
+        st.session_state.send_button_disabled = True
+        with st.spinner("Chatbot is typing..."):
+            # Generate response
+            response = generate_response(user_input)  # Modified to remove conversation history
+            
+            # Update conversation history
+            st.session_state.conversation_history.append({"user": user_input, "bot": response})
+            
+            # Re-enable the send button
+            st.session_state.send_button_disabled = False
+
+# Display conversation history
+for i, chat in enumerate(st.session_state.conversation_history):
+    st.markdown(f'<div class="chat-message"><img src="./images/user_icon.png" class="user-icon"/><div class="user-message">{chat["user"]}</div></div>', unsafe_allow_html=True)
+    st.markdown(f'<div class="chat-message"><img src="./images/bot_icon.jpg" class="bot-icon"/><div class="bot-message">{chat["bot"]}</div></div>', unsafe_allow_html=True)
 
 # Sidebar for model information
 st.sidebar.title("Model Information")
@@ -149,11 +164,11 @@ st.markdown("""
         }
         .bot-message {
             background-color: #F1F0F0;
-            text-align: left;
+            text-align: left.
         }
         .chat-container {
-            max-height: 400px;
-            overflow-y: auto;
+            max-height: 400px.
+            overflow-y: auto.
         }
     </style>
 """, unsafe_allow_html=True)
