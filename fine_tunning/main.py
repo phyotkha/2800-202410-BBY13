@@ -15,26 +15,33 @@ for file_name in required_files:
     file_path = os.path.join(MODEL_PATH, file_name)
     assert os.path.isfile(file_path), f"Required file not found: {file_path}"
 
-print("Initializing device configuration...")
+# Initialize device configuration
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 num_gpus = torch.cuda.device_count()
 print(f"Using {num_gpus} GPU(s): {[torch.cuda.get_device_name(i) for i in range(num_gpus)]}")
 
-print("Loading model with mixed precision...")
-model = AutoModelForCausalLM.from_pretrained(
-    MODEL_PATH, 
-    device_map='auto',
-    torch_dtype=torch.float16,
-    load_in_8bit=True
-)
+# Load model and tokenizer only once
+@st.cache_resource
+def load_model_and_tokenizer():
+    print("Loading model with mixed precision...")
+    model = AutoModelForCausalLM.from_pretrained(
+        MODEL_PATH, 
+        device_map='auto',
+        torch_dtype=torch.float16,
+        load_in_8bit=True
+    )
 
-if num_gpus > 1:
-    model = torch.nn.DataParallel(model)
-print("Model loaded successfully.")
+    if num_gpus > 1:
+        model = torch.nn.DataParallel(model)
+    print("Model loaded successfully.")
 
-print("Loading tokenizer...")
-tokenizer = AutoTokenizer.from_pretrained(MODEL_PATH)
-print("Tokenizer loaded successfully.")
+    print("Loading tokenizer...")
+    tokenizer = AutoTokenizer.from_pretrained(MODEL_PATH)
+    print("Tokenizer loaded successfully.")
+    
+    return model, tokenizer
+
+model, tokenizer = load_model_and_tokenizer()
 
 # System prompt used within the codebase
 SYSTEM_PROMPT = """
@@ -50,48 +57,43 @@ Use this template for your responses:
 - URL for more information: [URL]
 - Navigation instructions: "To find more information, start at the BCIT main page (https://www.bcit.ca). From there, navigate to [specific page] by [detailed navigation steps]."
 
-### Sample Response:
-**User**: "What are the main fields covered in BCIT's 'Applied & Natural Sciences' program?"
-**Chatbot**:
-- **Direct Answer**: The main fields covered in BCIT's "Applied & Natural Sciences" program are: Biotechnology, Forensic Science, Health Sciences, and Natural Sciences.
-- **URL for More Information**: For more information, visit the [Applied & Natural Sciences home page](https://www.bcit.ca/applied-natural-sciences/).
-- **Navigation Instructions**: To find more information, start at the BCIT main page (https://www.bcit.ca). From there, navigate to the Applied & Natural Sciences home page by clicking on the "Applied & Natural Sciences" link in the left-hand menu. Then, click on the "Programs & Courses" link in the top menu to view a list of all the programs and courses offered by the Applied & Natural Sciences faculty.
-
 Always be polite, professional, and eager to help.
 """
 
-# Function to generate response with profiling
+# Function to generate response (Modified for longer output)
 def generate_response(new_user_input):
+    start_preprocessing = time.time()
+    
+    # Combine system prompt and new user input (Removed conversation history)
     input_text = SYSTEM_PROMPT + f"\nUser: {new_user_input}\nChatbot:"
-    
-    start_time = time.time()
-    
-    # Preprocessing
-    pre_start = time.time()
     inputs = tokenizer.encode(input_text, return_tensors="pt").to(device)
-    pre_end = time.time()
-    preprocessing_time = pre_end - pre_start
-    print(f"Preprocessing time: {preprocessing_time:.2f} seconds")
     
-    # Inference
-    inf_start = time.time()
+    end_preprocessing = time.time()
+    preprocessing_time = end_preprocessing - start_preprocessing
+
+    start_inference = time.time()
     with torch.cuda.amp.autocast():  # Mixed precision context
-        outputs = model.module.generate(inputs, max_length=750, num_return_sequences=1) if num_gpus > 1 else model.generate(inputs, max_length=750, num_return_sequences=1)
-    inf_end = time.time()
-    inference_time = inf_end - inf_start
-    print(f"Inference time: {inference_time:.2f} seconds")
+        if num_gpus > 1:
+            print("Performing inference on multiple GPUs...")
+            outputs = model.module.generate(inputs, max_length=750, num_return_sequences=1)
+        else:
+            print("Performing inference on a single GPU or CPU...")
+            outputs = model.generate(inputs, max_length=750, num_return_sequences=1)
+    end_inference = time.time()
+    inference_time = end_inference - start_inference
     
-    # Postprocessing
-    post_start = time.time()
+    start_postprocessing = time.time()
     response = tokenizer.decode(outputs[0], skip_special_tokens=True)
     response_text = response.split("Chatbot:")[-1].strip()
-    post_end = time.time()
-    postprocessing_time = post_end - post_start
-    print(f"Postprocessing time: {postprocessing_time:.2f} seconds")
     
-    total_time = time.time() - start_time
-    print(f"Total time: {total_time:.2f} seconds")
-    
+    end_postprocessing = time.time()
+    postprocessing_time = end_postprocessing - start_postprocessing
+
+    # Print times to terminal
+    print(f"Preprocessing time: {preprocessing_time:.4f} seconds")
+    print(f"Inference time: {inference_time:.4f} seconds")
+    print(f"Postprocessing time: {postprocessing_time:.4f} seconds")
+
     return response_text
 
 # Streamlit interface
@@ -107,15 +109,15 @@ user_input = st.text_input("You:", "")
 if st.button("Send"):
     if user_input:
         # Generate response
-        response = generate_response(user_input)
+        response = generate_response(user_input)  # Modified to remove conversation history
         
         # Update conversation history
         st.session_state.conversation_history.append({"user": user_input, "bot": response})
         
         # Display conversation
         for i, chat in enumerate(st.session_state.conversation_history):
-            st.markdown(f'<div class="chat-message"><img src="user-icon.png" class="user-icon"/><div class="user-message">{chat["user"]}</div></div>', unsafe_allow_html=True)
-            st.markdown(f'<div class="chat-message"><img src="bot-icon.png" class="bot-icon"/><div class="bot-message">{chat["bot"]}</div></div>', unsafe_allow_html=True)
+            st.markdown(f'<div class="chat-message"><img src="./images/user_icon.png" class="user-icon"/><div class="user-message">{chat["user"]}</div></div>', unsafe_allow_html=True)
+            st.markdown(f'<div class="chat-message"><img src="./images/bot_icon.jpg" class="bot-icon"/><div class="bot-message">{chat["bot"]}</div></div>', unsafe_allow_html=True)
 
 # Sidebar for model information
 st.sidebar.title("Model Information")
@@ -155,5 +157,3 @@ st.markdown("""
         }
     </style>
 """, unsafe_allow_html=True)
-
-# No need to explicitly run Streamlit; it is handled by the `streamlit run` command
